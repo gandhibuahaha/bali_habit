@@ -1,0 +1,11 @@
+# File rahasia
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+
+# File sistem operasi
+.DS_Store
+Thumbs.db

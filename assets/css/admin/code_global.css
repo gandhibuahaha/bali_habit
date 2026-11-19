@@ -1,0 +1,85 @@
+    /* Transisi untuk Sidebar dan Area Utama */
+    #sidebar, #mainContent {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* === DESKTOP BEHAVIOR (Collapse/Expand) === */
+    @media (min-width: 1024px) {
+      body.sidebar-collapsed #sidebar {
+        width: 88px;
+      }
+      body.sidebar-collapsed #mainContent {
+        margin-left: 88px;
+      }
+      /* Sembunyikan semua teks di sidebar saat dikecilkan */
+      body.sidebar-collapsed .sidebar-text,
+      body.sidebar-collapsed .sidebar-divider {
+        display: none;
+        opacity: 0;
+      }
+      /* Pusatkan ikon dan logo */
+      body.sidebar-collapsed .sidebar-logo-link {
+        justify-content: center;
+      }
+      body.sidebar-collapsed #sidebar .px-6 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      body.sidebar-collapsed .sidebar-menu-link {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+      }
+      body.sidebar-collapsed .sidebar-menu-link svg {
+        margin: 0;
+      }
+    }
+
+    /* === MOBILE BEHAVIOR (Slide In/Out) === */
+    @media (max-width: 1023px) {
+      body.sidebar-mobile-open #sidebar {
+        transform: translateX(0);
+      }
+      body.sidebar-mobile-open #mobileOverlay {
+        opacity: 1;
+        visibility: visible;
+      }
+    }
+
+
+          /* Aktifkan transisi antar-halaman bawaan browser modern */
+      @view-transition {
+        navigation: auto;
+      }
+
+      /* Keyframes untuk animasi masuk (Slide dari bawah/samping & Fade) */
+      @keyframes tabContentEnter {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Keyframes untuk animasi keluar saat tab diklik */
+      @keyframes tabContentExit {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+      }
+
+      .animate-tab-enter {
+        animation: tabContentEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+
+      .animate-tab-exit {
+        animation: tabContentExit 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
