@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profil - BaliHabit</title>
+  <link href="{{ asset('assets/css/output.css') }}" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col relative">
+
+  <!-- ================= NAV BAR (POST-LOGIN) ================= -->
+  <nav class="flex justify-between items-center px-4 sm:px-6 py-4 max-w-6xl mx-auto w-full sticky top-0 z-40 bg-slate-50/90 backdrop-blur-md relative">
+
+    <!-- KIRI: Logo & Nama Brand -->
+    <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 z-10 hover:opacity-80 transition cursor-pointer">
+      <div class="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 overflow-hidden p-0.5">
+        <img
+          src="{{ asset('assets/images/logo.png') }}"
+          alt="Logo BaliHabit"
+          class="w-full h-full rounded-full object-cover"
+        />
+      </div>
+      <span class="text-xl font-extrabold tracking-tight text-[#1F2937]">Bali<span class="text-[#10B981]">Habit</span></span>
+    </a>
+
+    <!-- TENGAH: Menu Desktop -->
+    <div class="hidden lg:flex items-center gap-8 text-sm font-bold">
+      <a href="{{ url('/dashboard') }}" class="text-slate-500 hover:text-[#10B981] transition">Beranda Orang Tua</a>
+      <a href="{{ url('/halaman-anak') }}" class="text-slate-500 hover:text-[#10B981] transition">Profil Anak</a>
+      <a href="{{ url('/profil-orangtua') }}" class="text-[#10B981] transition">Profil Saya</a>
+    </div>
+
+    <!-- KANAN: Tombol Keluar (Desktop) & Tombol Burger (Mobile) -->
+    <div class="flex items-center gap-3">
+      <button onclick="openLogoutModal()" type="button" class="hidden lg:flex items-center gap-2 text-slate-500 hover:text-red-500 font-bold text-sm transition cursor-pointer">
+        Keluar
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        </svg>
+      </button>
+
+      <button id="hamburgerBtn" class="lg:hidden p-2 rounded-full border border-gray-200 text-slate-600 bg-white shadow-sm hover:bg-gray-50 cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= KONTEN UTAMA ================= -->
+  <main class="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 flex-grow">
+
+    <!-- Tombol Kembali -->
+    <a href="{{ url('/profil-orangtua') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-[#10B981] font-bold text-sm mb-6 transition cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
+      Kembali ke Profil
+    </a>
+
+    <!-- KOTAK FORM UTAMA -->
+    <div class="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-6 sm:p-10">
+
+      <!-- Header Form -->
+      <div class="mb-8 text-center sm:text-left">
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Edit Profil</h1>
+        <p class="text-slate-500 text-sm leading-relaxed">
+          Perbarui informasi profil dan kontak Anda.
+        </p>
+      </div>
+
+      <!-- Area Ubah Foto -->
+      <div class="flex flex-col items-center justify-center mb-8">
+        <!-- Input file tersembunyi untuk membuka penyimpanan lokal -->
+        <input type="file" id="inputFotoProfil" name="foto_profil" accept="image/jpeg, image/png" class="hidden">
+
+        <div onclick="document.getElementById('inputFotoProfil').click()" class="relative mb-4 cursor-pointer hover:opacity-90 transition group" title="Klik untuk memilih foto">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 bg-emerald-50 rounded-[1.5rem] flex items-center justify-center border-2 border-emerald-100 overflow-hidden">
+            <img id="previewFotoProfil" src="" alt="Foto Profil" class="hidden w-full h-full object-cover">
+            <svg id="defaultIconProfil" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-[#10B981]">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+          </div>
+          <div class="absolute -bottom-2 -right-2 bg-[#10B981] rounded-full p-1 border-2 border-white text-white shadow-sm transition-transform group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+        <button type="button" onclick="document.getElementById('inputFotoProfil').click()" class="border border-gray-200 text-[#10B981] text-xs font-bold px-5 py-2.5 rounded-full flex items-center gap-2 hover:bg-emerald-50 transition shadow-sm mb-1.5 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
+          Ubah Foto
+        </button>
+        <p id="fotoErrorText" class="hidden text-[11px] text-red-500 font-bold mb-1"></p>
+        <p class="text-[11px] text-slate-400">Format JPG atau PNG (Maks. 2MB)</p>
+      </div>
+
+      <!-- FORM PENGISIAN -->
+      <form id="formEditProfil" class="flex flex-col gap-6">
+        @csrf
+
+        <!-- Input Nama Lengkap -->
+        <div>
+          <label class="block text-sm font-bold text-[#1F2937] mb-2">
+            Nama Lengkap Orang Tua <span class="text-red-500">*</span>
+          </label>
+          <input type="text" name="nama_lengkap" value="Satya Devi" required class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+        </div>
+
+        <!-- Input Email -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-sm font-bold text-[#1F2937]">
+              Alamat Email <span class="text-red-500">*</span>
+            </label>
+            <span class="bg-emerald-100 text-[#10B981] text-[10px] font-extrabold px-2.5 py-1 rounded-md flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>
+              Terverifikasi
+            </span>
+          </div>
+          <input type="email" name="email" value="satyadevi@gmail.com" required class="w-full bg-[#F8FAFC] border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-600 font-medium focus:outline-none transition shadow-sm" readonly>
+          <p class="text-xs text-slate-400 mt-2">Digunakan untuk menerima notifikasi laporan capaian anak.</p>
+        </div>
+
+        <!-- Input Nomor Telepon -->
+        <div>
+          <label class="block text-sm font-bold text-[#1F2937] mb-2">
+            Nomor WhatsApp / Telepon
+          </label>
+          <div class="flex border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#10B981] focus-within:ring-1 focus-within:ring-[#10B981] transition shadow-sm">
+            <div class="bg-gray-50 px-4 flex items-center justify-center border-r border-gray-200 select-none">
+               <span class="text-[10px] font-extrabold text-slate-500 mr-1.5">ID</span>
+               <span class="text-sm font-bold text-slate-700">+62</span>
+            </div>
+            <input type="tel" name="no_telepon" value="812-3456-7890" class="flex-1 w-full bg-white px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none placeholder:text-slate-400">
+          </div>
+          <p class="text-xs text-slate-400 mt-2">Untuk ringkasan kebiasaan harian via WhatsApp.</p>
+        </div>
+
+        <!-- ================= TOMBOL AKSI ================= -->
+        <div class="flex flex-col sm:flex-row gap-4 mt-6">
+          <button type="submit" class="w-full sm:w-1/2 bg-[#10B981] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 hover:bg-[#059669] transition shadow-md cursor-pointer order-1 sm:order-2">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+            Simpan Perubahan
+          </button>
+
+          <!-- Tombol Batal -->
+          <a href="{{ url('/profil-orangtua') }}" class="w-full sm:w-1/2 bg-white border border-transparent text-slate-500 font-bold py-3.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-center cursor-pointer order-2 sm:order-1">
+            Batal
+          </a>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+<!-- ================= POPUP MODAL KONFIRMASI SIMPAN ================= -->
+  <div id="saveModal" class="fixed inset-0 z-[70] hidden">
+    <div id="saveBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+
+    <div class="flex items-center justify-center min-h-screen px-4 py-8 text-center sm:p-0 pointer-events-none">
+      <div id="saveModalBox" class="relative bg-white rounded-[2rem] text-left overflow-hidden shadow-2xl transform transition-all my-8 max-w-[340px] w-full p-6 sm:p-8 opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 duration-300 pointer-events-auto">
+
+        <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-emerald-50 mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-8 w-8 text-[#10B981]">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <div class="text-center">
+          <h3 class="text-xl font-extrabold text-[#1F2937] mb-2">Simpan Perubahan?</h3>
+          <p class="text-sm text-slate-500 leading-relaxed mb-7">
+            Apakah Anda yakin data profil Anda sudah benar?
+          </p>
+        </div>
+
+        <div class="flex flex-row gap-3">
+          <button id="btnBatalSimpan" type="button" onclick="toggleSaveModal(false)" class="flex-1 inline-flex justify-center items-center rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-gray-50 transition cursor-pointer">
+            Batal
+          </button>
+
+          <button id="btnYaSimpan" type="button" onclick="window.location.href='{{ url('/profil-orangtua') }}'" class="flex-1 inline-flex justify-center items-center gap-2 rounded-2xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer">
+            Ya, Simpan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-slate-50 pt-8 pb-12 mt-auto">
+    <div class="max-w-md mx-auto px-4 text-center">
+      <p class="text-slate-800 font-bold text-sm mb-1">
+        BaliHabit <span class="text-slate-400 font-normal mx-1">•</span> <span class="font-normal text-slate-500">© 2026</span>
+      </p>
+      <p class="text-slate-500 text-[11px] mb-4">Misi Kebaikan & Karakter Baik <span class="mx-1">•</span> Pulau Dewata</p>
+      <div class="flex justify-center gap-4 text-[11px] text-[#10B981] font-semibold">
+        <a href="#" class="hover:underline">Kebijakan Privasi</a>
+        <a href="#" class="hover:underline">Ketentuan Layanan</a>
+      </div>
+      <div class="flex justify-center gap-4 text-[11px] text-[#10B981] font-semibold mt-2.5">
+        <a href="{{ url('/halaman-bantuan') }}" class="hover:underline">Bantuan Ayah & Bunda</a>
+        <a href="{{ url('/admin/login') }}" class="hover:underline">Masuk sebagai Admin</a>
+      </div>
+    </div>
+  </footer>
+
+<!-- ================= POPUP MENU NAVIGASI (MOBILE) ================= -->
+  <div id="mobileMenu" class="fixed inset-0 z-[60] hidden lg:hidden">
+    <div id="menuBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+    <div id="menuContent" class="absolute top-4 left-4 right-4 bg-white rounded-3xl p-5 shadow-2xl transform -translate-y-[150%] transition-transform duration-300 flex flex-col gap-5">
+
+      <!-- Header Logo -->
+      <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+            <img src="{{ asset('assets/images/logo.png') }}" alt="Logo BaliHabit" class="w-full h-full rounded-full object-cover">
+          </div>
+          <div>
+            <h2 class="text-lg font-extrabold text-[#1F2937] tracking-tight">Bali<span class="text-[#10B981]">Habit</span></h2>
+            <p class="text-[10px] text-slate-500 font-medium">Menu Navigasi</p>
+          </div>
+        </a>
+        <button id="closeMenuBtn" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-slate-500 hover:bg-gray-200 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <!-- Menu Utama -->
+      <div class="flex flex-col gap-2">
+        <!-- Beranda Orang Tua -->
+        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+          Beranda Orang Tua
+        </a>
+
+        <!-- Profil Anak -->
+        <a href="{{ url('/halaman-anak') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.182 15.182a4.5 4.5 0 01-6.364 0M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75c0 .414-.168.75-.375.75S9 10.164 9 9.75 9.168 9 9.375 9s.375.336.375.75zm3.625 0c0 .414-.168.75-.375.75s-.375-.336-.375-.75.168-.75.375-.75.375.336.375.75z" />
+          </svg>
+          Profil Anak
+        </a>
+
+        <!-- Profil Saya (Menu Aktif) -->
+        <a href="{{ url('/profil-orangtua') }}" class="flex items-center gap-3 px-4 py-3 rounded-2xl text-[#10B981] bg-emerald-50 font-bold transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+          Profil Saya
+        </a>
+      </div>
+
+      <!-- Tombol Keluar Akun -->
+      <div class="mt-4 pt-2">
+        <button onclick="openLogoutModal()" type="button" class="w-full flex justify-center items-center gap-3 px-4 py-3.5 rounded-2xl text-red-500 font-bold border border-red-100 hover:bg-red-50 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" /></svg>
+          Keluar Akun
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= POPUP KONFIRMASI KELUAR ================= -->
+  <div id="logoutModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+    <!-- Latar Belakang Gelap -->
+    <div id="logoutBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Kotak Popup -->
+    <div id="logoutContent" class="bg-white rounded-[2rem] p-6 w-full max-w-[320px] relative z-10 transform scale-95 opacity-0 transition-all duration-300 flex flex-col items-center text-center shadow-2xl">
+
+      <!-- Ikon Peringatan -->
+      <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+        </svg>
+      </div>
+
+      <h3 class="text-xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Keluar Akun?</h3>
+      <p class="text-sm text-slate-500 mb-7 leading-relaxed">Apakah Anda yakin ingin keluar dari aplikasi BaliHabit?</p>
+
+      <div class="flex gap-3 w-full">
+        <!-- Tombol Batal -->
+        <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
+          Batal
+        </button>
+        <!-- Tombol Ya, Keluar -->
+        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+          Ya, Keluar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ asset('assets/js/script.js') }}"></script>
+  <script>
+    // Fungsi Ubah Foto dari Penyimpanan Lokal + Pratinjau
+    document.getElementById('inputFotoProfil').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      const errorText = document.getElementById('fotoErrorText');
+      const previewImg = document.getElementById('previewFotoProfil');
+      const defaultIcon = document.getElementById('defaultIconProfil');
+
+      errorText.classList.add('hidden');
+      if (!file) return;
+
+      // Validasi format JPG/PNG
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        errorText.textContent = 'Format file harus JPG atau PNG.';
+        errorText.classList.remove('hidden');
+        this.value = '';
+        return;
+      }
+
+      // Validasi ukuran maksimal 2MB
+      if (file.size > 2 * 1024 * 1024) {
+        errorText.textContent = 'Ukuran foto maksimal 2MB.';
+        errorText.classList.remove('hidden');
+        this.value = '';
+        return;
+      }
+
+      // Tampilkan pratinjau foto di kotak avatar
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        previewImg.src = event.target.result;
+        previewImg.classList.remove('hidden');
+        defaultIcon.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Modal Konfirmasi Simpan
+    document.getElementById('formEditProfil').addEventListener('submit', function(e) {
+      e.preventDefault();
+      toggleSaveModal(true);
+    });
+
+    function toggleSaveModal(show) {
+      const modal = document.getElementById('saveModal');
+      const backdrop = document.getElementById('saveBackdrop');
+      const box = document.getElementById('saveModalBox');
+
+      if(show) {
+        modal.classList.remove('hidden');
+        void modal.offsetWidth;
+        backdrop.classList.remove('opacity-0');
+        box.classList.remove('opacity-0', 'translate-y-4', 'sm:scale-95');
+        box.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+      } else {
+        backdrop.classList.add('opacity-0');
+        box.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
+        box.classList.add('opacity-0', 'translate-y-4', 'sm:scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bantuan Ayah & Bunda - BaliHabit</title>
+  <link href="{{ asset('assets/css/output.css') }}" rel="stylesheet">
+</head>
+<body class="bg-[#F8F7F4] text-[#1F2937] min-h-screen flex flex-col justify-between selection:bg-emerald-100 selection:text-emerald-800">
+
+  <!-- ================= NAVBAR / HEADER ================= -->
+  <header class="w-full py-5 px-6 sm:px-8 bg-white border-b border-slate-100 flex items-center sticky top-0 z-50">
+    <!-- Kiri: Logo & Label -->
+    <a href="{{ url('/dashboard') }}" class="flex items-center gap-2.5 hover:opacity-80 transition">
+      <div class="w-8 h-8 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 overflow-hidden p-0.5">
+        <img src="{{ asset('assets/images/logo.png') }}" alt="Logo BaliHabit" class="w-full h-full rounded-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=B+H&color=10B981&background=ecfdf5'"/>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-base font-extrabold tracking-tight text-[#0F172A] leading-none">Bali<span class="text-[#10B981]">Habit</span></span>
+        <span class="text-[9px] font-bold text-slate-400 tracking-wider mt-0.5 uppercase">Pusat Bantuan</span>
+      </div>
+    </a>
+  </header>
+
+  <!-- ================= TOMBOL KEMBALI KIRI ATAS ================= -->
+  <div class="w-full px-6 sm:px-8 pt-6 md:pt-8">
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#10B981] transition cursor-pointer w-fit">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Kembali
+    </a>
+  </div>
+
+  <!-- ================= KONTEN UTAMA ================= -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pb-10 pt-4 md:pb-14 md:pt-6">
+    
+    <!-- Bagian Judul Utama -->
+    <div class="text-center max-w-2xl mx-auto mb-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 text-[#10B981] text-xs font-bold mb-3 border border-emerald-100 shadow-sm">
+        🌿 Pusat Bantuan & Layanan Orang Tua
+      </div>
+      <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1F2937] tracking-tight mb-3">
+        Bantuan Ayah & Bunda
+      </h1>
+      <p class="text-sm sm:text-base text-slate-500 leading-relaxed font-medium">
+        Temukan jawaban cepat seputar panduan aplikasi, pengelolaan misi anak, dan kebiasaan baik, atau kirimkan pertanyaan khusus Anda kepada tim kami.
+      </p>
+    </div>
+
+    <!-- ================= BAGIAN 1: PERTANYAAN TEMPLATE (FAQ ACCORDION) ================= -->
+    <section class="mb-12">
+      <h2 class="text-xl font-extrabold text-[#1F2937] mb-5 flex items-center gap-2">
+        <span class="w-2 h-6 bg-[#10B981] rounded-full inline-block"></span>
+        Pertanyaan yang Sering Diajukan (FAQ)
+      </h2>
+
+      <div class="space-y-3">
+        
+        <!-- FAQ Item 1 -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition">
+          <button onclick="toggleFaq(1)" class="w-full flex items-center justify-between p-5 text-left font-bold text-sm sm:text-base text-[#1F2937] hover:text-[#10B981] transition cursor-pointer">
+            <span>Bagaimana cara memantau progress misi harian anak?</span>
+            <svg id="faqIcon1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-slate-400 transition-transform duration-200">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="faqContent1" class="hidden px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-gray-50 pt-3">
+            Ayah & Bunda dapat masuk ke akun orang tua, lalu memilih menu <strong class="text-[#1F2937]">User Management</strong> atau dashboard utama. Di sana, grafik pencapaian, riwayat misi kebaikan, serta lencana yang dikumpulkan anak akan tampil secara *real-time*.
+          </div>
+        </div>
+
+        <!-- FAQ Item 2 -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition">
+          <button onclick="toggleFaq(2)" class="w-full flex items-center justify-between p-5 text-left font-bold text-sm sm:text-base text-[#1F2937] hover:text-[#10B981] transition cursor-pointer">
+            <span>Apa yang harus dilakukan jika anak lupa kata sandi akun mereka?</span>
+            <svg id="faqIcon2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-slate-400 transition-transform duration-200">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="faqContent2" class="hidden px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-gray-50 pt-3">
+            Orang tua dapat membantu mengatur ulang kata sandi melalui menu pengaturan akun di panel orang tua, atau menggunakan fitur <strong class="text-[#1F2937]">Lupa Kata Sandi</strong> pada halaman masuk menggunakan email terdaftar.
+          </div>
+        </div>
+
+        <!-- FAQ Item 3 -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition">
+          <button onclick="toggleFaq(3)" class="w-full flex items-center justify-between p-5 text-left font-bold text-sm sm:text-base text-[#1F2937] hover:text-[#10B981] transition cursor-pointer">
+            <span>Bagaimana sistem penilaian atau reward lencana diberikan?</span>
+            <svg id="faqIcon3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-slate-400 transition-transform duration-200">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="faqContent3" class="hidden px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-gray-50 pt-3">
+            Lencana dan poin kebaikan akan otomatis bertambah setelah anak menyelesaikan misi harian yang telah diverifikasi oleh sistem atau divalidasi langsung oleh orang tua melalui modul refleksi kebiasaan.
+          </div>
+        </div>
+
+        <!-- FAQ Item 4 -->
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden transition">
+          <button onclick="toggleFaq(4)" class="w-full flex items-center justify-between p-5 text-left font-bold text-sm sm:text-base text-[#1F2937] hover:text-[#10B981] transition cursor-pointer">
+            <span>Apakah cerita tradisional Bali di aplikasi aman untuk dibaca anak?</span>
+            <svg id="faqIcon4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-slate-400 transition-transform duration-200">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="faqContent4" class="hidden px-5 pb-5 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-gray-50 pt-3">
+            Sangat aman. Seluruh konten cerita fabel dan kearifan lokal Bali di BaliHabit telah dikurasi secara khusus untuk menanamkan nilai moral, etika, dan budi pekerti luhur bagi anak-anak.
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= BAGIAN 2: FORMULIR TULIS PERTANYAAN SENDIRI ================= -->
+    <section class="bg-white rounded-[2rem] border border-gray-100 shadow-md p-6 sm:p-10 relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-32 h-32 bg-emerald-50 rounded-full pointer-events-none blur-xl"></div>
+      
+      <div class="max-w-xl mb-6">
+        <h2 class="text-xl font-extrabold text-[#1F2937] mb-2">Masih Punya Kendala Lain?</h2>
+        <p class="text-xs sm:text-sm text-slate-500 font-medium">
+          Silakan tulis pertanyaan atau kendala Ayah & Bunda pada form di bawah ini. Tim kami akan merespons melalui email secepatnya.
+        </p>
+      </div>
+
+      <form id="helpForm" class="space-y-4">
+        @csrf
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Nama Lengkap -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1F2937] mb-1">Nama Ayah / Bunda</label>
+            <input type="text" id="parentName" name="nama" required placeholder="Contoh: Ibu Lestari" class="w-full bg-[#F6F5F2] border border-transparent rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-[#10B981] focus:bg-white outline-none transition placeholder:text-slate-400">
+          </div>
+          <!-- Email Kontak -->
+          <div>
+            <label class="block text-[11px] font-bold text-[#1F2937] mb-1">Email Aktif</label>
+            <input type="email" id="parentEmail" name="email" required placeholder="email@example.com" class="w-full bg-[#F6F5F2] border border-transparent rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-[#10B981] focus:bg-white outline-none transition placeholder:text-slate-400">
+          </div>
+        </div>
+
+        <!-- Kategori Kendala -->
+        <div>
+          <label class="block text-[11px] font-bold text-[#1F2937] mb-1">Kategori Kendala</label>
+          <select id="helpCategory" name="kategori" class="w-full bg-[#F6F5F2] border border-transparent rounded-xl px-4 py-3 text-xs sm:text-sm focus:border-[#10B981] focus:bg-white outline-none transition cursor-pointer text-slate-700">
+            <option value="Akun & Login">Masalah Akun & Masuk / Login</option>
+            <option value="Misi & Poin">Kendala Misi & Perhitungan Poin Anak</option>
+            <option value="Cerita & Fitur">Saran / Pertanyaan Terkait Cerita & Fitur</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <!-- Tulis Pesan / Pertanyaan Sendiri -->
+        <div>
+          <label class="block text-[11px] font-bold text-[#1F2937] mb-1">Tulis Pertanyaan / Pesan Anda</label>
+          <textarea id="parentMessage" name="pesan" rows="4" required placeholder="Jelaskan kendala atau pertanyaan yang Ayah & Bunda hadapi secara detail..." class="w-full bg-[#F6F5F2] border border-transparent rounded-xl p-4 text-xs sm:text-sm focus:border-[#10B981] focus:bg-white outline-none transition resize-none placeholder:text-slate-400"></textarea>
+        </div>
+
+        <!-- Tombol Kirim -->
+        <button type="submit" class="w-full bg-[#10B981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-sm text-sm cursor-pointer flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+          </svg>
+          Kirim Pesan Bantuan
+        </button>
+      </form>
+
+      <!-- Notifikasi Sukses Terkirim (Hidden Default) -->
+      <div id="successAlert" class="hidden mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs sm:text-sm font-semibold text-center animate-fade-in">
+        ✨ Terima kasih! Pesan Ayah & Bunda berhasil dikirim. Tim BaliHabit akan segera menghubungi melalui email.
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER UTAMA (KONSISTEN) ================= -->
+  <footer class="bg-slate-50 pt-10 pb-16 mt-auto border-t border-gray-100">
+    <div class="max-w-md mx-auto px-4 text-center flex flex-col items-center gap-3">
+      
+      <!-- Baris 1: Nama Brand & Tahun -->
+      <p class="text-[#1F2937] font-bold text-sm tracking-tight">
+        BaliHabit <span class="text-slate-300 font-normal mx-1.5">•</span> <span class="font-semibold text-slate-500">© 2026</span>
+      </p>
+      
+      <!-- Baris 2: Tautan Menu (Baris Pertama) -->
+      <div class="flex flex-wrap justify-center items-center gap-2 text-xs font-bold text-[#10B981]">
+        <a href="#" class="hover:underline transition">Kebijakan Privasi</a>
+        <span class="text-slate-300">•</span>
+        <a href="#" class="hover:underline transition">Ketentuan Layanan</a>
+      </div>
+
+      <!-- Baris 3: Tautan Menu (Baris Kedua) -->
+      <div class="flex flex-wrap justify-center items-center gap-2 text-xs font-bold text-[#10B981]">
+        <a href="{{ url('/bantuan') }}" class="hover:underline transition">Bantuan Ayah & Bunda</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url('/admin/login') }}" class="hover:underline transition">Masuk sebagai Admin</a>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPT INTERAKSI (FAQ & FORM SUBMIT) ================= -->
+  <script>
+    // Fungsi Dropdown Akordion FAQ Template
+    function toggleFaq(id) {
+      const content = document.getElementById(`faqContent${id}`);
+      const icon = document.getElementById(`faqIcon${id}`);
+      
+      if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+      } else {
+        content.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+      }
+    }
+
+    // Simpan & Kirim Pesan Bantuan ke Notifikasi Admin
+    document.getElementById('helpForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // 1. Ambil nilai dari input form
+      const nama = document.getElementById('parentName').value.trim();
+      const email = document.getElementById('parentEmail').value.trim();
+      const kategori = document.getElementById('helpCategory').value;
+      const pesan = document.getElementById('parentMessage').value.trim();
+
+      // 2. Simpan ke localStorage untuk dibaca oleh lonceng notifikasi admin
+      const daftarPesan = JSON.parse(localStorage.getItem('balihabit_help_messages')) || [];
+      const pesanBaru = {
+        id: Date.now(),
+        nama: nama,
+        email: email,
+        kategori: kategori,
+        pesan: pesan,
+        waktu: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WITA',
+        dibaca: false
+      };
+      daftarPesan.unshift(pesanBaru);
+      localStorage.setItem('balihabit_help_messages', JSON.stringify(daftarPesan));
+      
+      // 3. Tampilkan alert sukses
+      const successAlert = document.getElementById('successAlert');
+      successAlert.classList.remove('hidden');
+      
+      // 4. Reset form
+      this.reset();
+
+      // 5. Sembunyikan alert otomatis setelah 5 detik
+      setTimeout(() => {
+        successAlert.classList.add('hidden');
+      }, 5000);
+    });
+  </script>
+
+</body>
+</html>

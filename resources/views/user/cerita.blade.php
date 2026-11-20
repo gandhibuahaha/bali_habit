@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cerita Bali - BaliHabit</title>
+  <link href="{{ asset('assets/css/output.css') }}" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased">
+
+ <!-- ================= NAV BAR ================= -->
+  <nav class="flex justify-between items-center px-6 py-4 max-w-6xl mx-auto w-full bg-white/80 backdrop-blur-md sticky top-0 z-40">
+
+    <a href="{{ url('/') }}" class="flex items-center gap-2.5 z-10 hover:opacity-80 transition cursor-pointer">
+      <div class="w-9 h-9 bg-emerald-50 rounded-full flex items-center justify-center border border-emerald-100 overflow-hidden p-0.5">
+        <img
+          src="{{ asset('assets/images/logo.png') }}"
+          alt="Logo BaliHabit"
+          class="w-full h-full rounded-full object-cover"
+        />
+      </div>
+      <span class="text-xl font-extrabold tracking-tight text-[#1F2937]">Bali<span class="text-[#10B981]">Habit</span></span>
+    </a>
+
+    <div class="hidden lg:flex items-center gap-8 text-sm font-bold text-slate-500">
+      <a href="{{ url('/') }}" class="hover:text-[#10B981] transition">Beranda</a>
+      <a href="{{ url('/cerita') }}" class="text-[#10B981] transition">Cerita</a>
+      <a href="{{ url('/tentang') }}" class="hover:text-[#10B981] transition">Tentang Kami</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="{{ url('/login') }}" class="hidden sm:block px-5 py-2 rounded-full border border-gray-200 text-sm font-semibold hover:bg-gray-50 hover:text-[#10B981] transition bg-white">
+        Masuk
+      </a>
+
+      <a href="{{ url('/registrasi') }}" class="hidden sm:block px-5 py-2 rounded-full bg-[#10B981] text-white text-sm font-semibold hover:bg-[#059669] transition shadow-sm">
+        Daftar
+      </a>
+
+      <button id="hamburgerBtn" class="lg:hidden p-2 rounded-full border border-emerald-100 text-[#10B981] bg-emerald-50 hover:bg-emerald-100 transition cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ================= KONTEN UTAMA ================= -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pb-12">
+
+    <!-- Header Halaman -->
+    <div class="text-center mb-10">
+      <h1 class="text-3xl font-extrabold text-slate-900 mb-3">Cerita Bali</h1>
+      <p class="text-slate-500 text-sm max-w-sm mx-auto leading-relaxed">Menanam Cerita. Menumbuhkan Kebiasaan, Menjaga Alam Bali</p>
+    </div>
+
+    <!-- Grid Kartu Cerita -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-12">
+
+      <!-- Kartu Cerita 1 -->
+      <div class="border border-emerald-100/50 rounded-2xl p-2 md:p-3 shadow-sm hover:shadow-md transition bg-white flex flex-col h-full">
+        <div class="w-full h-32 md:h-40 bg-gray-200 rounded-xl mb-3 overflow-hidden">
+          <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/alu_puuh.png') }}')"></div>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">I Alu Teken I Kedis Puuh</h3>
+        <p class="text-[10px] md:text-xs text-slate-500 mb-4 flex-grow">Tentang kecerdikan menjaga rumah dan alam.</p>
+        <a href="{{ url('/detail-cerita?cerita=alu-puuh') }}" class="w-full py-2 rounded-full bg-emerald-50 text-[#10B981] font-bold text-xs flex justify-center items-center gap-1 hover:bg-emerald-100 transition mt-auto">
+          Lihat Cerita
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </a>
+      </div>
+
+      <!-- Kartu Cerita 2 -->
+      <div class="border border-emerald-100/50 rounded-2xl p-2 md:p-3 shadow-sm hover:shadow-md transition bg-white flex flex-col h-full">
+        <div class="w-full h-32 md:h-40 bg-gray-200 rounded-xl mb-3 overflow-hidden">
+          <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lutung_kekua.png') }}')"></div>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">I Lutung Teken I Kekua</h3>
+        <p class="text-[10px] md:text-xs text-slate-500 mb-4 flex-grow">Tentang kepedulian dan menjaga lingkungan.</p>
+        <a href="{{ url('/detail-cerita?cerita=lutung-kekua') }}" class="w-full py-2 rounded-full bg-emerald-50 text-[#10B981] font-bold text-xs flex justify-center items-center gap-1 hover:bg-emerald-100 transition mt-auto">
+          Lihat Cerita
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </a>
+      </div>
+
+      <!-- Kartu Cerita 3 -->
+      <div class="border border-emerald-100/50 rounded-2xl p-2 md:p-3 shadow-sm hover:shadow-md transition bg-white flex flex-col h-full">
+        <div class="w-full h-32 md:h-40 bg-gray-200 rounded-xl mb-3 overflow-hidden">
+          <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lelipi_selem.png') }}')"></div>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">Lipi Selem Bukit</h3>
+        <p class="text-[10px] md:text-xs text-slate-500 mb-4 flex-grow">Pentingnya alam dan lingkungan.</p>
+        <a href="{{ url('/detail-cerita?cerita=lipi-selem') }}" class="w-full py-2 rounded-full bg-emerald-50 text-[#10B981] font-bold text-xs flex justify-center items-center gap-1 hover:bg-emerald-100 transition mt-auto">
+          Lihat Cerita
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </a>
+      </div>
+
+      <!-- Kartu Cerita 4 -->
+      <div class="border border-emerald-100/50 rounded-2xl p-2 md:p-3 shadow-sm hover:shadow-md transition bg-white flex flex-col h-full">
+        <div class="w-full h-32 md:h-40 bg-gray-200 rounded-xl mb-3 overflow-hidden">
+          <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lutung_pecalang.png') }}')"></div>
+        </div>
+        <h3 class="font-bold text-slate-900 text-sm leading-tight mb-1">I Lutung Dadi Pecalang</h3>
+        <p class="text-[10px] md:text-xs text-slate-500 mb-4 flex-grow">Penjaga yang berusaha memahami masalah.</p>
+        <a href="{{ url('/detail-cerita?cerita=lutung-pecalang') }}" class="w-full py-2 rounded-full bg-emerald-50 text-[#10B981] font-bold text-xs flex justify-center items-center gap-1 hover:bg-emerald-100 transition mt-auto">
+          Lihat Cerita
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Kotak CTA -->
+    <div class="bg-[#FFFDF4] border border-amber-100 rounded-3xl p-5 md:p-8 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+      <div class="w-full sm:w-1/3 h-32 md:h-40 bg-gray-200 rounded-2xl flex-shrink-0 overflow-hidden">
+        <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/ibuanak.png') }}')"></div>
+      </div>
+      <div class="text-center sm:text-left flex flex-col items-center sm:items-start w-full sm:w-2/3 mt-2 sm:mt-0">
+        <h2 class="text-lg md:text-xl font-bold text-slate-900 mb-2">Bersama Mendampingi Kebiasaan Baik Anak</h2>
+        <p class="text-slate-600 text-xs md:text-sm leading-relaxed mb-4">Orang tua dapat melihat perkembangan aktivitas anak, pencapaian bintang, dan lencana yang diperoleh.</p>
+         <a href="{{ url('/registrasi') }}" class="px-6 py-2 md:py-3 rounded-full bg-[#10B981] text-white font-semibold text-sm hover:bg-[#059669] transition shadow-sm">
+          Masuk sebagai Orang Tua
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-gray-50/50 pt-8 pb-12 mt-4 border-t border-gray-100">
+    <div class="max-w-6xl mx-auto px-4 text-center">
+      <p class="text-slate-800 font-bold text-sm mb-1">
+        BaliHabit <span class="text-slate-400 font-normal mx-1">•</span> <span class="font-normal text-slate-500">© 2026</span>
+      </p>
+      <div class="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-[#10B981] font-semibold">
+        <a href="#" class="hover:underline">Kebijakan Privasi</a>
+        <span class="text-slate-300">•</span>
+        <a href="#" class="hover:underline">Ketentuan Layanan</a>
+      </div>
+      <div class="flex flex-wrap justify-center gap-x-3 gap-y-2 text-xs text-[#10B981] font-semibold mt-2">
+        <a href="{{ url('/halaman-bantuan') }}" class="hover:underline">Bantuan Ayah & Bunda</a>
+        <span class="text-slate-300">•</span>
+        <a href="{{ url('/admin/login') }}" class="hover:underline">Masuk sebagai Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= POPUP MENU NAVIGASI (MOBILE) ================= -->
+  <div id="mobileMenu" class="fixed inset-0 z-[60] hidden lg:hidden">
+    <div id="menuBackdrop" class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 transition-opacity duration-300"></div>
+    <div id="menuContent" class="absolute top-4 left-4 right-4 bg-white rounded-[2rem] p-5 shadow-2xl transform -translate-y-[150%] transition-transform duration-300 flex flex-col">
+
+      <!-- Header (Logo Clickable + Tombol Close) -->
+      <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+        <a href="{{ url('/') }}" class="flex items-center gap-3 !bg-transparent hover:opacity-80 transition cursor-pointer">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+            <img src="{{ asset('assets/images/logo.png') }}" alt="Logo BaliHabit" class="w-full h-full rounded-full object-cover">
+          </div>
+          <div>
+            <h2 class="text-lg font-extrabold text-[#1F2937] tracking-tight">Bali<span class="text-[#10B981]">Habit</span></h2>
+            <p class="text-[10px] text-slate-500 font-medium">Menu Navigasi</p>
+          </div>
+        </a>
+        <button id="closeMenuBtn" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-slate-500 hover:bg-gray-200 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <a href="{{ url('/') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" /></svg>
+          Beranda
+        </a>
+        <a href="{{ url('/cerita') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[#10B981] bg-emerald-50 font-bold transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+          Cerita
+        </a>
+        <a href="{{ url('/tentang') }}" class="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-slate-500 font-bold hover:bg-slate-50 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" /></svg>
+          Tentang Kami
+        </a>
+      </div>
+      <div class="h-px bg-gray-100 my-5"></div>
+      <div class="flex flex-col gap-3">
+        <a href="{{ url('/login') }}" class="w-full text-center border-2 border-[#10B981] text-[#10B981] font-bold py-3.5 rounded-xl hover:bg-emerald-50 transition">Masuk</a>
+        <a href="{{ url('/registrasi') }}" class="w-full text-center bg-[#10B981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-md">Daftar</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ asset('assets/js/script.js') }}"></script>
+</body>
+</html>
