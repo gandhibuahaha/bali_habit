@@ -205,7 +205,7 @@ function initAdminNotifications() {
   wrapper.appendChild(bellBtn);
 
   const dropdownHTML = `
-    <div id="adminNotifMenu" style="display: none; width: 350px; max-width: 90vw; position: absolute; right: 0; top: 100%; margin-top: 12px; z-index: 999;" class="bg-white rounded-[20px] shadow-xl border border-slate-100 overflow-hidden">
+    <div id="adminNotifMenu" style="display: none; width: 21.875rem; max-width: 90vw; position: absolute; right: 0; top: 100%; margin-top: 0.75rem; z-index: 999;" class="bg-white rounded-[20px] shadow-xl border border-slate-100 overflow-hidden">
       <div class="flex justify-between items-center px-4 py-3.5 border-b border-slate-100 bg-slate-50">
         <div class="flex items-center gap-2">
           <span class="font-extrabold text-[13.5px] text-[#0F172A]">Pesan Bantuan</span>
@@ -215,7 +215,7 @@ function initAdminNotifications() {
           Tandai dibaca
         </button>
       </div>
-      <div id="adminNotifList" style="max-height: 320px; overflow-y: auto;" class="divide-y divide-slate-100"></div>
+      <div id="adminNotifList" style="max-height: 20rem; overflow-y: auto;" class="divide-y divide-slate-100"></div>
     </div>
   `;
   wrapper.insertAdjacentHTML('beforeend', dropdownHTML);

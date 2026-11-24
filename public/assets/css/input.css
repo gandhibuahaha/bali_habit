@@ -4,3 +4,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Scale the whole page with the window on wide screens, so zooming out keeps the layout.
+   Up to 1440px wide nothing changes; past that, 1rem grows with the window, up to 4x
+   (enough to hold the layout down to 33% zoom on a 1920px screen).
+   After rebuilding output.css, run `node scripts/px-to-rem.mjs` so pixel sizes in
+   arbitrary classes (text-[13px], w-[260px]...) become rem and scale too. */
+html {
+  font-size: clamp(100%, 100vw / 90, 400%);
+}
+

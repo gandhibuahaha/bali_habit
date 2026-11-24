@@ -6,10 +6,10 @@
     /* === DESKTOP BEHAVIOR (Collapse/Expand) === */
     @media (min-width: 1024px) {
       body.sidebar-collapsed #sidebar {
-        width: 88px;
+        width: 5.5rem;
       }
       body.sidebar-collapsed #mainContent {
-        margin-left: 88px;
+        margin-left: 5.5rem;
       }
       /* Sembunyikan semua teks di sidebar saat dikecilkan */
       body.sidebar-collapsed .sidebar-text,

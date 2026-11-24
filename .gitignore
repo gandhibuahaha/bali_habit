@@ -29,3 +29,7 @@ Thumbs.db
 # Additional environment protection
 .env.*
 !.env.example
+
+# graphify
+/graphify-out
+.graphify_*
