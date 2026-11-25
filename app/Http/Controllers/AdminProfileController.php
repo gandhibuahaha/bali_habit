@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class AdminProfileController extends Controller
@@ -66,6 +67,26 @@ class AdminProfileController extends Controller
                 'min:8',
                 'confirmed',
             ],
+
+            'photo' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:2048',
+            ],
+        ], [
+            // Pesan validasi dalam Bahasa Indonesia (ditampilkan di bawah tiap field).
+            'name.required' => 'Nama lengkap wajib diisi.',
+            'name.max' => 'Nama lengkap maksimal 100 karakter.',
+            'no_tlp.required' => 'Nomor telepon WhatsApp wajib diisi.',
+            'no_tlp.regex' => 'Nomor telepon tidak valid. Contoh: 0812-3456-7890.',
+            'no_tlp.unique' => 'Nomor telepon sudah dipakai akun lain.',
+            'password.min' => 'Kata sandi baru minimal 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'photo.image' => 'Format foto harus JPG atau PNG.',
+            'photo.mimes' => 'Format foto harus JPG atau PNG.',
+            'photo.max' => 'Ukuran foto maksimal 2MB.',
+            'photo.uploaded' => 'Foto gagal diunggah. Pastikan ukurannya maksimal 2MB.',
         ]);
 
         // Perbarui informasi dasar.
@@ -79,7 +100,18 @@ class AdminProfileController extends Controller
             );
         }
 
+        // Foto profil (opsional): simpan yang baru, hapus file lama setelah tersimpan.
+        $oldPhoto = null;
+        if ($request->hasFile('photo')) {
+            $oldPhoto = $user->profile_picture;
+            $user->profile_picture = $request->file('photo')->store('users', 'public');
+        }
+
         $user->save();
+
+        if ($oldPhoto) {
+            Storage::disk('public')->delete($oldPhoto);
+        }
 
         return redirect()
             ->route('admin.profile')

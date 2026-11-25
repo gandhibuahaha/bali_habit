@@ -127,8 +127,8 @@
         <div class="relative">
           <!-- Trigger Button -->
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm">PG</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">Ni Putu Gayatri</span>
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
           </button>
 
@@ -137,12 +137,12 @@
             
             <!-- User Info Header -->
             <div class="p-4 bg-white border-b border-slate-50 flex items-center gap-3">
-              <div class="w-11 h-11 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-sm flex-shrink-0">PG</div>
+              <div class="w-11 h-11 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-sm flex-shrink-0 overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
               <div class="flex flex-col min-w-0">
                 <div class="flex items-center gap-2 mb-0.5">
-                  <span class="text-[14px] font-extrabold text-[#0F172A] truncate">Ni Putu Gayatri</span>
+                  <span class="text-[14px] font-extrabold text-[#0F172A] truncate">{{ $admin->name }}</span>
                 </div>
-                <span class="text-[11.5px] font-medium text-slate-400 truncate">putu.gayatri@balihabit.id</span>
+                <span class="text-[11.5px] font-medium text-slate-400 truncate">{{ $admin->email }}</span>
               </div>
             </div>
             
@@ -177,6 +177,20 @@
           <p class="text-slate-500 text-[13.5px]">Kelola informasi pribadi, kredensial akun, dan hak akses administratif BaliHabit.</p>
         </div>
 
+        @if (session('status'))
+          <p class="bg-emerald-50 border border-emerald-100 text-[#10B981] text-[13px] font-bold rounded-[12px] px-4 py-3">{{ session('status') }}</p>
+        @endif
+
+        <form
+            id="adminProfileForm"
+            method="POST"
+            action="{{ route('admin.profile.update') }}"
+            enctype="multipart/form-data"
+            class="hidden"
+        >
+            @csrf
+        </form>
+
         <!-- Kartu Konten Utama -->
         <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-7 sm:p-10 flex flex-col gap-8 mt-2">
           
@@ -185,8 +199,8 @@
             <div class="flex items-center gap-5">
               <!-- Avatar Besar -->
               <div class="relative">
-                <div id="avatarContainer" class="w-20 h-20 rounded-full bg-[#10B981] text-white text-[24px] font-extrabold flex items-center justify-center shadow-md overflow-hidden bg-cover bg-center">
-                  <span id="avatarInitials">PG</span>
+                <div id="avatarContainer" class="w-20 h-20 rounded-full bg-[#10B981] text-white text-[24px] font-extrabold flex items-center justify-center shadow-md overflow-hidden bg-cover bg-center" @if ($adminPhoto) style="background-image: url('{{ $adminPhoto }}')" @endif>
+                  <span id="avatarInitials" @if ($adminPhoto) style="display: none" @endif>{{ $adminInitials }}</span>
                 </div>
                 <!-- Badge Ikon Kamera -->
                 <div onclick="document.getElementById('profileImageInput').click()" class="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full border border-slate-200 flex items-center justify-center text-slate-500 shadow-sm cursor-pointer hover:text-[#10B981] transition group">
@@ -197,8 +211,8 @@
                 </div>
               </div>
               <div>
-                <h2 class="text-[20px] font-extrabold text-[#0F172A]">Ni Putu Gayatri</h2>
-                <p class="text-[13px] text-slate-400 font-medium mt-0.5">Administrator Utama</p>
+                <h2 class="text-[20px] font-extrabold text-[#0F172A]">{{ $admin->name }}</h2>
+                <p class="text-[13px] text-slate-400 font-medium mt-0.5">Administrator</p>
               </div>
             </div>
 
@@ -211,8 +225,9 @@
             </button>
             
             <!-- Input File Tersembunyi -->
-            <input type="file" id="profileImageInput" class="hidden" accept="image/png, image/jpeg, image/jpg">
+            <input type="file" id="profileImageInput" name="photo" form="adminProfileForm" class="hidden" accept="image/png, image/jpeg, image/jpg">
           </div>
+          <p class="text-xs text-red-500 font-medium {{ $errors->has('photo') ? '' : 'hidden' }}">{{ $errors->first('photo') }}</p>
 
           <!-- Form Informasi Akun -->
           <div class="flex flex-col gap-6">
@@ -225,31 +240,39 @@
               <!-- Nama Lengkap -->
               <div class="flex flex-col gap-2">
                 <label class="text-[13px] font-bold text-[#1E293B]">Nama Lengkap <span class="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value="Ni Putu Gayatri" 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
+                <input
+                    type="text"
+                    name="name"
+                    form="adminProfileForm"
+                    value="{{ old('name', auth()->user()->name) }}"
+                    class="w-full border {{ $errors->has('name') ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }} rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
                 >
+                <p class="text-xs text-red-500 font-medium {{ $errors->has('name') ? '' : 'hidden' }}">{{ $errors->first('name') }}</p>
               </div>
 
               <!-- Alamat Email -->
               <div class="flex flex-col gap-2">
                 <label class="text-[13px] font-bold text-[#1E293B]">Alamat Email <span class="text-red-500">*</span></label>
-                <input 
-                  type="email" 
-                  value="putu.gayatri@balihabit.id" 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
+                <input
+                    type="email"
+                    value="{{ auth()->user()->email }}"
+                    readonly
+                    class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
                 >
               </div>
 
               <!-- Nomor Telepon WhatsApp -->
               <div class="flex flex-col gap-2 md:col-span-2">
                 <label class="text-[13px] font-bold text-[#1E293B]">Nomor Telepon WhatsApp <span class="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  value="+62 812-3456-7890" 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
-                >
+                @php $phone = (string) old('no_tlp', $admin->no_tlp); @endphp
+               <input
+                  type="text"
+                  name="no_tlp"
+                  form="adminProfileForm"
+                  value="{{ $phone !== '' ? '+' . ltrim($phone, '+') : '' }}"
+                  class="w-full border {{ $errors->has('no_tlp') ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }} rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
+              >
+                <p class="text-xs text-red-500 font-medium {{ $errors->has('no_tlp') ? '' : 'hidden' }}">{{ $errors->first('no_tlp') }}</p>
               </div>
             </div>
           </div>
@@ -265,21 +288,29 @@
               <!-- Kata Sandi Baru -->
               <div class="flex flex-col gap-2">
                 <label class="text-[13px] font-bold text-[#1E293B]">Kata Sandi Baru</label>
-                <input 
-                  type="password" 
-                  placeholder="Minimal 8 karakter" 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
+                <input
+                    type="password"
+                    name="password"
+                    form="adminProfileForm"
+                    placeholder="Minimal 8 karakter"
+                    autocomplete="new-password"
+                    class="w-full border {{ $errors->has('password') ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }} rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
                 >
+                <p class="text-xs text-red-500 font-medium {{ $errors->has('password') ? '' : 'hidden' }}">{{ $errors->first('password') }}</p>
               </div>
 
               <!-- Konfirmasi Kata Sandi Baru -->
               <div class="flex flex-col gap-2">
                 <label class="text-[13px] font-bold text-[#1E293B]">Konfirmasi Kata Sandi Baru</label>
-                <input 
-                  type="password" 
-                  placeholder="Ulangi kata sandi baru" 
-                  class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
+                <input
+                    type="password"
+                    name="password_confirmation"
+                    form="adminProfileForm"
+                    placeholder="Ulangi kata sandi baru"
+                    autocomplete="new-password"
+                    class="w-full border {{ $errors->has('password_confirmation') ? 'bg-red-50 border-red-200' : 'bg-slate-50 border-slate-200' }} rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
                 >
+                <p class="text-xs text-red-500 font-medium {{ $errors->has('password_confirmation') ? '' : 'hidden' }}">{{ $errors->first('password_confirmation') }}</p>
               </div>
             </div>
           </div>
@@ -414,8 +445,15 @@
     }
 
     function confirmSave() {
-      window.location.href = "{{ url('/admin/dashboard') }}";
-    }
+      const form = document.getElementById('adminProfileForm');
+
+      if (!form) {
+          alert('Form profil tidak ditemukan.');
+          return;
+      }
+
+      form.requestSubmit();
+  }
 
     // --- Script Preview Foto Profil ---
     const profileImageInput = document.getElementById('profileImageInput');
