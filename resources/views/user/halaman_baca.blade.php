@@ -237,8 +237,6 @@
       </div>
       <div class="flex flex-wrap justify-center items-center gap-2 text-xs font-bold text-[#10B981]">
         <a href="{{ url('/halaman-bantuan') }}" class="hover:underline transition">Bantuan Ayah & Bunda</a>
-        <span class="text-slate-300">•</span>
-        <a href="{{ url('/admin/login') }}" class="hover:underline transition">Masuk sebagai Admin</a>
       </div>
     </div>
   </footer>
