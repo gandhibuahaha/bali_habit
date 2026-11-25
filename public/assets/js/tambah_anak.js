@@ -34,7 +34,11 @@
     const formTambah = document.getElementById('formTambahAnak');
     if (formTambah) {
       formTambah.addEventListener('submit', function(e) {
-        e.preventDefault(); 
+        e.preventDefault();
+        // Cek data dulu (form_anak.js); popup simpan hanya muncul jika semua valid
+        if (typeof validateChildForm === 'function' && !validateChildForm(formTambah)) {
+          return;
+        }
         if (typeof toggleSaveModal === 'function') {
           toggleSaveModal(true);
         }

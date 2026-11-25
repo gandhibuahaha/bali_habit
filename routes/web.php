@@ -5,6 +5,10 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\ChildController;
+use App\Http\Controllers\ChildProgressController;
+use App\Http\Controllers\ParentDashboardController;
+use App\Http\Controllers\ParentProfileController;
 
 /* Halaman publik */
 Route::view('/', 'user.index')->name('home');
@@ -27,19 +31,24 @@ Route::view('/lupa-sandi', 'user.lupa_sandi')->name('password.request');
 
 /* Halaman yang hanya dapat diakses akun Parent */
 Route::middleware(EnsureUserRole::class . ':parent')->group(function () {
-    Route::view('/dashboard', 'user.dashboard')->name('parent.dashboard');
-    Route::view('/halaman-anak', 'user.halaman_anak');
+    Route::get('/dashboard', [ParentDashboardController::class, 'index'])->name('parent.dashboard');
+    Route::get('/halaman-anak', [ChildController::class, 'index'])->name('children.index');
     Route::view('/profil-orangtua', 'user.profil_orangtua');
-    Route::view('/progress-anak', 'user.progress_anak');
-    Route::view('/belajar-bersama', 'user.belajar_bersama');
-    Route::view('/tambah-anak', 'user.tambah_anak');
-    Route::view('/edit-anak', 'user.edit_anak');
-    Route::view('/halaman-baca', 'user.halaman_baca');
-    Route::view('/halaman-refleksi', 'user.halaman_refleksi');
-    Route::view('/halaman-misi', 'user.halaman_misi');
-    Route::view('/rekap-cerita', 'user.rekap_cerita');
+    Route::get('/progress-anak', [ChildProgressController::class, 'progress'])->name('children.progress');
+    Route::get('/belajar-bersama', [ChildProgressController::class, 'learn'])->name('children.learn');
+    Route::get('/tambah-anak', [ChildController::class, 'create'])->name('children.create');
+    Route::post('/tambah-anak', [ChildController::class, 'store'])->name('children.store');
+    Route::get('/edit-anak/{child}', [ChildController::class, 'edit'])->whereNumber('child')->name('children.edit');
+    Route::put('/edit-anak/{child}', [ChildController::class, 'update'])->whereNumber('child')->name('children.update');
+    Route::delete('/edit-anak/{child}', [ChildController::class, 'destroy'])->whereNumber('child')->name('children.destroy');
+    Route::get('/halaman-baca', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_baca');
+    Route::get('/halaman-refleksi', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_refleksi');
+    Route::get('/halaman-misi', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_misi');
+    Route::get('/rekap-cerita', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.rekap_cerita');
     Route::view('/edit-profil', 'user.edit_profil');
+    Route::put('/edit-profil', [ParentProfileController::class, 'update'])->name('parent.profile.update');
     Route::view('/ubah-sandi', 'user.ubah_sandi');
+    Route::put('/ubah-sandi', [ParentProfileController::class, 'updatePassword'])->name('parent.password.update');
     Route::view('/halaman-bantuan', 'user.halaman_bantuan');
 
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');

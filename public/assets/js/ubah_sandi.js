@@ -47,13 +47,13 @@ if (newPasswordInput) {
       bar1.className = "h-1.5 flex-1 bg-gray-200 rounded-full transition-all";
       bar2.className = "h-1.5 flex-1 bg-gray-200 rounded-full transition-all";
       bar3.className = "h-1.5 flex-1 bg-gray-200 rounded-full transition-all";
-    } else if (val.length < 6) {
-      strengthText.innerText = "Lemah (Minimal 6 karakter)";
+    } else if (val.length < 8) {
+      strengthText.innerText = "Lemah (Minimal 8 karakter)";
       strengthText.className = "text-[11px] sm:text-xs font-extrabold text-red-500";
       bar1.className = "h-1.5 flex-1 bg-red-500 rounded-full transition-all";
       bar2.className = "h-1.5 flex-1 bg-gray-200 rounded-full transition-all";
       bar3.className = "h-1.5 flex-1 bg-gray-200 rounded-full transition-all";
-    } else if (val.length < 8) {
+    } else if (val.length < 12) {
       strengthText.innerText = "Sedang";
       strengthText.className = "text-[11px] sm:text-xs font-extrabold text-amber-500";
       bar1.className = "h-1.5 flex-1 bg-amber-500 rounded-full transition-all";
@@ -93,8 +93,9 @@ if (formUbahSandi) {
       document.getElementById('err-new').innerText = "Kata sandi baru tidak boleh kosong.";
       document.getElementById('err-new').classList.remove('hidden');
       isValid = false;
-    } else if (newPass.length < 6) {
-      document.getElementById('err-new').innerText = "Kata sandi harus minimal 6 karakter.";
+    } else if (newPass.length < 8) {
+      // Sama dengan aturan registrasi dan server (minimal 8 karakter)
+      document.getElementById('err-new').innerText = "Kata sandi harus minimal 8 karakter.";
       document.getElementById('err-new').classList.remove('hidden');
       isValid = false;
     }

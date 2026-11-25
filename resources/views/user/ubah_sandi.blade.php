@@ -73,13 +73,14 @@
           </svg>
         </div>
         <p class="text-[11px] sm:text-[13px] text-slate-600 leading-relaxed font-medium">
-          Pastikan kata sandi minimal <span class="font-extrabold text-[#1F2937]">6 karakter</span> dengan kombinasi huruf dan angka untuk melindungi privasi data si kecil.
+          Pastikan kata sandi minimal <span class="font-extrabold text-[#1F2937]">8 karakter</span> dengan kombinasi huruf dan angka untuk melindungi privasi data si kecil.
         </p>
       </div>
 
       <!-- FORM PENGISIAN -->
-      <form id="formUbahSandi" class="flex flex-col gap-6">
+      <form id="formUbahSandi" action="{{ route('parent.password.update') }}" method="POST" novalidate class="flex flex-col gap-6">
         @csrf
+        @method('PUT')
 
         <!-- Input Kata Sandi Saat Ini -->
         <div>
@@ -98,7 +99,7 @@
               </svg>
             </button>
           </div>
-          <p id="err-current" class="error-msg hidden text-red-500 text-[11px] mt-1.5 font-medium"></p>
+          <p id="err-current" class="error-msg {{ $errors->has('current_password') ? '' : 'hidden' }} text-red-500 text-[11px] mt-1.5 font-medium">{{ $errors->first('current_password') }}</p>
           <div class="text-right mt-2">
             <a href="{{ url('/lupa-sandi') }}" class="text-xs sm:text-[13px] font-bold text-[#10B981] hover:underline">Lupa kata sandi saat ini?</a>
           </div>
@@ -121,7 +122,7 @@
               </svg>
             </button>
           </div>
-          <p id="err-new" class="error-msg hidden text-red-500 text-[11px] mt-1.5 font-medium"></p>
+          <p id="err-new" class="error-msg {{ $errors->has('new_password') ? '' : 'hidden' }} text-red-500 text-[11px] mt-1.5 font-medium">{{ $errors->first('new_password') }}</p>
 
           <!-- Indikator Kekuatan Sandi -->
           <div class="flex justify-between items-center mb-1.5 mt-2">
@@ -152,7 +153,7 @@
               </svg>
             </button>
           </div>
-          <p id="err-confirm" class="error-msg hidden text-red-500 text-[11px] mt-1.5 font-medium"></p>
+          <p id="err-confirm" class="error-msg {{ $errors->has('new_password_confirmation') ? '' : 'hidden' }} text-red-500 text-[11px] mt-1.5 font-medium">{{ $errors->first('new_password_confirmation') }}</p>
         </div>
 
         <!-- ================= TOMBOL AKSI ================= -->
@@ -195,7 +196,7 @@
             Batal
           </button>
 
-          <button id="btnYaSimpan" type="button" onclick="window.location.href='{{ url('/profil-orangtua') }}'" class="flex-1 inline-flex justify-center items-center gap-2 rounded-2xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer">
+          <button id="btnYaSimpan" type="button" onclick="document.getElementById('formUbahSandi').submit()" class="flex-1 inline-flex justify-center items-center gap-2 rounded-2xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer">
             Ya, Simpan
           </button>
         </div>
@@ -227,7 +228,7 @@
           Batal
         </button>
         <!-- Tombol Ya, Keluar -->
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -303,5 +304,7 @@
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
   <script src="{{ asset('assets/js/ubah_sandi.js') }}"></script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

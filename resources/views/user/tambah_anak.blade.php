@@ -69,7 +69,7 @@
       <div class="flex flex-col items-center justify-center mb-8">
 
         <!-- Input File Tersembunyi -->
-        <input type="file" id="fotoInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+        <input type="file" id="fotoInput" name="photo" form="formTambahAnak" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="previewImage(event)">
 
         <div class="w-24 h-24 sm:w-28 sm:h-28 bg-[#F8FAFC] rounded-full flex items-center justify-center border-2 border-dashed border-gray-300 mb-4 cursor-pointer hover:bg-gray-50 transition group overflow-hidden" onclick="document.getElementById('fotoInput').click();">
 
@@ -86,18 +86,21 @@
         <button type="button" onclick="document.getElementById('fotoInput').click();" class="border border-gray-200 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-full hover:bg-gray-100 transition shadow-sm mb-1.5 cursor-pointer">
           Tambah Foto
         </button>
-        <p class="text-[11px] text-slate-400">Foto profil anak (opsional)</p>
+        <p class="text-[11px] text-slate-400">Foto profil anak (opsional, JPG/PNG/WEBP, maks. 2 MB)</p>
+        <p id="err-photo" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('photo') ? '' : 'hidden' }}">{{ $errors->first('photo') }}</p>
       </div>
 
       <!-- FORM PENGISIAN -->
-      <form id="formTambahAnak" class="flex flex-col gap-5">
+      <form id="formTambahAnak" novalidate action="{{ route('children.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-5">
+        @csrf
 
         <!-- Input Nama Anak -->
         <div>
           <label class="block text-sm font-bold text-[#1F2937] mb-2">
             Nama Anak <span class="text-red-500">*</span>
           </label>
-          <input type="text" required placeholder="Masukkan nama anak" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <input type="text" name="name" value="{{ old('name') }}" required maxlength="100" placeholder="Masukkan nama anak" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <p id="err-name" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('name') ? '' : 'hidden' }}">{{ $errors->first('name') }}</p>
         </div>
 
         <!-- Input Tanggal Lahir -->
@@ -106,8 +109,9 @@
             Tanggal Lahir <span class="text-red-500">*</span>
           </label>
           <div class="relative">
-            <input type="date" required class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm appearance-none cursor-pointer">
+            <input type="date" name="birth_date" value="{{ old('birth_date') }}" max="{{ now()->toDateString() }}" required class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm appearance-none cursor-pointer">
           </div>
+          <p id="err-birth_date" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('birth_date') ? '' : 'hidden' }}">{{ $errors->first('birth_date') }}</p>
         </div>
 
         <!-- Input Jenis Kelamin -->
@@ -118,7 +122,7 @@
           <div class="flex gap-3">
 
             <label class="flex-1 relative cursor-pointer group">
-              <input type="radio" name="gender" value="laki-laki" required class="peer sr-only" id="laki">
+              <input type="radio" name="gender" value="laki-laki" required class="peer sr-only" id="laki" @checked(old('gender') === 'laki-laki')>
               <div class="border border-gray-200 bg-white rounded-xl p-3.5 flex items-center justify-center gap-2.5 transition hover:bg-gray-50 shadow-sm peer-checked:border-[#10B981] peer-checked:bg-emerald-50 peer-checked:[&_.bulatan]:border-[#10B981] peer-checked:[&_.bulatan]:bg-[#10B981] peer-checked:[&_svg]:block peer-checked:[&_span]:text-[#10B981]">
                 <div class="bulatan w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center transition-all bg-white">
                   <svg class="w-3 h-3 text-white hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -130,7 +134,7 @@
             </label>
 
             <label class="flex-1 relative cursor-pointer group">
-              <input type="radio" name="gender" value="perempuan" class="peer sr-only" id="perempuan">
+              <input type="radio" name="gender" value="perempuan" class="peer sr-only" id="perempuan" @checked(old('gender') === 'perempuan')>
               <div class="border border-gray-200 bg-white rounded-xl p-3.5 flex items-center justify-center gap-2.5 transition hover:bg-gray-50 shadow-sm peer-checked:border-[#10B981] peer-checked:bg-emerald-50 peer-checked:[&_.bulatan]:border-[#10B981] peer-checked:[&_.bulatan]:bg-[#10B981] peer-checked:[&_svg]:block peer-checked:[&_span]:text-[#10B981]">
                 <div class="bulatan w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center transition-all bg-white">
                   <svg class="w-3 h-3 text-white hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -142,6 +146,7 @@
             </label>
 
           </div>
+          <p id="err-gender" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('gender') ? '' : 'hidden' }}">{{ $errors->first('gender') }}</p>
         </div>
 
         <!-- Kotak Informasi -->
@@ -190,7 +195,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <button id="btnYaSimpan" type="button" onclick="window.location.href='{{ url('/halaman-anak') }}'" class="w-full sm:w-1/2 inline-flex justify-center items-center gap-2 rounded-xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer order-1 sm:order-2">
+          <button id="btnYaSimpan" type="button" onclick="document.getElementById('formTambahAnak').submit()" class="w-full sm:w-1/2 inline-flex justify-center items-center gap-2 rounded-xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer order-1 sm:order-2">
             Ya, Simpan
           </button>
 
@@ -223,7 +228,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3">
-          <button type="button" onclick="window.location.href='{{ url('/login') }}'" class="w-full sm:w-1/2 inline-flex justify-center rounded-xl bg-red-500 px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-red-600 transition cursor-pointer order-1 sm:order-2">
+          <button type="button" onclick="document.getElementById('logoutForm').submit()" class="w-full sm:w-1/2 inline-flex justify-center rounded-xl bg-red-500 px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-red-600 transition cursor-pointer order-1 sm:order-2">
             Ya, Keluar
           </button>
           <button type="button" onclick="toggleLogoutModal(false)" class="w-full sm:w-1/2 inline-flex justify-center rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-gray-50 transition cursor-pointer order-2 sm:order-1">
@@ -303,6 +308,7 @@
 
   <!-- Script Menu Navbar Mobile, Animasi Simpan, dan Modal Logout -->
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <script src="{{ asset('assets/js/form_anak.js') }}"></script>
   <script src="{{ asset('assets/js/tambah_anak.js') }}"></script>
 
   <!-- Script Pratinjau Unggah Foto -->
@@ -325,5 +331,7 @@
       }
     }
   </script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

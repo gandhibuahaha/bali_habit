@@ -57,6 +57,11 @@
       <p class="text-slate-500 text-sm">Kelola informasi akun Anda.</p>
     </header>
 
+    {{-- Pesan sukses setelah Edit Profil / Ubah Sandi --}}
+    @if (session('status'))
+      <p class="bg-emerald-50 border border-emerald-100 text-[#10B981] text-sm font-bold rounded-2xl px-4 py-3 mb-4">{{ session('status') }}</p>
+    @endif
+
     <!-- SECTION KARTU PENGATURAN -->
     <div class="space-y-4">
 
@@ -65,9 +70,13 @@
         <div class="flex items-center gap-4">
           <!-- Avatar Icon dengan Badge Centang -->
           <div class="relative w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center flex-shrink-0">
+            @if (auth()->user()->profile_picture)
+            <img src="{{ asset('storage/' . auth()->user()->profile_picture) }}" alt="Foto {{ auth()->user()->name }}" class="w-full h-full rounded-2xl object-cover">
+            @else
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8 text-[#10B981]">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
+            @endif
             <!-- Badge Centang Hijau -->
             <div class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg>
@@ -77,10 +86,9 @@
           <!-- Teks Identitas -->
           <div>
             <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-extrabold text-lg text-[#1F2937]">Satya Devi</h3>
-              <span class="bg-emerald-50 text-[#10B981] text-[10px] font-extrabold px-2 py-0.5 rounded tracking-wide">IBU</span>
+              <h3 class="font-extrabold text-lg text-[#1F2937]">{{ auth()->user()->name }}</h3>
             </div>
-            <p class="text-sm text-slate-500 font-medium">satyadevi@gmail.com</p>
+            <p class="text-sm text-slate-500 font-medium">{{ auth()->user()->email }}</p>
           </div>
         </div>
 
@@ -201,7 +209,7 @@
         <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
           Batal
         </button>
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -234,5 +242,7 @@
   </script>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

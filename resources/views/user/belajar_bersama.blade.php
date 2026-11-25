@@ -60,7 +60,7 @@
     <!-- HEADER -->
     <header class="flex justify-between items-start mb-6">
       <div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Belajar Bersama Ayu</h1>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Belajar Bersama {{ $child->name }}</h1>
         <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-md">Pilih cerita untuk memulai petualangan belajar bersama.</p>
       </div>
     </header>
@@ -68,14 +68,20 @@
     <!-- KARTU PROFIL ANAK -->
     <div class="bg-white border border-gray-100 rounded-[2rem] p-4 md:p-5 shadow-sm flex justify-between items-center mb-8 max-w-2xl">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm">
-          Avatar
+        @php $isGirl = $child->gender === 'female'; @endphp
+        <div class="w-14 h-14 {{ $isGirl ? 'bg-orange-50' : 'bg-cyan-50' }} text-3xl rounded-full flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm overflow-hidden">
+          @if ($child->profile_picture)
+            <img src="{{ asset('storage/' . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
+          @else
+            {{ $isGirl ? '👧🏼' : '👦🏽' }}
+          @endif
         </div>
-        <h2 class="font-extrabold text-base md:text-lg text-[#1F2937]">Ayu</h2>
+        <h2 class="font-extrabold text-base md:text-lg text-[#1F2937]">{{ $child->name }}</h2>
       </div>
+      <!-- Bintang: belum ada aturan perhitungan -->
       <div class="bg-yellow-100/80 text-yellow-800 px-3 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-1.5">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-        12 Bintang
+        0 Bintang
       </div>
     </div>
 
@@ -98,21 +104,7 @@
           <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Tentang kecerdikan menjaga rumah dan alam.</p>
 
           <!-- Indikator Progress Cerita -->
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-[#10B981] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">3/3 Selesai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-yellow-600 font-bold bg-yellow-50 px-1.5 py-0.5 rounded">2/2 Selesai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: Hari ini, O...</p>
-          </div>
+          @include('user.partials.story_progress', ['p' => $storyProgress->get('kedis-puuh', $noProgress)])
 
           <a href="{{ url('/halaman-baca?cerita=kedis-puuh') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
             Mulai Baca
@@ -129,21 +121,7 @@
           <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">I Lutung teken I Kekua</h3>
           <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Tentang peduli dan merawat lingkungan sekitar.</p>
 
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-[#10B981] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">2/3 Selesai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-yellow-600 font-bold bg-yellow-50 px-1.5 py-0.5 rounded">1/2 Selesai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: Kemarin</p>
-          </div>
+          @include('user.partials.story_progress', ['p' => $storyProgress->get('lutung-kekua', $noProgress)])
 
           <a href="{{ url('/halaman-baca?cerita=lutung-kekua') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
             Mulai Baca
@@ -160,21 +138,7 @@
           <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">Lelipi Selem Bukit</h3>
           <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Menjaga Alam & Lingkungan</p>
 
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/3 Mulai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-slate-300"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/2 Mulai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: 2 hari lalu</p>
-          </div>
+          @include('user.partials.story_progress', ['p' => $storyProgress->get('lelipi-selem', $noProgress)])
 
           <a href="{{ url('/halaman-baca?cerita=lelipi-selem') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
             Mulai Baca
@@ -191,21 +155,7 @@
           <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">I Lutung Dadi Pecalang</h3>
           <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Penjaga yang berusaha memahami masalah</p>
 
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/3 Mulai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-slate-300"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/2 Mulai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Belum pernah dibaca</p>
-          </div>
+          @include('user.partials.story_progress', ['p' => $storyProgress->get('lutung-pecalang', $noProgress)])
 
           <a href="{{ url('/halaman-baca?cerita=lutung-pecalang') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
             Mulai Baca
@@ -318,7 +268,7 @@
           Batal
         </button>
         <!-- Tombol Ya, Keluar -->
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -326,5 +276,7 @@
   </div>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

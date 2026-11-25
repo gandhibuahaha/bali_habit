@@ -51,7 +51,7 @@
   <main class="w-full max-w-2xl mx-auto px-4 sm:px-6 py-8 flex-grow">
 
     <!-- Tombol Kembali -->
-    <a href="{{ url('/progress-anak') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-[#10B981] font-bold text-sm mb-6 transition cursor-pointer">
+    <a href="{{ route('children.progress', ['anak' => $child->child_id]) }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-[#10B981] font-bold text-sm mb-6 transition cursor-pointer">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
       Kembali ke Progress Anak
     </a>
@@ -71,16 +71,16 @@
       <div class="flex flex-col items-center justify-center mb-8">
 
         <!-- Input File Tersembunyi -->
-        <input type="file" id="fotoInput" accept="image/*" class="hidden" onchange="previewImage(event)">
+        <input type="file" id="fotoInput" name="photo" form="formEditAnak" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="previewImage(event)">
 
         <div class="relative mb-4 cursor-pointer hover:opacity-90 transition group" onclick="document.getElementById('fotoInput').click();">
           <!-- Area Lingkaran Foto -->
           <div class="w-24 h-24 sm:w-28 sm:h-28 bg-[#FFFBEB] rounded-full flex items-center justify-center border-2 border-[#FDE68A] overflow-hidden">
-            <!-- Icon Awal (Sebelum Diganti) -->
-            <span id="fotoIcon" class="text-5xl sm:text-6xl pb-2">👧🏼</span>
+            <!-- Icon Awal (dipakai jika belum ada foto) -->
+            <span id="fotoIcon" class="text-5xl sm:text-6xl pb-2 {{ $child->profile_picture ? 'hidden' : '' }}">{{ $child->gender === 'female' ? '👧🏼' : '👦🏽' }}</span>
 
-            <!-- Image Preview (Disembunyikan secara default) -->
-            <img id="fotoPreview" class="hidden w-full h-full object-cover">
+            <!-- Foto saat ini / pratinjau foto baru -->
+            <img id="fotoPreview" src="{{ $child->profile_picture ? asset('storage/' . $child->profile_picture) : '' }}" alt="Foto {{ $child->name }}" class="{{ $child->profile_picture ? '' : 'hidden' }} w-full h-full object-cover">
           </div>
 
           <div class="absolute bottom-0 right-0 bg-[#10B981] rounded-full p-2 border-[3px] border-white text-white shadow-sm transition-transform group-hover:scale-110">
@@ -94,19 +94,26 @@
         <button type="button" onclick="document.getElementById('fotoInput').click();" class="border border-gray-200 text-slate-700 text-xs font-bold px-5 py-2.5 rounded-full hover:bg-gray-100 transition shadow-sm mb-1.5 cursor-pointer">
           Ubah Foto
         </button>
-        <p class="text-[11px] text-slate-400">Foto profil anak</p>
+        <p class="text-[11px] text-slate-400">Foto profil anak (JPG/PNG/WEBP, maks. 2 MB)</p>
+        <p id="err-photo" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('photo') ? '' : 'hidden' }}">{{ $errors->first('photo') }}</p>
       </div>
 
+      @php $gender = old('gender', $child->gender === 'female' ? 'perempuan' : 'laki-laki'); @endphp
+
       <!-- FORM PENGISIAN -->
-      <form class="flex flex-col gap-5" id="formEditAnak">
+      <form class="flex flex-col gap-5" id="formEditAnak" novalidate action="{{ route('children.update', $child->child_id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
         <div>
           <label class="block text-sm font-bold text-[#1F2937] mb-2">Nama Anak <span class="text-red-500">*</span></label>
-          <input type="text" value="Ayu" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <input type="text" name="name" value="{{ old('name', $child->name) }}" required maxlength="100" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <p id="err-name" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('name') ? '' : 'hidden' }}">{{ $errors->first('name') }}</p>
         </div>
 
         <div>
           <label class="block text-sm font-bold text-[#1F2937] mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
-          <input type="date" value="2018-08-12" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm cursor-pointer">
+          <input type="date" name="birth_date" value="{{ old('birth_date', $child->birth_date->toDateString()) }}" max="{{ now()->toDateString() }}" required class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm cursor-pointer">
+          <p id="err-birth_date" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('birth_date') ? '' : 'hidden' }}">{{ $errors->first('birth_date') }}</p>
         </div>
 
         <div>
@@ -115,7 +122,7 @@
 
             <!-- Pilihan Laki-laki -->
             <label class="flex-1 relative cursor-pointer group">
-              <input type="radio" name="gender" value="laki-laki" class="peer sr-only" id="laki">
+              <input type="radio" name="gender" value="laki-laki" required class="peer sr-only" id="laki" @checked($gender === 'laki-laki')>
               <div class="border border-gray-200 bg-white rounded-xl p-3.5 flex items-center justify-center gap-2.5 transition hover:bg-gray-50 shadow-sm peer-checked:border-[#10B981] peer-checked:bg-emerald-50 peer-checked:[&_.bulatan]:border-[#10B981] peer-checked:[&_.bulatan]:bg-[#10B981] peer-checked:[&_svg]:block peer-checked:[&_span]:text-[#10B981]">
                 <div class="bulatan w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center transition-all bg-white">
                   <svg class="w-3 h-3 text-white hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -128,7 +135,7 @@
 
             <!-- Pilihan Perempuan -->
             <label class="flex-1 relative cursor-pointer group">
-              <input type="radio" name="gender" value="perempuan" class="peer sr-only" id="perempuan" checked>
+              <input type="radio" name="gender" value="perempuan" class="peer sr-only" id="perempuan" @checked($gender === 'perempuan')>
               <div class="border border-gray-200 bg-white rounded-xl p-3.5 flex items-center justify-center gap-2.5 transition hover:bg-gray-50 shadow-sm peer-checked:border-[#10B981] peer-checked:bg-emerald-50 peer-checked:[&_.bulatan]:border-[#10B981] peer-checked:[&_.bulatan]:bg-[#10B981] peer-checked:[&_svg]:block peer-checked:[&_span]:text-[#10B981]">
                 <div class="bulatan w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center transition-all bg-white">
                   <svg class="w-3 h-3 text-white hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -140,6 +147,7 @@
             </label>
 
           </div>
+          <p id="err-gender" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('gender') ? '' : 'hidden' }}">{{ $errors->first('gender') }}</p>
         </div>
 
         <div class="bg-[#F8FAFC] border border-gray-100 rounded-xl p-4 flex gap-3 items-start mt-2">
@@ -148,10 +156,10 @@
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 mt-4">
-          <button type="button" onclick="toggleSaveModal(true)" class="w-full sm:w-1/2 bg-[#10B981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-md cursor-pointer order-1 sm:order-2">
+          <button type="button" onclick="if (validateChildForm(document.getElementById('formEditAnak'))) toggleSaveModal(true)" class="w-full sm:w-1/2 bg-[#10B981] text-white font-bold py-3.5 rounded-xl hover:bg-[#059669] transition shadow-md cursor-pointer order-1 sm:order-2">
             Simpan Perubahan
           </button>
-          <a href="{{ url('/progress-anak') }}" class="w-full sm:w-1/2 bg-white border border-gray-200 text-slate-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 transition shadow-sm cursor-pointer order-2 sm:order-1 flex items-center justify-center">
+          <a href="{{ url('/progress-anak') }}?anak={{ $child->child_id }}" class="w-full sm:w-1/2 bg-white border border-gray-200 text-slate-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 transition shadow-sm cursor-pointer order-2 sm:order-1 flex items-center justify-center">
             Batal
           </a>
         </div>
@@ -168,6 +176,11 @@
           </svg>
           Hapus Profil Anak
         </button>
+
+        <form id="formHapusAnak" action="{{ route('children.destroy', $child->child_id) }}" method="POST" class="hidden">
+          @csrf
+          @method('DELETE')
+        </form>
       </div>
 
     </div>
@@ -197,7 +210,7 @@
           <button type="button" onclick="toggleSaveModal(false)" class="flex-1 inline-flex justify-center rounded-2xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-gray-50 focus:outline-none transition cursor-pointer">
             Batal
           </button>
-          <button type="button" onclick="window.location.href='{{ url('/halaman-anak') }}'" class="flex-1 inline-flex justify-center rounded-2xl border border-transparent bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] focus:outline-none transition cursor-pointer">
+          <button type="button" onclick="document.getElementById('formEditAnak').submit()" class="flex-1 inline-flex justify-center rounded-2xl border border-transparent bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] focus:outline-none transition cursor-pointer">
             Ya, Simpan
           </button>
         </div>
@@ -220,14 +233,14 @@
         </div>
 
         <div class="text-center">
-          <h3 class="text-xl font-extrabold text-[#1F2937] mb-2">Hapus Profil Ayu?</h3>
+          <h3 class="text-xl font-extrabold text-[#1F2937] mb-2">Hapus Profil {{ $child->name }}?</h3>
           <p class="text-sm text-slate-500 leading-relaxed mb-8">
             Tindakan ini tidak dapat dibatalkan. Seluruh riwayat cerita dan <i>progress</i> belajar anak akan terhapus secara permanen.
           </p>
         </div>
 
         <div class="flex flex-col gap-3">
-          <button type="button" onclick="window.location.href='{{ url('/halaman-anak') }}'" class="w-full inline-flex justify-center rounded-xl border border-transparent bg-red-600 px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-red-700 focus:outline-none transition cursor-pointer">
+          <button type="button" onclick="document.getElementById('formHapusAnak').submit()" class="w-full inline-flex justify-center rounded-xl border border-transparent bg-red-600 px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-red-700 focus:outline-none transition cursor-pointer">
             Ya, Hapus Profil
           </button>
           <button type="button" onclick="toggleDeleteModal(false)" class="w-full inline-flex justify-center rounded-xl border border-gray-200 bg-white px-4 py-3.5 text-sm font-bold text-slate-700 shadow-sm hover:bg-gray-50 focus:outline-none transition cursor-pointer">
@@ -322,7 +335,7 @@
         <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
           Batal
         </button>
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -330,6 +343,7 @@
   </div>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <script src="{{ asset('assets/js/form_anak.js') }}"></script>
   <script>
     function toggleDeleteModal(show) {
       const modal = document.getElementById('deleteModal');
@@ -396,5 +410,7 @@
       }
     }
   </script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

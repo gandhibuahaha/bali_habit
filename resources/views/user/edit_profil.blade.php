@@ -68,12 +68,13 @@
       <!-- Area Ubah Foto -->
       <div class="flex flex-col items-center justify-center mb-8">
         <!-- Input file tersembunyi untuk membuka penyimpanan lokal -->
-        <input type="file" id="inputFotoProfil" name="foto_profil" accept="image/jpeg, image/png" class="hidden">
+        <input type="file" id="inputFotoProfil" name="foto_profil" form="formEditProfil" accept="image/jpeg, image/png" class="hidden">
 
         <div onclick="document.getElementById('inputFotoProfil').click()" class="relative mb-4 cursor-pointer hover:opacity-90 transition group" title="Klik untuk memilih foto">
           <div class="w-24 h-24 sm:w-28 sm:h-28 bg-emerald-50 rounded-[1.5rem] flex items-center justify-center border-2 border-emerald-100 overflow-hidden">
-            <img id="previewFotoProfil" src="" alt="Foto Profil" class="hidden w-full h-full object-cover">
-            <svg id="defaultIconProfil" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 text-[#10B981]">
+            @php $photo = auth()->user()->profile_picture; @endphp
+            <img id="previewFotoProfil" src="{{ $photo ? asset('storage/' . $photo) : '' }}" alt="Foto Profil" class="{{ $photo ? '' : 'hidden' }} w-full h-full object-cover">
+            <svg id="defaultIconProfil" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{{ $photo ? 'hidden' : '' }} w-12 h-12 text-[#10B981]">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
           </div>
@@ -87,20 +88,22 @@
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" /><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" /></svg>
           Ubah Foto
         </button>
-        <p id="fotoErrorText" class="hidden text-[11px] text-red-500 font-bold mb-1"></p>
+        <p id="fotoErrorText" class="{{ $errors->has('foto_profil') ? '' : 'hidden' }} text-[11px] text-red-500 font-bold mb-1">{{ $errors->first('foto_profil') }}</p>
         <p class="text-[11px] text-slate-400">Format JPG atau PNG (Maks. 2MB)</p>
       </div>
 
       <!-- FORM PENGISIAN -->
-      <form id="formEditProfil" class="flex flex-col gap-6">
+      <form id="formEditProfil" action="{{ route('parent.profile.update') }}" method="POST" enctype="multipart/form-data" novalidate class="flex flex-col gap-6">
         @csrf
+        @method('PUT')
 
         <!-- Input Nama Lengkap -->
         <div>
           <label class="block text-sm font-bold text-[#1F2937] mb-2">
             Nama Lengkap Orang Tua <span class="text-red-500">*</span>
           </label>
-          <input type="text" name="nama_lengkap" value="Satya Devi" required class="w-full bg-white border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <input type="text" id="inputNamaLengkap" name="nama_lengkap" value="{{ old('nama_lengkap', auth()->user()->name) }}" required maxlength="100" class="w-full {{ $errors->has('nama_lengkap') ? 'bg-red-50 border-red-200' : 'bg-white border-gray-200' }} border rounded-xl px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition shadow-sm">
+          <p id="err-nama_lengkap" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('nama_lengkap') ? '' : 'hidden' }}">{{ $errors->first('nama_lengkap') }}</p>
         </div>
 
         <!-- Input Email -->
@@ -109,12 +112,16 @@
             <label class="block text-sm font-bold text-[#1F2937]">
               Alamat Email <span class="text-red-500">*</span>
             </label>
+            {{-- Badge hanya tampil jika email benar-benar sudah diverifikasi --}}
+            @if (auth()->user()->email_verified_at)
             <span class="bg-emerald-100 text-[#10B981] text-[10px] font-extrabold px-2.5 py-1 rounded-md flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clip-rule="evenodd" /></svg>
               Terverifikasi
             </span>
+            @endif
           </div>
-          <input type="email" name="email" value="satyadevi@gmail.com" required class="w-full bg-[#F8FAFC] border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-600 font-medium focus:outline-none transition shadow-sm" readonly>
+          {{-- Email tidak bisa diubah di sini (readonly, tidak ikut dikirim) --}}
+          <input type="email" value="{{ auth()->user()->email }}" class="w-full bg-[#F8FAFC] border border-gray-200 rounded-xl px-4 py-3.5 text-sm text-slate-600 font-medium focus:outline-none transition shadow-sm" readonly>
           <p class="text-xs text-slate-400 mt-2">Digunakan untuk menerima notifikasi laporan capaian anak.</p>
         </div>
 
@@ -123,13 +130,15 @@
           <label class="block text-sm font-bold text-[#1F2937] mb-2">
             Nomor WhatsApp / Telepon
           </label>
-          <div class="flex border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#10B981] focus-within:ring-1 focus-within:ring-[#10B981] transition shadow-sm">
+          <div class="flex border {{ $errors->has('no_telepon') ? 'border-red-200' : 'border-gray-200' }} rounded-xl overflow-hidden focus-within:border-[#10B981] focus-within:ring-1 focus-within:ring-[#10B981] transition shadow-sm">
             <div class="bg-gray-50 px-4 flex items-center justify-center border-r border-gray-200 select-none">
                <span class="text-[10px] font-extrabold text-slate-500 mr-1.5">ID</span>
                <span class="text-sm font-bold text-slate-700">+62</span>
             </div>
-            <input type="tel" name="no_telepon" value="812-3456-7890" class="flex-1 w-full bg-white px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none placeholder:text-slate-400">
+            {{-- Disimpan sebagai 62xxxxxxxxx; di sini ditampilkan tanpa awalan 62 karena "+62" sudah ada di kotak kiri --}}
+            <input type="tel" name="no_telepon" value="{{ preg_replace('/^62/', '', (string) old('no_telepon', auth()->user()->no_tlp)) }}" placeholder="812-3456-7890" class="flex-1 w-full {{ $errors->has('no_telepon') ? 'bg-red-50' : 'bg-white' }} px-4 py-3.5 text-sm text-slate-800 font-medium focus:outline-none placeholder:text-slate-400">
           </div>
+          <p id="err-no_telepon" class="text-xs text-red-500 mt-1 font-medium {{ $errors->has('no_telepon') ? '' : 'hidden' }}">{{ $errors->first('no_telepon') }}</p>
           <p class="text-xs text-slate-400 mt-2">Untuk ringkasan kebiasaan harian via WhatsApp.</p>
         </div>
 
@@ -177,7 +186,7 @@
             Batal
           </button>
 
-          <button id="btnYaSimpan" type="button" onclick="window.location.href='{{ url('/profil-orangtua') }}'" class="flex-1 inline-flex justify-center items-center gap-2 rounded-2xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer">
+          <button id="btnYaSimpan" type="button" onclick="document.getElementById('formEditProfil').submit()" class="flex-1 inline-flex justify-center items-center gap-2 rounded-2xl bg-[#10B981] px-4 py-3.5 text-sm font-bold text-white shadow-sm hover:bg-[#059669] transition cursor-pointer">
             Ya, Simpan
           </button>
         </div>
@@ -281,7 +290,7 @@
           Batal
         </button>
         <!-- Tombol Ya, Keluar -->
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -327,9 +336,31 @@
       reader.readAsDataURL(file);
     });
 
-    // Modal Konfirmasi Simpan
+    // Nama wajib diisi: tampilkan pesan merah di bawah field (bukan bubble bawaan browser)
+    const inputNama = document.getElementById('inputNamaLengkap');
+    const errNama = document.getElementById('err-nama_lengkap');
+
+    function setNamaError(message) {
+      errNama.textContent = message;
+      errNama.classList.toggle('hidden', !message);
+      inputNama.classList.toggle('bg-red-50', !!message);
+      inputNama.classList.toggle('border-red-200', !!message);
+      inputNama.classList.toggle('bg-white', !message);
+      inputNama.classList.toggle('border-gray-200', !message);
+    }
+
+    inputNama.addEventListener('input', function() {
+      if (inputNama.value.trim() !== '') setNamaError('');
+    });
+
+    // Modal Konfirmasi Simpan (hanya muncul jika nama sudah diisi)
     document.getElementById('formEditProfil').addEventListener('submit', function(e) {
       e.preventDefault();
+      if (inputNama.value.trim() === '') {
+        setNamaError('Nama lengkap wajib diisi.');
+        inputNama.focus();
+        return;
+      }
       toggleSaveModal(true);
     });
 
@@ -352,5 +383,7 @@
       }
     }
   </script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

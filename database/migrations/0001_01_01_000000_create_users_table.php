@@ -11,14 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Matches the `users` table of the BaliHabit database design (balihabit.sql).
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
-            $table->rememberToken();
-            $table->timestamps();
+            $table->bigInteger('user_id', true);
+            $table->string('username', 100);
+            $table->string('password', 255)->nullable();
+            $table->string('name', 100);
+            $table->string('email', 150)->unique();
+            $table->char('no_tlp', 13)->nullable()->unique();
+            $table->string('kota', 100)->nullable();
+            $table->string('profile_picture', 255)->nullable();
+            $table->string('pekerjaan', 100)->nullable();
+            $table->enum('role', ['parent', 'admin']);
+            $table->dateTime('email_verified_at')->nullable();
+            $table->dateTime('created_at');
+            $table->dateTime('updated_at');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

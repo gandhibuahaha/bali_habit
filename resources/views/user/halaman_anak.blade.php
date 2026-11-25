@@ -60,58 +60,41 @@
     <!-- GRID KARTU ANAK (1 Kolom HP, 2 Kolom Tablet, 3 Kolom Desktop) -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
 
-      <!-- KARTU ANAK 1 (Ayu) -->
+      @foreach ($children as $child)
+      @php $isGirl = $child->gender === "female"; @endphp
+      <!-- KARTU ANAK -->
       <div class="bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
         <div class="flex justify-between items-start mb-6">
           <div class="flex items-center gap-3">
-            <div class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-3xl">👧🏼</div>
+            <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden">
+              @if ($child->profile_picture)
+                <img src="{{ asset("storage/" . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
+              @else
+                {{ $isGirl ? "👧🏼" : "👦🏽" }}
+              @endif
+            </div>
             <div>
-              <h3 class="font-extrabold text-lg text-[#1F2937]">Ayu</h3>
-              <p class="text-xs text-slate-500 font-medium mt-0.5">7 tahun</p>
+              <h3 class="font-extrabold text-lg text-[#1F2937]">{{ $child->name }}</h3>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">{{ $child->birth_date->age }} tahun</p>
             </div>
           </div>
-          <!-- Label Bintang -->
+          <!-- Label Bintang (belum ada data bintang; diisi oleh fitur progress) -->
           <div class="bg-yellow-50/50 border border-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-            12 Bintang
+            0 Bintang
           </div>
         </div>
         <!-- Tombol Aksi -->
         <div class="flex gap-2.5 mt-auto pt-2">
-          <a href="{{ url('/progress-anak') }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center cursor-pointer">
+          <a href="{{ url("/progress-anak") }}?anak={{ $child->child_id }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center cursor-pointer">
             Lihat Progress
           </a>
-          <a href="{{ url('/belajar-bersama') }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center cursor-pointer">
+          <a href="{{ url("/belajar-bersama") }}?anak={{ $child->child_id }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center cursor-pointer">
             Belajar Bersama
           </a>
         </div>
       </div>
-
-      <!-- KARTU ANAK 2 (Made) -->
-      <div class="bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-        <div class="flex justify-between items-start mb-6">
-          <div class="flex items-center gap-3">
-            <div class="w-14 h-14 bg-cyan-50 rounded-full flex items-center justify-center text-3xl">👦🏽</div>
-            <div>
-              <h3 class="font-extrabold text-lg text-[#1F2937]">Made</h3>
-              <p class="text-xs text-slate-500 font-medium mt-0.5">5 tahun</p>
-            </div>
-          </div>
-          <div class="bg-yellow-50/50 border border-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-            7 Bintang
-          </div>
-        </div>
-        <div class="flex gap-2.5 mt-auto pt-2">
-          <a href="{{ url('/progress-anak') }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center cursor-pointer">
-            Lihat Progress
-          </a>
-          <a href="{{ url('/belajar-bersama') }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center cursor-pointer">
-            Belajar Bersama
-          </a>
-        </div>
-      </div>
-
+      @endforeach
       <!-- KARTU TAMBAH ANAK -->
       <a href="{{ url('/tambah-anak') }}" class="border-2 border-dashed border-[#10B981]/30 bg-emerald-50/30 rounded-[2rem] p-6 hover:bg-emerald-50/80 transition-colors flex flex-col items-center justify-center text-center h-full min-h-[200px] group cursor-pointer">
         <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-[#10B981] group-hover:scale-110 transition-transform duration-300 shadow-sm mb-4">
@@ -220,7 +203,7 @@
           Batal
         </button>
         <!-- Tombol Ya, Keluar -->
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -254,5 +237,7 @@
       toggleLogoutModal(false);
     }
   </script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

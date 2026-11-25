@@ -75,56 +75,49 @@
         <!-- DAFTAR KARTU ANAK (Grid: 1 Kolom HP, 2 Kolom Tablet/Desktop) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
 
-          <!-- Kartu Anak 1 (Ayu) -->
+          @forelse ($children as $child)
+          @php $isGirl = $child->gender === "female"; @endphp
+          <!-- Kartu Anak -->
           <div class="bg-white border border-gray-100 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-6">
               <div class="flex items-center gap-3">
-                <div class="w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-3xl">👧🏼</div>
+                <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden">
+                  @if ($child->profile_picture)
+                    <img src="{{ asset("storage/" . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
+                  @else
+                    {{ $isGirl ? "👧🏼" : "👦🏽" }}
+                  @endif
+                </div>
                 <div>
-                  <h3 class="font-extrabold text-base text-[#1F2937]">Ayu</h3>
-                  <p class="text-xs text-slate-500 font-medium">7 tahun</p>
+                  <h3 class="font-extrabold text-base text-[#1F2937]">{{ $child->name }}</h3>
+                  <p class="text-xs text-slate-500 font-medium">{{ $child->birth_date->age }} tahun</p>
                 </div>
               </div>
+              <!-- Bintang: belum ada data, diisi oleh fitur progress -->
               <div class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-                12
+                0
               </div>
             </div>
             <div class="flex gap-2.5">
-              <a href="{{ url('/progress-anak?from=dashboard') }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center">
+              <a href="{{ url("/progress-anak") }}?from=dashboard&anak={{ $child->child_id }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center">
                 Lihat Progress
               </a>
-              <a href="{{ url('/belajar-bersama?from=dashboard') }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center">
+              <a href="{{ url("/belajar-bersama") }}?from=dashboard&anak={{ $child->child_id }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center">
                 Belajar Bersama
               </a>
             </div>
           </div>
-
-          <!-- Kartu Anak 2 (Made) -->
-          <div class="bg-white border border-gray-100 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-14 h-14 bg-cyan-50 rounded-full flex items-center justify-center text-3xl">👦🏽</div>
-                <div>
-                  <h3 class="font-extrabold text-base text-[#1F2937]">Made</h3>
-                  <p class="text-xs text-slate-500 font-medium">5 tahun</p>
-                </div>
-              </div>
-              <div class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-                7
-              </div>
+          @empty
+          <!-- Belum ada anak: tampilkan kartu Tambah Anak -->
+          <a href="{{ url('/tambah-anak') }}" class="border-2 border-dashed border-[#10B981]/30 bg-emerald-50/30 rounded-[2rem] p-6 hover:bg-emerald-50/80 transition-colors flex flex-col items-center justify-center text-center h-full min-h-[200px] group cursor-pointer">
+            <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-[#10B981] group-hover:scale-110 transition-transform duration-300 shadow-sm mb-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
             </div>
-            <div class="flex gap-2.5">
-              <a href="{{ url('/progress-anak?from=dashboard') }}" class="flex-1 border border-[#10B981] text-[#10B981] font-bold py-2.5 rounded-xl text-xs hover:bg-emerald-50 transition flex items-center justify-center">
-                Lihat Progress
-              </a>
-              <a href="{{ url('/belajar-bersama?from=dashboard') }}" class="flex-1 bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs hover:bg-[#059669] transition shadow-sm flex items-center justify-center">
-                Belajar Bersama
-              </a>
-            </div>
-          </div>
-
+            <h3 class="font-bold text-base text-[#10B981] mb-1.5">+ Tambah Anak</h3>
+            <p class="text-xs text-slate-500 leading-relaxed px-4">Tambahkan profil anak untuk memulai perjalanan belajar bersama.</p>
+          </a>
+          @endforelse
         </div>
       </div>
 
@@ -135,38 +128,33 @@
 
         <div class="bg-white border border-gray-100 rounded-[2rem] p-3 shadow-sm">
 
-          <!-- List Item 1 -->
-          <div class="flex items-start gap-4 p-4 border-b border-gray-50 hover:bg-slate-50 transition rounded-2xl">
-            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+          @forelse ($activities as $activity)
+          <div class="flex items-start gap-4 p-4 {{ $loop->last ? '' : 'border-b border-gray-50' }} hover:bg-slate-50 transition rounded-2xl">
+            <div class="w-10 h-10 rounded-full {{ $activity['type'] === 'badge' ? 'bg-yellow-50' : 'bg-emerald-50' }} flex items-center justify-center flex-shrink-0">
+              @if ($activity['type'] === 'story')
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+              @elseif ($activity['type'] === 'badge')
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+              @else
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              @endif
             </div>
             <div>
-              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed"><span class="font-extrabold">Ayu</span> menyelesaikan cerita "Kancil dan Buaya"</p>
-              <p class="text-[11px] text-slate-400 mt-1 font-medium">2 jam lalu</p>
+              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed">
+                <span class="font-extrabold">{{ $activity['child'] }}</span>
+                @switch($activity['type'])
+                  @case('story') menyelesaikan cerita "{{ $activity['subject'] }}" @break
+                  @case('mission') menyelesaikan misi cerita "{{ $activity['subject'] }}" @break
+                  @case('reflection') mengisi refleksi cerita "{{ $activity['subject'] }}" @break
+                  @case('badge') mendapatkan lencana "{{ $activity['subject'] }}" @break
+                @endswitch
+              </p>
+              <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ $activity['time_label'] }}</p>
             </div>
           </div>
-
-          <!-- List Item 2 -->
-          <div class="flex items-start gap-4 p-4 border-b border-gray-50 hover:bg-slate-50 transition rounded-2xl">
-            <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-            </div>
-            <div>
-              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed"><span class="font-extrabold">Made</span> mendapatkan 1 bintang</p>
-              <p class="text-[11px] text-slate-400 mt-1 font-medium">5 jam lalu</p>
-            </div>
-          </div>
-
-          <!-- List Item 3 -->
-          <div class="flex items-start gap-4 p-4 hover:bg-slate-50 transition rounded-2xl">
-            <div class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center flex-shrink-0">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            </div>
-            <div>
-              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed"><span class="font-extrabold">Ayu</span> menyelesaikan misi hari ini</p>
-              <p class="text-[11px] text-slate-400 mt-1 font-medium">Kemarin</p>
-            </div>
-          </div>
+          @empty
+          <p class="text-[13px] text-slate-400 p-4 leading-relaxed">Belum ada aktivitas. Ajak anak membaca cerita di Belajar Bersama!</p>
+          @endforelse
 
         </div>
       </div>
@@ -274,7 +262,7 @@
           Batal
         </button>
         <!-- Tombol Ya, Keluar -->
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -282,5 +270,7 @@
   </div>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

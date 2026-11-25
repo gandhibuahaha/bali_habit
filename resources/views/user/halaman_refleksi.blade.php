@@ -65,7 +65,7 @@
 
     <header class="mb-6">
       <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-1 tracking-tight">Refleksi Cerita</h1>
-      <p class="text-slate-500 text-sm md:text-base">Yuk, pikirkan bersama Ayu!</p>
+      <p class="text-slate-500 text-sm md:text-base">Yuk, pikirkan bersama {{ $child->name }}!</p>
     </header>
 
     <!-- KARTU RIWAYAT REFLEKSI TERAKHIR -->
@@ -93,7 +93,7 @@
 
       <div class="bg-slate-50 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-slate-600 border border-slate-100/80">
         <span class="text-base">😊</span>
-        <p class="leading-relaxed">Hebat! Pemahaman Ayu tentang pesan cerita I Kedis Puuh & I Alu sangat baik.</p>
+        <p class="leading-relaxed">Hebat! Pemahaman {{ $child->name }} tentang pesan cerita I Kedis Puuh & I Alu sangat baik.</p>
       </div>
     </div>
 
@@ -242,7 +242,7 @@
         <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
           Batal
         </button>
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -274,5 +274,7 @@
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
 
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

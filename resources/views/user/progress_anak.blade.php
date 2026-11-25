@@ -74,22 +74,27 @@
         <!-- KARTU PROFIL -->
         <div class="bg-white border border-gray-100 rounded-3xl p-5 md:p-6 shadow-sm flex justify-between items-center">
           <div class="flex items-center gap-4">
-            <div class="relative w-14 h-14 bg-orange-50 rounded-full flex items-center justify-center text-3xl flex-shrink-0">
-              👧🏼
+            @php $isGirl = $child->gender === 'female'; @endphp
+            <div class="relative w-14 h-14 {{ $isGirl ? 'bg-orange-50' : 'bg-cyan-50' }} rounded-full flex items-center justify-center text-3xl flex-shrink-0">
+              @if ($child->profile_picture)
+                <img src="{{ asset('storage/' . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full rounded-full object-cover">
+              @else
+                {{ $isGirl ? '👧🏼' : '👦🏽' }}
+              @endif
               <div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#10B981] border-2 border-white rounded-full"></div>
             </div>
             <div>
-              <h2 class="font-extrabold text-xl text-[#1F2937]">Ayu</h2>
+              <h2 class="font-extrabold text-xl text-[#1F2937]">{{ $child->name }}</h2>
               <div class="flex items-center gap-2 mt-1">
-                <span class="text-xs text-slate-500 font-medium">7 tahun</span>
+                <span class="text-xs text-slate-500 font-medium">{{ $child->birth_date->age }} tahun</span>
                 <span class="bg-yellow-50 text-yellow-700 px-2.5 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 border border-yellow-100">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-                  12 Bintang
+                  0 Bintang
                 </span>
               </div>
             </div>
           </div>
-          <a href="{{ url('/edit-anak') }}" class="border border-emerald-200 bg-emerald-50 text-[#10B981] font-bold py-2 px-4 rounded-full text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer">
+          <a href="{{ route('children.edit', $child->child_id) }}" class="border border-emerald-200 bg-emerald-50 text-[#10B981] font-bold py-2 px-4 rounded-full text-xs hover:bg-emerald-100 transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg>
             Edit
           </a>
@@ -118,17 +123,17 @@
           <div id="content-hari-ini" class="grid grid-cols-3 gap-3 md:gap-4">
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-emerald-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">1</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['hari-ini']['cerita'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Cerita Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-teal-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-teal-600"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">1</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['hari-ini']['misi'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Misi Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-yellow-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">2</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['hari-ini']['bintang'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Total Bintang</p>
             </div>
           </div>
@@ -137,17 +142,17 @@
           <div id="content-minggu-ini" class="hidden grid-cols-3 gap-3 md:gap-4">
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-emerald-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">2</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['minggu-ini']['cerita'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Cerita Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-teal-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-teal-600"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">3</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['minggu-ini']['misi'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Misi Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-yellow-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">6</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['minggu-ini']['bintang'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Total Bintang</p>
             </div>
           </div>
@@ -156,17 +161,17 @@
           <div id="content-keseluruhan" class="hidden grid-cols-3 gap-3 md:gap-4">
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-emerald-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">4</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['keseluruhan']['cerita'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Cerita Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-teal-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-teal-600"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">6</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['keseluruhan']['misi'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Misi Selesai</p>
             </div>
             <div class="bg-white border border-gray-100 rounded-[1.5rem] p-4 text-center shadow-sm">
               <div class="w-10 h-10 mx-auto bg-yellow-50 rounded-xl flex items-center justify-center mb-2"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg></div>
-              <p class="font-extrabold text-2xl text-[#1F2937]">12</p>
+              <p class="font-extrabold text-2xl text-[#1F2937]">{{ $summary['keseluruhan']['bintang'] }}</p>
               <p class="text-[11px] md:text-xs text-slate-500 font-medium">Total Bintang</p>
             </div>
           </div>
@@ -189,43 +194,31 @@
           <!-- SLIDER HORIZONTAL -->
           <div id="badgeSlider" class="flex gap-4 overflow-x-auto pb-4 snap-x hide-scroll w-full cursor-grab active:cursor-grabbing select-none">
 
-            <!-- Badge 1 -->
+            @forelse ($badges as $badge)
+            @if ($badge->earned)
             <div class="flex-none w-[130px] border border-[#10B981] rounded-3xl p-4 text-center snap-center flex flex-col items-center shadow-sm bg-white pointer-events-none">
               <div class="w-12 h-12 rounded-full bg-[#FEF3C7] flex items-center justify-center mb-3"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-[#F59E0B]"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg></div>
-              <h4 class="font-extrabold text-[13px] text-[#1F2937] leading-snug mb-1">Pembaca<br>Hebat</h4>
-              <p class="text-[10px] text-slate-400 mb-3">5 Bintang</p>
+              <h4 class="font-extrabold text-[13px] text-[#1F2937] leading-snug mb-1">{{ $badge->name }}</h4>
+              <p class="text-[10px] text-slate-400 mb-3">{{ $badge->minimum_stars }} Bintang</p>
               <div class="bg-emerald-100 text-[#10B981] text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto">Diperoleh</div>
             </div>
-
-            <!-- Badge 2 -->
+            @else
             <div class="flex-none w-[130px] border border-gray-100 rounded-3xl p-4 text-center snap-center flex flex-col items-center shadow-sm bg-white opacity-70 pointer-events-none">
               <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-3"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-              <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Penjaga<br>Alam</h4>
-              <p class="text-[10px] text-slate-400 mb-3">10 Bintang</p>
+              <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">{{ $badge->name }}</h4>
+              <p class="text-[10px] text-slate-400 mb-3">{{ $badge->minimum_stars }} Bintang</p>
               <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto tracking-tight">Belum Diperoleh</div>
             </div>
-
-            <!-- Badge 3 -->
-            <div class="flex-none w-[130px] border border-gray-100 rounded-3xl p-4 text-center snap-center flex flex-col items-center shadow-sm bg-white opacity-70 pointer-events-none">
-              <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-3"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-              <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Pahlawan<br>Kebaikan</h4>
-              <p class="text-[10px] text-slate-400 mb-3">20 Bintang</p>
-              <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto tracking-tight">Belum Diperoleh</div>
-            </div>
-
-            <!-- Badge 4 -->
-            <div class="flex-none w-[130px] border border-gray-100 rounded-3xl p-4 text-center snap-center flex flex-col items-center shadow-sm bg-white opacity-70 pointer-events-none">
-              <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mb-3"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-              <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Misi<br>Sempurna</h4>
-              <p class="text-[10px] text-slate-400 mb-3">30 Bintang</p>
-              <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto tracking-tight">Belum Diperoleh</div>
-            </div>
+            @endif
+            @empty
+            <p class="text-xs text-slate-400">Belum ada lencana.</p>
+            @endforelse
 
           </div>
         </div>
 
-        <a href="{{ url('/belajar-bersama') }}" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl hover:bg-[#059669] transition shadow-md flex justify-center items-center gap-2 cursor-pointer">
-          Belajar Bersama Ayu
+        <a href="{{ route('children.learn', ['anak' => $child->child_id, 'from' => request('from')]) }}" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl hover:bg-[#059669] transition shadow-md flex justify-center items-center gap-2 cursor-pointer">
+          Belajar Bersama {{ $child->name }}
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
         </a>
       </div>
@@ -264,30 +257,25 @@
       </div>
       <div class="p-6 overflow-y-auto flex-grow">
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+          @forelse ($badges as $badge)
+          @if ($badge->earned)
           <div class="border border-[#10B981] bg-emerald-50/20 rounded-3xl p-4 text-center flex flex-col items-center">
             <div class="w-14 h-14 bg-[#FEF3C7] rounded-full flex items-center justify-center mb-3"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-[#F59E0B]"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg></div>
-            <h4 class="font-extrabold text-[13px] text-[#1F2937] leading-snug mb-1">Pembaca<br>Hebat</h4>
-            <p class="text-[10px] text-slate-500 mb-3">5 Bintang</p>
+            <h4 class="font-extrabold text-[13px] text-[#1F2937] leading-snug mb-1">{{ $badge->name }}</h4>
+            <p class="text-[10px] text-slate-500 mb-3">{{ $badge->minimum_stars }} Bintang</p>
             <div class="bg-emerald-100 text-[#10B981] text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto">Diperoleh</div>
           </div>
+          @else
           <div class="border border-gray-100 bg-white rounded-3xl p-4 text-center opacity-70 flex flex-col items-center">
             <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-slate-100"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-            <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Penjaga<br>Alam</h4>
-            <p class="text-[10px] text-slate-400 mb-3">10 Bintang</p>
+            <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">{{ $badge->name }}</h4>
+            <p class="text-[10px] text-slate-400 mb-3">{{ $badge->minimum_stars }} Bintang</p>
             <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto">Belum</div>
           </div>
-          <div class="border border-gray-100 bg-white rounded-3xl p-4 text-center opacity-70 flex flex-col items-center">
-            <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-slate-100"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-            <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Pahlawan<br>Kebaikan</h4>
-            <p class="text-[10px] text-slate-400 mb-3">20 Bintang</p>
-            <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto">Belum</div>
-          </div>
-          <div class="border border-gray-100 bg-white rounded-3xl p-4 text-center opacity-70 flex flex-col items-center">
-            <div class="w-14 h-14 bg-slate-50 rounded-full flex items-center justify-center mb-3 border border-slate-100"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg></div>
-            <h4 class="font-bold text-[13px] text-slate-500 leading-snug mb-1">Misi<br>Sempurna</h4>
-            <p class="text-[10px] text-slate-400 mb-3">30 Bintang</p>
-            <div class="bg-slate-100 text-slate-500 text-[10px] font-bold py-1.5 px-3 rounded-full w-full mt-auto">Belum</div>
-          </div>
+          @endif
+          @empty
+          <p class="text-xs text-slate-400">Belum ada lencana.</p>
+          @endforelse
         </div>
       </div>
     </div>
@@ -355,7 +343,7 @@
         <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
           Batal
         </button>
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -424,5 +412,7 @@
       });
     }
   </script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

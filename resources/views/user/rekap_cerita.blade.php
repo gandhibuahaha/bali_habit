@@ -85,7 +85,7 @@
     <div class="text-center mb-8 px-2">
       <h1 class="text-2xl md:text-3xl font-extrabold text-[#1F2937] mb-3 tracking-tight">Cerita Selesai!</h1>
       <p class="text-slate-500 text-sm md:text-base leading-relaxed">
-        Hebat, <span class="font-bold text-slate-700">Ayu</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">I Alu Teken I Kedis Puuh</span>".
+        Hebat, <span class="font-bold text-slate-700">{{ $child->name }}</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle ?? 'I Alu Teken I Kedis Puuh' }}</span>".
       </p>
     </div>
 
@@ -154,7 +154,7 @@
           <div class="flex items-baseline gap-1.5">
             <span class="font-extrabold text-2xl text-[#1F2937]">2 Kali</span>
           </div>
-          <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dibaca bersama Ayu</p>
+          <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dibaca bersama {{ $child->name }}</p>
         </div>
       </div>
     </div>
@@ -269,7 +269,7 @@
         <button onclick="closeLogoutModal()" class="flex-1 bg-slate-50 text-slate-500 font-bold py-3.5 rounded-2xl hover:bg-slate-100 transition border border-slate-100 cursor-pointer">
           Batal
         </button>
-        <button onclick="window.location.replace('{{ url('/login') }}')" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
+        <button onclick="document.getElementById('logoutForm').submit()" class="flex-1 bg-red-500 text-white font-extrabold py-3.5 rounded-2xl hover:bg-red-600 transition shadow-sm shadow-red-200 cursor-pointer">
           Ya, Keluar
         </button>
       </div>
@@ -277,5 +277,7 @@
   </div>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
+  <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>
