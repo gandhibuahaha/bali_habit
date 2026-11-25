@@ -57,7 +57,7 @@
         </div>
 
         <!-- Form Utama -->
-        <form id="loginForm" action="{{ url('/dashboard') }}" method="POST">
+          <form id="loginForm" action="{{ route('login.store') }}" method="POST">
           @csrf
 
           <!-- Input Email -->
@@ -68,6 +68,11 @@
               <input type="email" id="email" name="email" placeholder="email@example.com" class="bg-transparent w-full outline-none text-xs md:text-sm text-[#1F2937] ml-2.5 placeholder:text-slate-400">
             </div>
             <p id="err-email" class="error-msg hidden text-red-500 text-[10px] mt-1 font-medium"></p>
+            @error('email')
+              <p class="text-red-500 text-[10px] mt-1 font-medium">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- Input Password -->
@@ -86,6 +91,11 @@
               </button>
             </div>
             <p id="err-pass" class="error-msg hidden text-red-500 text-[10px] mt-1 font-medium"></p>
+            @error('password')
+              <p class="text-red-500 text-[10px] mt-1 font-medium">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- Simpan Password & Lupa Password -->
@@ -258,7 +268,7 @@
       }
 
       if (isValid) {
-        window.location.href = this.action;
+      HTMLFormElement.prototype.submit.call(this);
       }
     });
   </script>

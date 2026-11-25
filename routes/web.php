@@ -1,140 +1,103 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminProfileController;
 
-Route::get('/', function () {
-    return view('user.index');
-});
-Route::get('/cerita', function () {
-    return view('user.cerita');
-});
-Route::get('/tentang', function () {
-    return view('user.tentang');
-});
-Route::get('/detail-cerita', function () {
-    return view('user.detail_cerita');
-});
-Route::get('/login', function () {
-    return view('user.login');
-});
-Route::get('/registrasi', function () {
-    return view('user.registrasi');
-});
-Route::get('/lupa-sandi', function () {
-    return view('user.lupa_sandi');
-});
-Route::get('/dashboard', function () {
-    return view('user.dashboard');
-});
-Route::get('/halaman-anak', function () {
-    return view('user.halaman_anak');
-});
-Route::get('/profil-orangtua', function () {
-    return view('user.profil_orangtua');
-});
-Route::get('/progress-anak', function () {
-    return view('user.progress_anak');
-});
-Route::get('/belajar-bersama', function () {
-    return view('user.belajar_bersama');
-});
-Route::get('/tambah-anak', function () {
-    return view('user.tambah_anak');
-});
-Route::get('/edit-anak', function () {
-    return view('user.edit_anak');
-});
-Route::get('/halaman-baca', function () {
-    return view('user.halaman_baca');
-});
-Route::get('/halaman-refleksi', function () {
-    return view('user.halaman_refleksi');
-});
-Route::get('/halaman-misi', function () {
-    return view('user.halaman_misi');
-});
-Route::get('/rekap-cerita', function () {
-    return view('user.rekap_cerita');
-});
-Route::get('/edit-profil', function () {
-    return view('user.edit_profil');
-});
-Route::get('/ubah-sandi', function () {
-    return view('user.ubah_sandi');
-});
-Route::get('/halaman-bantuan', function () {
-    return view('user.halaman_bantuan');
+/* Halaman publik */
+Route::view('/', 'user.index')->name('home');
+Route::view('/cerita', 'user.cerita')->name('cerita');
+Route::view('/tentang', 'user.tentang')->name('tentang');
+Route::view('/detail-cerita', 'user.detail_cerita')->name('detail-cerita');
+
+/* Autentikasi Parent */
+Route::view('/login', 'user.login')->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('login.store');
+
+Route::view('/registrasi', 'user.registrasi')->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('register.store');
+
+Route::view('/lupa-sandi', 'user.lupa_sandi')->name('password.request');
+
+/* Halaman yang hanya dapat diakses akun Parent */
+Route::middleware(EnsureUserRole::class . ':parent')->group(function () {
+    Route::view('/dashboard', 'user.dashboard')->name('parent.dashboard');
+    Route::view('/halaman-anak', 'user.halaman_anak');
+    Route::view('/profil-orangtua', 'user.profil_orangtua');
+    Route::view('/progress-anak', 'user.progress_anak');
+    Route::view('/belajar-bersama', 'user.belajar_bersama');
+    Route::view('/tambah-anak', 'user.tambah_anak');
+    Route::view('/edit-anak', 'user.edit_anak');
+    Route::view('/halaman-baca', 'user.halaman_baca');
+    Route::view('/halaman-refleksi', 'user.halaman_refleksi');
+    Route::view('/halaman-misi', 'user.halaman_misi');
+    Route::view('/rekap-cerita', 'user.rekap_cerita');
+    Route::view('/edit-profil', 'user.edit_profil');
+    Route::view('/ubah-sandi', 'user.ubah_sandi');
+    Route::view('/halaman-bantuan', 'user.halaman_bantuan');
+
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-Route::get('/admin/login', function () {
-    return view('admin.login_admin');
-});
-Route::get('/admin/lupa-sandi', function () {
-    return view('admin.lupa_sandi_admin');
-});
-Route::get('/admin/dashboard', function () {
-    return view('admin.beranda_admin');
-});
-Route::get('/admin/user-management', function () {
-    return view('admin.user_management_ortu');
-});
-Route::get('/admin/user-management-anak', function () {
-    return view('admin.user_management_anak');
-});
-Route::get('/admin/aktivitas-pengguna', function () {
-    return view('admin.aktivitas_pengguna');
-});
-Route::get('/admin/story-management', function () {
-    return view('admin.story_management');
-});
-Route::get('/admin/tambah-cerita', function () {
-    return view('admin.tambah_cerita');
-});
-Route::get('/admin/edit-cerita', function () {
-    return view('admin.edit_cerita');
-});
-Route::get('/admin/detail-cerita', function () {
-    return view('admin.detail_cerita');
-});
-Route::get('/admin/edit-halaman-cerita', function () {
-    return view('admin.edit_halaman_cerita');
-});
-Route::get('/admin/tambah-halaman-cerita', function () {
-    return view('admin.tambah_halaman_cerita');
-});
-Route::get('/admin/refleksi-management', function () {
-    return view('admin.refleksi_management');
-});
-Route::get('/admin/tambah-refleksi', function () {
-    return view('admin.tambah_refleksi');
-});
-Route::get('/admin/edit-refleksi', function () {
-    return view('admin.edit_refleksi');
-});
-Route::get('/admin/lihat-refleksi', function () {
-    return view('admin.lihat_refleksi');
-});
-Route::get('/admin/mission-management', function () {
-    return view('admin.mission_management');
-});
-Route::get('/admin/edit-misi', function () {
-    return view('admin.edit_misi');
-});
-Route::get('/admin/tambah-misi', function () {
-    return view('admin.tambah_misi');
-});
-Route::get('/admin/lihat-misi', function () {
-    return view('admin.lihat_misi');
-});
-Route::get('/admin/lencana-management', function () {
-    return view('admin.lencana_management');
-});
-Route::get('/admin/tambah-lencana', function () {
-    return view('admin.tambah_lencana');
-});
-Route::get('/admin/edit-lencana', function () {
-    return view('admin.edit_lencana');
-});
-Route::get('/admin/profil', function () {
-    return view('admin.profil_admin');
+
+/* Halaman Login Admin dapat dibuka untuk pergantian akun.
+   Dashboard Admin tetap dilindungi middleware EnsureUserRole. */
+
+Route::view('/admin/login', 'admin.login_admin')
+    ->name('admin.login');
+
+Route::post('/admin/login', [
+    AuthenticatedSessionController::class,
+    'adminStore'
+])
+    ->middleware('throttle:10,1')
+    ->name('admin.login.store');
+
+/* Halaman lupa sandi Admin */
+Route::view('/admin/lupa-sandi', 'admin.lupa_sandi_admin')
+    ->name('admin.password.request');
+
+
+/* Seluruh halaman manajemen Admin memerlukan role admin */
+Route::prefix('admin')->middleware(EnsureUserRole::class . ':admin')->group(function () {
+    Route::view('/dashboard', 'admin.beranda_admin')->name('admin.dashboard');
+    Route::view('/user-management', 'admin.user_management_ortu');
+    Route::view('/user-management-anak', 'admin.user_management_anak');
+    Route::view('/aktivitas-pengguna', 'admin.aktivitas_pengguna');
+
+    Route::view('/story-management', 'admin.story_management');
+    Route::view('/tambah-cerita', 'admin.tambah_cerita');
+    Route::view('/edit-cerita', 'admin.edit_cerita');
+    Route::view('/detail-cerita', 'admin.detail_cerita');
+    Route::view('/edit-halaman-cerita', 'admin.edit_halaman_cerita');
+    Route::view('/tambah-halaman-cerita', 'admin.tambah_halaman_cerita');
+
+    Route::view('/refleksi-management', 'admin.refleksi_management');
+    Route::view('/tambah-refleksi', 'admin.tambah_refleksi');
+    Route::view('/edit-refleksi', 'admin.edit_refleksi');
+    Route::view('/lihat-refleksi', 'admin.lihat_refleksi');
+
+    Route::view('/mission-management', 'admin.mission_management');
+    Route::view('/edit-misi', 'admin.edit_misi');
+    Route::view('/tambah-misi', 'admin.tambah_misi');
+    Route::view('/lihat-misi', 'admin.lihat_misi');
+
+    Route::view('/lencana-management', 'admin.lencana_management');
+    Route::view('/tambah-lencana', 'admin.tambah_lencana');
+    Route::view('/edit-lencana', 'admin.edit_lencana');
+    Route::view('/profil', 'admin.profil_admin')
+    ->name('admin.profile');
+
+    Route::post('/profil', [
+        AdminProfileController::class,
+        'update'
+    ])->name('admin.profile.update');
+
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });

@@ -57,7 +57,7 @@
         </div>
 
         <!-- FORM UTAMA -->
-        <form id="registerForm" action="{{ url('/login') }}" method="POST">
+        <form id="registerForm" action="{{ route('register.store') }}" method="POST">
           @csrf
 
           <div class="mb-3">
@@ -67,6 +67,11 @@
               <input type="text" id="nama" name="name" placeholder="Masukkan nama lengkap Anda" class="bg-transparent w-full outline-none text-xs md:text-sm text-[#1F2937] ml-2.5 placeholder:text-slate-400">
             </div>
             <p id="err-nama" class="error-msg hidden text-red-500 text-[10px] mt-1 font-medium"></p>
+            @error('name')
+            <p class="text-red-500 text-[10px] mt-1 font-medium">
+                {{ $message }}
+            </p>
+            @enderror
           </div>
 
           <div class="mb-3">
@@ -76,6 +81,11 @@
               <input type="email" id="email" name="email" placeholder="email@example.com" class="bg-transparent w-full outline-none text-xs md:text-sm text-[#1F2937] ml-2.5 placeholder:text-slate-400">
             </div>
             <p id="err-email" class="error-msg hidden text-red-500 text-[10px] mt-1 font-medium"></p>
+            @error('email')
+              <p class="text-red-500 text-[10px] mt-1 font-medium">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- INPUT PASSWORD -->
@@ -95,6 +105,11 @@
               </button>
             </div>
             <p id="err-pass" class="error-msg hidden text-red-500 text-[10px] mt-1 font-medium"></p>
+            @error('password')
+              <p class="text-red-500 text-[10px] mt-1 font-medium">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- INPUT KONFIRMASI PASSWORD -->
@@ -248,8 +263,8 @@
         document.getElementById('err-pass').innerText = "Kata sandi tidak boleh kosong.";
         document.getElementById('err-pass').classList.remove('hidden');
         isValid = false;
-      } else if (password.length < 6) {
-        document.getElementById('err-pass').innerText = "Kata sandi harus minimal 6 karakter.";
+      } else if (password.length < 8) {
+        document.getElementById('err-pass').innerText = "Kata sandi harus minimal 8 karakter.";
         document.getElementById('err-pass').classList.remove('hidden');
         isValid = false;
       }
@@ -267,7 +282,7 @@
 
       // Jika valid
       if (isValid) {
-        window.location.href = this.action;
+        HTMLFormElement.prototype.submit.call(this);
       }
     });
   </script>

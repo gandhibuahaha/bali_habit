@@ -85,7 +85,7 @@
         <p class="text-[13.5px] text-slate-500 mb-8 font-medium">Otentikasi kredensial administrator Anda.</p>
 
         <!-- Form Login -->
-        <form id="loginAdminForm" action="{{ url('/admin/dashboard') }}" method="GET" class="w-full flex flex-col gap-5">
+        <form id="loginAdminForm" action="{{ route('admin.login.store') }}" method="POST" class="w-full flex flex-col gap-5">
           @csrf
           
           <!-- Input Email Administrator -->
@@ -105,6 +105,11 @@
             </div>
             <!-- Pesan Error Email -->
             <p id="err-email" class="error-msg hidden text-red-500 text-[11px] font-bold mt-1.5"></p>
+            @error('email')
+              <p class="text-red-500 text-[11px] font-bold mt-1.5">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- Input Kata Sandi -->
@@ -136,6 +141,11 @@
             </div>
             <!-- Pesan Error Password -->
             <p id="err-pass" class="error-msg hidden text-red-500 text-[11px] font-bold mt-1.5"></p>
+            @error('password')
+              <p class="text-red-500 text-[11px] font-bold mt-1.5">
+                  {{ $message }}
+              </p>
+            @enderror
           </div>
 
           <!-- Ingat Sesi Saya & Lupa Sandi -->
@@ -273,7 +283,7 @@
       }
 
       if (isValid) {
-        window.location.href = this.action;
+        HTMLFormElement.prototype.submit.call(this);
       }
     });
   </script>
