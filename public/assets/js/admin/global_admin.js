@@ -50,8 +50,17 @@ window.closeLogoutModal = function() {
 };
 
 window.confirmLogout = function() {
-  // Sesuaikan dengan route login admin di routes/web.php (misal: '/admin/login' atau '/login')
-  window.location.href = '/admin/login';
+  // Keluar sungguhan: kirim form POST (berisi token CSRF) ke route admin.logout.
+  // Server mengakhiri sesi lalu mengarahkan ke halaman login Admin.
+  // Form #adminLogoutForm ada di bagian bawah setiap halaman Admin.
+  const form = document.getElementById('adminLogoutForm');
+
+  if (!form) {
+    alert('Form keluar tidak ditemukan. Silakan muat ulang halaman, lalu coba lagi.');
+    return;
+  }
+
+  form.submit();
 };
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -108,7 +108,7 @@
         </button>
         <!-- Breadcrumb Header -->
         <div class="hidden sm:flex items-center text-[13px] font-bold text-slate-400">
-          <span>Portal Admin</span>
+          <a href="{{ route('admin.dashboard') }}" class="hover:text-[#10B981] transition">Portal Admin</a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 mx-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
           <span class="text-[#10B981]">Profil Saya</span>
         </div>
@@ -127,8 +127,8 @@
         <div class="relative">
           <!-- Trigger Button -->
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
+            <div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>@if ($admin->no_tlp)<span class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-3.5 h-3.5 flex items-center justify-center border-2 border-white" title="Nomor telepon sudah diisi"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-2 h-2 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg></span>@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block truncate max-w-[150px]" title="{{ $admin->name }}">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
           </button>
 
@@ -196,12 +196,18 @@
           
           <!-- Bagian Atas: Avatar & Nama -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-slate-100">
-            <div class="flex items-center gap-5">
+            <div class="flex items-center gap-5 min-w-0">
               <!-- Avatar Besar -->
-              <div class="relative">
+              <div class="relative flex-shrink-0">
                 <div id="avatarContainer" class="w-20 h-20 rounded-full bg-[#10B981] text-white text-[24px] font-extrabold flex items-center justify-center shadow-md overflow-hidden bg-cover bg-center" @if ($adminPhoto) style="background-image: url('{{ $adminPhoto }}')" @endif>
                   <span id="avatarInitials" @if ($adminPhoto) style="display: none" @endif>{{ $adminInitials }}</span>
                 </div>
+                <!-- Badge Centang Hijau: hanya jika nomor telepon sudah diisi (kanan atas; kamera di kanan bawah) -->
+                @if ($admin->no_tlp)
+                <div class="absolute top-0 right-0 w-6 h-6 bg-[#10B981] rounded-full border-2 border-white flex items-center justify-center shadow-sm" title="Nomor telepon sudah diisi">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg>
+                </div>
+                @endif
                 <!-- Badge Ikon Kamera -->
                 <div onclick="document.getElementById('profileImageInput').click()" class="absolute bottom-0 right-0 w-7 h-7 bg-white rounded-full border border-slate-200 flex items-center justify-center text-slate-500 shadow-sm cursor-pointer hover:text-[#10B981] transition group">
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
@@ -210,14 +216,15 @@
                   </svg>
                 </div>
               </div>
-              <div>
-                <h2 class="text-[20px] font-extrabold text-[#0F172A]">{{ $admin->name }}</h2>
+              <div class="min-w-0">
+                {{-- Nama panjang dipotong dengan "…"; nama lengkap saat kursor diarahkan --}}
+                <h2 class="text-[20px] font-extrabold text-[#0F172A] truncate" title="{{ $admin->name }}">{{ $admin->name }}</h2>
                 <p class="text-[13px] text-slate-400 font-medium mt-0.5">Administrator</p>
               </div>
             </div>
 
             <!-- Tombol Ganti Foto -->
-            <button onclick="document.getElementById('profileImageInput').click()" class="self-start sm:self-center inline-flex items-center gap-2 bg-slate-50 text-slate-600 border border-slate-200 hover:bg-[#10B981] hover:text-white hover:border-[#10B981] px-5 py-2.5 rounded-[12px] text-[13px] font-bold shadow-sm transition group">
+            <button onclick="document.getElementById('profileImageInput').click()" class="flex-shrink-0 self-start sm:self-center inline-flex items-center gap-2 bg-slate-50 text-slate-600 border border-slate-200 hover:bg-[#10B981] hover:text-white hover:border-[#10B981] px-5 py-2.5 rounded-[12px] text-[13px] font-bold shadow-sm transition group">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-500 group-hover:text-white transition">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
               </svg>
@@ -477,5 +484,7 @@
     }
   </script>
 
+  <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
+  <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

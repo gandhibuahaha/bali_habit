@@ -77,18 +77,20 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
             </svg>
             @endif
-            <!-- Badge Centang Hijau -->
+            <!-- Badge Centang Hijau: hanya jika nomor telepon sudah diisi -->
+            @if (auth()->user()->no_tlp)
             <div class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg>
             </div>
+            @endif
           </div>
 
-          <!-- Teks Identitas -->
-          <div>
+          <!-- Teks Identitas (nama/email panjang dipotong dengan "…"; lengkapnya saat kursor diarahkan) -->
+          <div class="min-w-0">
             <div class="flex items-center gap-2 mb-1">
-              <h3 class="font-extrabold text-lg text-[#1F2937]">{{ auth()->user()->name }}</h3>
+              <h3 class="font-extrabold text-lg text-[#1F2937] truncate" title="{{ auth()->user()->name }}">{{ auth()->user()->name }}</h3>
             </div>
-            <p class="text-sm text-slate-500 font-medium">{{ auth()->user()->email }}</p>
+            <p class="text-sm text-slate-500 font-medium truncate" title="{{ auth()->user()->email }}">{{ auth()->user()->email }}</p>
           </div>
         </div>
 

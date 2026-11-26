@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -28,15 +29,9 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $initials = collect(preg_split('/\s+/', trim((string) $admin->name)))
-                ->filter()
-                ->take(2)
-                ->map(fn (string $word) => mb_strtoupper(mb_substr($word, 0, 1)))
-                ->implode('');
-
             $view->with([
                 'admin' => $admin,
-                'adminInitials' => $initials,
+                'adminInitials' => User::initialsOf((string) $admin->name),
                 'adminPhoto' => $admin->profile_picture ? asset('storage/'.$admin->profile_picture) : null,
             ]);
         });

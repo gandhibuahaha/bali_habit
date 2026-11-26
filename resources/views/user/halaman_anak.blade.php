@@ -64,22 +64,23 @@
       @php $isGirl = $child->gender === "female"; @endphp
       <!-- KARTU ANAK -->
       <div class="bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full">
-        <div class="flex justify-between items-start mb-6">
-          <div class="flex items-center gap-3">
-            <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden">
+        <div class="flex justify-between items-start gap-3 mb-6">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden flex-shrink-0">
               @if ($child->profile_picture)
                 <img src="{{ asset("storage/" . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
               @else
                 {{ $isGirl ? "👧🏼" : "👦🏽" }}
               @endif
             </div>
-            <div>
-              <h3 class="font-extrabold text-lg text-[#1F2937]">{{ $child->name }}</h3>
+            <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
+            <div class="min-w-0">
+              <h3 class="font-extrabold text-lg text-[#1F2937] truncate" title="{{ $child->name }}">{{ $child->name }}</h3>
               <p class="text-xs text-slate-500 font-medium mt-0.5">{{ $child->birth_date->age }} tahun</p>
             </div>
           </div>
           <!-- Label Bintang (belum ada data bintang; diisi oleh fitur progress) -->
-          <div class="bg-yellow-50/50 border border-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5">
+          <div class="bg-yellow-50/50 border border-yellow-100 text-yellow-700 px-3 py-1.5 rounded-full text-[11px] font-extrabold flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
             0 Bintang
           </div>

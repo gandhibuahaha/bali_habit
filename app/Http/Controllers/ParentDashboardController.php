@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Support\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -79,13 +80,8 @@ class ParentDashboardController extends Controller
                 'type' => $item['type'],
                 'child' => $item['child'],
                 'subject' => $item['subject'],
-                'time_label' => $this->timeLabel(Carbon::parse($item['time'])),
+                'time_label' => ActivityLog::timeLabel(Carbon::parse($item['time'])),
             ])
             ->values();
-    }
-
-    private function timeLabel(Carbon $time): string
-    {
-        return $time->isYesterday() ? 'Kemarin' : $time->locale('id')->diffForHumans();
     }
 }

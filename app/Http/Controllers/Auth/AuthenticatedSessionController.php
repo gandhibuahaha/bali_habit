@@ -35,7 +35,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->route('parent.dashboard');
+        // Kembali ke halaman yang tadi dibuka (jika halaman Orang Tua), selain itu ke dashboard.
+        return $this->redirectAfterLogin($request, false, route('parent.dashboard'));
     }
 
     /**
@@ -53,16 +54,6 @@ class AuthenticatedSessionController extends Controller
         // Ambil daftar email Admin dari konfigurasi privat.
         $allowedEmails = config('admin_access.allowed_emails', []);
 
-        // Pemeriksaan pertama: email harus termasuk whitelist.
-        if (! in_array($email, $allowedEmails, true)) {
-            return back()
-                ->withErrors([
-                    'email' => 'Email atau kata sandi tidak sesuai atau akun tidak diizinkan sebagai administrator.',
-                ])
-                ->onlyInput('email');
-        }
-
-        // Pemeriksaan kedua dan ketiga:
         // Password harus benar dan role harus admin.
         $credentials = [
             'email' => $email,
@@ -70,7 +61,17 @@ class AuthenticatedSessionController extends Controller
             'role' => 'admin',
         ];
 
-        if (! Auth::guard('web')->attempt($credentials)) {
+        // Email harus termasuk whitelist. Untuk email di luar whitelist, pemeriksaan
+        // kata sandi tetap dijalankan (hasilnya diabaikan) supaya jawaban selalu
+        // memakan waktu yang sama: Laravel membuat pemeriksaan yang gagal berlangsung
+        // minimal 0,2 detik. Tanpa ini, penolakan yang lebih cepat membocorkan email
+        // mana yang termasuk daftar Admin.
+        $allowed = in_array($email, $allowedEmails, true);
+        if (! $allowed) {
+            Auth::guard('web')->validate($credentials);
+        }
+
+        if (! $allowed || ! Auth::guard('web')->attempt($credentials)) {
             return back()
                 ->withErrors([
                     'email' => 'Email atau kata sandi tidak sesuai atau akun tidak diizinkan sebagai administrator.',
@@ -81,8 +82,30 @@ class AuthenticatedSessionController extends Controller
         // Perbarui session setelah autentikasi berhasil.
         $request->session()->regenerate();
 
-        // Admin selalu diarahkan ke dashboard Admin.
-        return redirect()->route('admin.dashboard');
+        // Kembali ke halaman Admin yang tadi dibuka, selain itu ke dashboard Admin.
+        return $this->redirectAfterLogin($request, true, route('admin.dashboard'));
+    }
+
+    /**
+     * Halaman tujuan setelah login: alamat yang tadi dibuka (disimpan oleh
+     * EnsureUserRole lewat redirect()->guest()), tetapi hanya jika sesuai jenis
+     * akunnya (/admin/... untuk Admin, selain itu untuk Orang Tua). Jika tidak
+     * sesuai, ke $fallback, supaya pengguna tidak dipantulkan ke login lagi.
+     */
+    private function redirectAfterLogin(Request $request, bool $isAdmin, string $fallback): RedirectResponse
+    {
+        $intended = $request->session()->pull('url.intended');
+
+        if (is_string($intended)) {
+            $path = '/'.ltrim((string) parse_url($intended, PHP_URL_PATH), '/');
+            $isAdminPage = $path === '/admin' || str_starts_with($path, '/admin/');
+
+            if ($isAdminPage === $isAdmin) {
+                return redirect()->to($intended);
+            }
+        }
+
+        return redirect()->to($fallback);
     }
 
     /**

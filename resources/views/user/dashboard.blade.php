@@ -79,22 +79,23 @@
           @php $isGirl = $child->gender === "female"; @endphp
           <!-- Kartu Anak -->
           <div class="bg-white border border-gray-100 rounded-[2rem] p-5 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden">
+            <div class="flex justify-between items-start gap-3 mb-6">
+              <div class="flex items-center gap-3 min-w-0">
+                <div class="w-14 h-14 {{ $isGirl ? "bg-orange-50" : "bg-cyan-50" }} rounded-full flex items-center justify-center text-3xl overflow-hidden flex-shrink-0">
                   @if ($child->profile_picture)
                     <img src="{{ asset("storage/" . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
                   @else
                     {{ $isGirl ? "👧🏼" : "👦🏽" }}
                   @endif
                 </div>
-                <div>
-                  <h3 class="font-extrabold text-base text-[#1F2937]">{{ $child->name }}</h3>
+                <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
+                <div class="min-w-0">
+                  <h3 class="font-extrabold text-base text-[#1F2937] truncate" title="{{ $child->name }}">{{ $child->name }}</h3>
                   <p class="text-xs text-slate-500 font-medium">{{ $child->birth_date->age }} tahun</p>
                 </div>
               </div>
               <!-- Bintang: belum ada data, diisi oleh fitur progress -->
-              <div class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5">
+              <div class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
                 0
               </div>
@@ -139,15 +140,18 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               @endif
             </div>
-            <div>
-              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed">
-                <span class="font-extrabold">{{ $activity['child'] }}</span>
-                @switch($activity['type'])
-                  @case('story') menyelesaikan cerita "{{ $activity['subject'] }}" @break
-                  @case('mission') menyelesaikan misi cerita "{{ $activity['subject'] }}" @break
-                  @case('reflection') mengisi refleksi cerita "{{ $activity['subject'] }}" @break
-                  @case('badge') mendapatkan lencana "{{ $activity['subject'] }}" @break
-                @endswitch
+            @php
+              $verb = [
+                'story' => 'menyelesaikan cerita',
+                'mission' => 'menyelesaikan misi cerita',
+                'reflection' => 'mengisi refleksi cerita',
+                'badge' => 'mendapatkan lencana',
+              ][$activity['type']];
+            @endphp
+            {{-- Satu baris saja; kalimat panjang dipotong dengan "…", lengkapnya saat kursor diarahkan --}}
+            <div class="min-w-0 flex-1">
+              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed truncate" title="{{ $activity['child'] }} {{ $verb }} &quot;{{ $activity['subject'] }}&quot;">
+                <span class="font-extrabold">{{ $activity['child'] }}</span> {{ $verb }} "{{ $activity['subject'] }}"
               </p>
               <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ $activity['time_label'] }}</p>
             </div>

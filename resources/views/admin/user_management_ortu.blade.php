@@ -107,7 +107,7 @@
           </svg>
         </button>
         <div class="hidden sm:flex items-center text-[13px] font-bold text-slate-400">
-          <span>Portal Admin</span>
+          <a href="{{ route('admin.dashboard') }}" class="hover:text-[#10B981] transition">Portal Admin</a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 mx-2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 L15.75 12 L8.25 19.5" />
           </svg>
@@ -129,8 +129,8 @@
         <div class="relative">
           <!-- Trigger Button -->
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
+            <div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>@if ($admin->no_tlp)<span class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-3.5 h-3.5 flex items-center justify-center border-2 border-white" title="Nomor telepon sudah diisi"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-2 h-2 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg></span>@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block truncate max-w-[150px]" title="{{ $admin->name }}">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25 L12 15.75 L4.5 8.25" />
             </svg>
@@ -186,12 +186,12 @@
           <!-- Tab Aktif (Orang Tua) -->
           <a href="{{ url('/admin/user-management') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-[#10B981] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition flex items-center gap-2">
             Orang Tua 
-            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-[#10B981] text-[10px] font-extrabold">24</span>
+            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-[#10B981] text-[10px] font-extrabold">{{ number_format($totalOrangTua, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Tidak Aktif (Anak) -->
           <a href="{{ url('/admin/user-management-anak') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
             Anak
-            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">36</span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">{{ number_format($totalAnak, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Baru: Aktivitas Pengguna -->
           <a href="{{ url('/admin/aktivitas-pengguna') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
@@ -245,13 +245,13 @@
 
           <!-- Tabel Data -->
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse" style="table-layout: fixed">
               <thead>
                 <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-[0.05em]">
                   <th class="py-4 px-4 w-16">No</th>
                   <th class="py-4 px-4">Nama</th>
                   <th class="py-4 px-4">Email</th>
-                  <th class="py-4 px-4">Jumlah Anak</th>
+                  <th class="py-4 px-4 w-36">Jumlah Anak</th>
                   <th class="py-4 px-4 text-right w-32">Aksi</th>
                 </tr>
               </thead>
@@ -264,7 +264,7 @@
           <!-- Footer Tabel: Informasi Data & Paginasi -->
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 mt-2">
             <span id="paginationInfo" class="text-[12px] font-medium text-slate-400">
-              Menampilkan <span class="font-extrabold text-[#0F172A]">1 – 5</span> dari <span class="font-extrabold text-[#0F172A]">24</span> data
+              Menampilkan <span class="font-extrabold text-[#0F172A]">0</span> data
             </span>
             <div id="paginationControls" class="flex items-center gap-1.5">
                <!-- Kontrol paginasi dirender oleh JavaScript -->
@@ -320,23 +320,23 @@
             <div class="border border-slate-100 rounded-[16px] p-5 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 shadow-sm relative overflow-hidden bg-white">
               <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
-              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full">
+              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full min-w-0">
                 <!-- Avatar -->
                 <div id="modalOrtuInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0">
                   PD
                 </div>
                 <!-- Info Utama -->
-                <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <h4 id="modalOrtuNama" class="text-[17px] font-extrabold text-[#0F172A]">Putri Dewi</h4>
+                <div class="flex flex-col items-center sm:items-start text-center sm:text-left min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                    <h4 id="modalOrtuNama" class="text-[17px] font-extrabold text-[#0F172A] truncate max-w-xs">Putri Dewi</h4>
                     <span class="inline-flex items-center gap-1 text-[#10B981] text-[11px] font-bold">
                       <div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> Aktif
                     </span>
                   </div>
                   <div class="text-[13px] font-medium text-slate-500 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-                    <span id="modalOrtuEmail">putri.dewi@mail.com</span>
+                    <span id="modalOrtuEmail" class="truncate max-w-xs">putri.dewi@mail.com</span>
                     <span class="hidden sm:inline text-slate-300">•</span>
-                    <span>+62 812 3456 7890</span>
+                    <span id="modalOrtuTelepon" class="whitespace-nowrap">Belum diisi</span>
                   </div>
                 </div>
               </div>
@@ -366,7 +366,7 @@
                     </svg>
                     <span class="text-[12px] font-bold">Terdaftar Sejak</span>
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">14 Januari 2026</span>
+                  <span id="modalOrtuTerdaftar" class="text-[14px] font-extrabold text-[#0F172A]">-</span>
                 </div>
                 <div class="border border-slate-100 rounded-[12px] p-4 flex flex-col gap-1.5 shadow-sm">
                   <div class="flex items-center gap-2 text-slate-400 mb-1">
@@ -375,8 +375,8 @@
                     </svg>
                     <span class="text-[12px] font-bold">Status Akun</span>
                   </div>
-                  <span class="inline-flex items-center gap-1.5 text-[#10B981] font-extrabold text-[13px]">
-                    <div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> Terverifikasi OTP
+                  <span id="modalOrtuStatus" class="inline-flex items-center gap-1.5 text-[#10B981] font-extrabold text-[13px]">
+                    <div id="modalOrtuStatusDot" class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> <span id="modalOrtuStatusText">Nomor telepon sudah diisi</span>
                   </span>
                 </div>
               </div>
@@ -394,7 +394,7 @@
         </div>
 
         <div class="px-7 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between flex-shrink-0">
-          <span class="text-[12px] font-medium text-slate-400">Terakhir aktif: Hari ini, 09:12 WITA</span>
+          <span id="modalOrtuTerakhirAktif" class="text-[12px] font-medium text-slate-400">Terakhir aktif: -</span>
           <button type="button" onclick="closeDetailOrtuModal()" class="px-5 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-600 hover:border-[#10B981] hover:text-[#10B981] font-bold text-[13px] shadow-sm transition">
             Tutup
           </button>
@@ -443,19 +443,48 @@
   <!-- ================= SCRIPT ================= -->
   <script>
 
-    // --- SCRIPT MODAL DETAIL ORANG TUA (DINAMIS) ---
+    // Teks dari database selalu di-escape sebelum masuk ke innerHTML,
+    // supaya nama/email berisi kode HTML tampil sebagai teks biasa.
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // --- SCRIPT MODAL DETAIL ORANG TUA (DATA ASLI) ---
     function openDetailOrtuModal(ortuId) {
       if(ortuId) {
         const ortu = dataOrtu.find(o => o.id === ortuId);
-        
+
         if(ortu) {
           document.getElementById('modalOrtuInisial').innerText = ortu.inisial;
           document.getElementById('modalOrtuNama').innerText = ortu.nama;
+          document.getElementById('modalOrtuNama').title = ortu.nama; // teks lengkap saat kursor diarahkan
           document.getElementById('modalOrtuEmail').innerText = ortu.email;
-          document.getElementById('modalOrtuJumlahAnakText').innerText = ortu.jumlahAnak + ' Anak';
-          document.getElementById('modalAnakCountTitle').innerText = ortu.jumlahAnak;
+          document.getElementById('modalOrtuEmail').title = ortu.email;
+          document.getElementById('modalOrtuTelepon').innerText = ortu.telepon || 'Belum diisi';
+          document.getElementById('modalOrtuTerdaftar').innerText = ortu.terdaftar;
+          document.getElementById('modalOrtuTerakhirAktif').innerText = 'Terakhir aktif: ' + ortu.terakhirAktif;
+          // Total = anak aktif saja; daftar di bawah juga memuat anak Nonaktif (dihapus orang tua)
+          document.getElementById('modalOrtuJumlahAnakText').innerText = ortu.jumlahAnak + ' Anak Aktif';
+          document.getElementById('modalAnakCountTitle').innerText = ortu.anak.length;
 
-          document.getElementById('modalAnakContainer').innerHTML = generateDummyChildrenHTML(ortu.jumlahAnak);
+          // Status akun: hijau kalau nomor telepon sudah diisi, abu-abu kalau belum.
+          const hasPhone = Boolean(ortu.telepon);
+          const status = document.getElementById('modalOrtuStatus');
+          const statusDot = document.getElementById('modalOrtuStatusDot');
+          status.classList.toggle('text-[#10B981]', hasPhone);
+          status.classList.toggle('text-slate-400', !hasPhone);
+          statusDot.classList.toggle('bg-[#10B981]', hasPhone);
+          statusDot.classList.toggle('bg-slate-300', !hasPhone);
+          document.getElementById('modalOrtuStatusText').innerText = hasPhone
+            ? 'Nomor telepon sudah diisi'
+            : 'Nomor telepon belum diisi';
+
+          document.getElementById('modalAnakContainer').innerHTML = renderAnakHTML(ortu.anak);
         }
       }
 
@@ -471,36 +500,31 @@
       }, 10);
     }
 
-    // Fungsi Untuk Membuat Dummy Kartu Anak berdasarkan Jumlah
-    function generateDummyChildrenHTML(count) {
-      const names = ['Ayu', 'Made', 'Budi', 'Sita', 'Agus', 'Dina', 'Putra', 'Sari'];
-      const genders = ['Perempuan', 'Laki-laki'];
-      let htmlContent = '';
+    // Kartu anak asli milik orang tua ini (nama, jenis kelamin, usia, bintang)
+    function renderAnakHTML(daftarAnak) {
+      if (!daftarAnak || daftarAnak.length === 0) {
+        return `<p class="text-[13px] font-medium text-slate-400">Belum ada anak.</p>`;
+      }
 
-      for(let i=0; i<count; i++) {
-        let name = names[Math.floor(Math.random() * names.length)];
-        let initial = name.substring(0,2).toUpperCase();
-        let gender = genders[Math.floor(Math.random() * genders.length)];
-        let age = Math.floor(Math.random() * 7) + 5;
-        let stars = Math.floor(Math.random() * 40) + 5;
-
-        htmlContent += `
-          <div class="border border-slate-100 rounded-[12px] p-4 shadow-sm flex items-center justify-between hover:border-[#10B981] transition group">
-            <div class="flex items-center gap-4">
-              <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0">${initial}</div>
-              <div class="flex flex-col gap-0.5">
-                <span class="text-[14px] font-extrabold text-[#0F172A]">${name}</span>
-                <span class="text-[12px] font-medium text-slate-500">${gender} • ${age} Tahun</span>
+      // Anak Nonaktif (dihapus orang tua) tetap tampil, dibuat pudar + label "Nonaktif"
+      return daftarAnak.map(anak => `
+          <div class="border border-slate-100 rounded-[12px] p-4 shadow-sm flex items-center justify-between gap-3 hover:border-[#10B981] transition group ${anak.aktif ? '' : 'opacity-70'}">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0">${escapeHtml(anak.inisial)}</div>
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <span class="flex items-center gap-1.5 min-w-0">
+                  <span class="text-[14px] font-extrabold text-[#0F172A] truncate" title="${escapeHtml(anak.nama)}">${escapeHtml(anak.nama)}</span>
+                  ${anak.aktif ? '' : '<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-extrabold whitespace-nowrap">Nonaktif</span>'}
+                </span>
+                <span class="text-[12px] font-medium text-slate-500">${escapeHtml(anak.gender)} • ${escapeHtml(anak.usia)} Tahun</span>
               </div>
             </div>
-            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-[8px] text-[11px] font-extrabold border border-amber-100/50">
+            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-[8px] text-[11px] font-extrabold border border-amber-100/50 whitespace-nowrap flex-shrink-0">
               <svg class="w-3 h-3 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              ${stars} Bintang
+              ${escapeHtml(anak.bintang)} Bintang
             </span>
           </div>
-        `;
-      }
-      return htmlContent;
+        `).join('');
     }
 
     function closeDetailOrtuModal() {
@@ -520,28 +544,11 @@
     document.getElementById('detailOrtuBackdrop').addEventListener('click', closeDetailOrtuModal);
 
     // =========================================================
-    // --- SCRIPT PAGINASI, SEARCH & DATA DUMMY ORANG TUA ---
+    // --- SCRIPT PAGINASI, SEARCH & DATA ORANG TUA (DATABASE) ---
     // =========================================================
-    
-    const dataOrtu = [
-      { id: 1, inisial: 'PD', nama: 'Putri Dewi', email: 'putri.dewi@mail.com', jumlahAnak: 2 },
-      { id: 2, inisial: 'IS', nama: 'I Made Surya', email: 'made.surya@mail.com', jumlahAnak: 1 },
-      { id: 3, inisial: 'KA', nama: 'Komang Ayu', email: 'komang.ayu@mail.com', jumlahAnak: 3 },
-      { id: 4, inisial: 'NS', nama: 'Ni Luh Sari', email: 'sari@mail.com', jumlahAnak: 1 },
-      { id: 5, inisial: 'KA', nama: 'Ketut Adi', email: 'ketut.adi@mail.com', jumlahAnak: 2 }
-    ];
 
-    const baseNames = ['Wayan', 'Putu', 'Made', 'Kadek', 'Nyoman', 'Komang', 'Ketut', 'Ngurah', 'Gede', 'Agus', 'Dian'];
-    for(let i = 6; i <= 24; i++) {
-      let randomName = baseNames[i % baseNames.length] + ' ' + (i > 10 ? 'S.' : 'P.');
-      dataOrtu.push({
-        id: i,
-        inisial: randomName.substring(0, 2).toUpperCase(),
-        nama: randomName,
-        email: randomName.toLowerCase().replace(' ', '.') + '@mail.com',
-        jumlahAnak: Math.floor(Math.random() * 3) + 1
-      });
-    }
+    // Semua orang tua dari database, terbaru dulu (urutan ini = "Urutkan: Default").
+    const dataOrtu = @json($parents).map((ortu, index) => ({ ...ortu, urutan: index }));
 
     let filteredDataOrtu = [...dataOrtu];
     const itemsPerPage = 5;
@@ -588,12 +595,13 @@
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
               <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0">
-                ${ortu.inisial}
+                ${escapeHtml(ortu.inisial)}
               </div>
-              <span class="font-extrabold text-[#0F172A]">${ortu.nama}</span>
+              <!-- Nama/email panjang dipotong dengan "…"; teks lengkap muncul saat kursor diarahkan -->
+              <span class="font-extrabold text-[#0F172A] truncate" title="${escapeHtml(ortu.nama)}">${escapeHtml(ortu.nama)}</span>
             </div>
           </td>
-          <td class="py-4 px-4 text-slate-500">${ortu.email}</td>
+          <td class="py-4 px-4 text-slate-500"><span class="block truncate" title="${escapeHtml(ortu.email)}">${escapeHtml(ortu.email)}</span></td>
           <td class="py-4 px-4">
             ${getBadgeHTML(ortu.jumlahAnak)}
           </td>
@@ -679,7 +687,7 @@
       } else if (filterValue === 'anak_asc') {
         filteredDataOrtu.sort((a, b) => a.jumlahAnak - b.jumlahAnak);
       } else {
-        filteredDataOrtu.sort((a, b) => a.id - b.id);
+        filteredDataOrtu.sort((a, b) => a.urutan - b.urutan);
       }
       
       changePage(1);
@@ -691,5 +699,7 @@
     changePage(1);
   </script>
 
+  <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
+  <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

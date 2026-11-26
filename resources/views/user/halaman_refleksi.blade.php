@@ -65,7 +65,7 @@
 
     <header class="mb-6">
       <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-1 tracking-tight">Refleksi Cerita</h1>
-      <p class="text-slate-500 text-sm md:text-base">Yuk, pikirkan bersama {{ $child->name }}!</p>
+      <p class="text-slate-500 text-sm md:text-base">Yuk, pikirkan bersama {{ $child->short_name }}!</p>
     </header>
 
     <!-- KARTU RIWAYAT REFLEKSI TERAKHIR -->
@@ -93,7 +93,7 @@
 
       <div class="bg-slate-50 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-slate-600 border border-slate-100/80">
         <span class="text-base">😊</span>
-        <p class="leading-relaxed">Hebat! Pemahaman {{ $child->name }} tentang pesan cerita I Kedis Puuh & I Alu sangat baik.</p>
+        <p class="leading-relaxed">Hebat! Pemahaman {{ $child->short_name }} tentang pesan cerita I Kedis Puuh & I Alu sangat baik.</p>
       </div>
     </div>
 

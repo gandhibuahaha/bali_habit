@@ -59,15 +59,16 @@
 
     <!-- HEADER -->
     <header class="flex justify-between items-start mb-6">
-      <div>
-        <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Belajar Bersama {{ $child->name }}</h1>
+      {{-- Nama panjang dipotong dengan "…" supaya judul tetap satu baris; nama lengkap saat kursor diarahkan --}}
+      <div class="min-w-0">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-2 tracking-tight truncate" title="Belajar Bersama {{ $child->name }}">Belajar Bersama {{ $child->name }}</h1>
         <p class="text-slate-500 text-sm md:text-base leading-relaxed max-w-md">Pilih cerita untuk memulai petualangan belajar bersama.</p>
       </div>
     </header>
 
     <!-- KARTU PROFIL ANAK -->
-    <div class="bg-white border border-gray-100 rounded-[2rem] p-4 md:p-5 shadow-sm flex justify-between items-center mb-8 max-w-2xl">
-      <div class="flex items-center gap-4">
+    <div class="bg-white border border-gray-100 rounded-[2rem] p-4 md:p-5 shadow-sm flex justify-between items-center gap-3 mb-8 max-w-2xl">
+      <div class="flex items-center gap-4 min-w-0">
         @php $isGirl = $child->gender === 'female'; @endphp
         <div class="w-14 h-14 {{ $isGirl ? 'bg-orange-50' : 'bg-cyan-50' }} text-3xl rounded-full flex items-center justify-center flex-shrink-0 border-2 border-white shadow-sm overflow-hidden">
           @if ($child->profile_picture)
@@ -76,10 +77,10 @@
             {{ $isGirl ? '👧🏼' : '👦🏽' }}
           @endif
         </div>
-        <h2 class="font-extrabold text-base md:text-lg text-[#1F2937]">{{ $child->name }}</h2>
+        <h2 class="font-extrabold text-base md:text-lg text-[#1F2937] truncate" title="{{ $child->name }}">{{ $child->name }}</h2>
       </div>
       <!-- Bintang: belum ada aturan perhitungan -->
-      <div class="bg-yellow-100/80 text-yellow-800 px-3 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-1.5">
+      <div class="bg-yellow-100/80 text-yellow-800 px-3 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
         0 Bintang
       </div>

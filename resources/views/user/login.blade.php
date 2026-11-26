@@ -56,6 +56,11 @@
           <p class="text-sm text-slate-500 font-medium">Masuk ke Akun Anda</p>
         </div>
 
+        {{-- Alasan diarahkan ke halaman login (misal halaman terkunci) --}}
+        @if (session('status'))
+          <p class="bg-emerald-50 border border-emerald-100 text-[#10B981] text-xs font-bold rounded-xl px-4 py-3 mb-4">{{ session('status') }}</p>
+        @endif
+
         <!-- Form Utama -->
           <form id="loginForm" action="{{ route('login.store') }}" method="POST">
           @csrf

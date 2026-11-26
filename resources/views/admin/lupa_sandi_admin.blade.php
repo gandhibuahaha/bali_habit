@@ -387,8 +387,9 @@
         errPass.classList.remove('hidden');
         return;
       }
-      if (newPass.length < 6) {
-        errPass.innerText = "Kata sandi minimal harus 6 karakter.";
+      // Sama dengan Profil Admin dan server: minimal 8 karakter
+      if (newPass.length < 8) {
+        errPass.innerText = "Kata sandi minimal harus 8 karakter.";
         errPass.classList.remove('hidden');
         return;
       }

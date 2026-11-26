@@ -81,7 +81,7 @@
     <div class="flex justify-between items-start mb-6">
       <div>
         <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-1 tracking-tight">Misi Hari Ini</h1>
-        <p class="text-slate-500 text-sm md:text-base">Yuk, lakukan misi ini bersama {{ $child->name }}!</p>
+        <p class="text-slate-500 text-sm md:text-base">Yuk, lakukan misi ini bersama {{ $child->short_name }}!</p>
       </div>
       <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold shadow-sm text-xl flex-shrink-0">
         👧🏼
@@ -190,7 +190,7 @@
       </h2>
 
       <p class="text-[#1F2937] text-[13px] sm:text-sm font-bold mb-7 px-1 leading-relaxed">
-        Hebat, {{ $child->name }}! Semua Misi Hari Ini<br>Berhasil Diselesaikan! 🎉
+        Hebat, {{ $child->short_name }}! Semua Misi Hari Ini<br>Berhasil Diselesaikan! 🎉
       </p>
 
       <button onclick="window.location.href='{{ url('/rekap-cerita') }}'" class="w-full bg-[#10B981] text-white font-extrabold py-3.5 rounded-2xl shadow-md hover:bg-[#059669] transition text-sm sm:text-base cursor-pointer">

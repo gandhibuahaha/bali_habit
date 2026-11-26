@@ -5,6 +5,8 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\UserManagementController as AdminUserManagementController;
 use App\Http\Controllers\ChildController;
 use App\Http\Controllers\ChildProgressController;
 use App\Http\Controllers\ParentDashboardController;
@@ -26,7 +28,7 @@ Route::view('/registrasi', 'user.registrasi')->name('register');
 Route::post('/register', [RegisteredUserController::class, 'store'])
     ->middleware('throttle:5,1')
     ->name('register.store');
-
+    
 Route::view('/lupa-sandi', 'user.lupa_sandi')->name('password.request');
 
 /* Halaman yang hanya dapat diakses akun Parent */
@@ -75,10 +77,10 @@ Route::view('/admin/lupa-sandi', 'admin.lupa_sandi_admin')
 
 /* Seluruh halaman manajemen Admin memerlukan role admin */
 Route::prefix('admin')->middleware(EnsureUserRole::class . ':admin')->group(function () {
-    Route::view('/dashboard', 'admin.beranda_admin')->name('admin.dashboard');
-    Route::view('/user-management', 'admin.user_management_ortu');
-    Route::view('/user-management-anak', 'admin.user_management_anak');
-    Route::view('/aktivitas-pengguna', 'admin.aktivitas_pengguna');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/user-management', [AdminUserManagementController::class, 'parents'])->name('admin.users.parents');
+    Route::get('/user-management-anak', [AdminUserManagementController::class, 'children'])->name('admin.users.children');
+    Route::get('/aktivitas-pengguna', [AdminUserManagementController::class, 'activities'])->name('admin.users.activities');
 
     Route::view('/story-management', 'admin.story_management');
     Route::view('/tambah-cerita', 'admin.tambah_cerita');

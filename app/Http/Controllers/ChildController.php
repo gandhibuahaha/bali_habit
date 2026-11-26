@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Child;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -78,30 +77,10 @@ class ChildController extends Controller
 
     public function destroy(Request $request, int $child): RedirectResponse
     {
-        $child = $this->findOwned($request, $child);
-        $id = $child->child_id;
-
-        // Foreign keys have no cascade, so progress rows go first (answers before attempts).
-        DB::transaction(function () use ($child, $id) {
-            DB::table('mission_answers')->whereIn(
-                'mission_attempt_id',
-                DB::table('mission_attempts')->select('mission_attempt_id')->where('child_id', $id)
-            )->delete();
-            DB::table('reflection_answers')->whereIn(
-                'reflection_attempt_id',
-                DB::table('reflection_attempts')->select('reflection_attempt_id')->where('child_id', $id)
-            )->delete();
-
-            foreach (['mission_attempts', 'reflection_attempts', 'story_progress', 'child_badges'] as $table) {
-                DB::table($table)->where('child_id', $id)->delete();
-            }
-
-            $child->delete();
-        });
-
-        if ($child->profile_picture) {
-            Storage::disk('public')->delete($child->profile_picture);
-        }
+        // Soft delete: the child disappears from every parent page, but the row,
+        // its progress, badges and photo are kept so the admin can still see the
+        // child as "Nonaktif".
+        $this->findOwned($request, $child)->delete();
 
         return redirect()->route('children.index');
     }

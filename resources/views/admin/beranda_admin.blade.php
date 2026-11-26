@@ -103,7 +103,7 @@
 
         <!-- Breadcrumb Header -->
         <div class="hidden sm:flex items-center text-[13px] font-bold text-slate-400">
-          <span>Portal Admin</span>
+          <a href="{{ route('admin.dashboard') }}" class="hover:text-[#10B981] transition">Portal Admin</a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 mx-2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" /></svg>
           <span class="text-[#10B981]">Beranda</span>
         </div>
@@ -121,8 +121,8 @@
         <!-- Profil Dropdown Container -->
         <div class="relative">
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
+            <div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] shadow-sm overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>@if ($admin->no_tlp)<span class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-3.5 h-3.5 flex items-center justify-center border-2 border-white" title="Nomor telepon sudah diisi"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-2 h-2 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg></span>@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block truncate max-w-[150px]" title="{{ $admin->name }}">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
           </button>
 
@@ -163,8 +163,28 @@
         
         <!-- Judul Welcome -->
         <div class="mb-8">
-          <h1 class="text-[28px] font-extrabold text-[#0F172A] tracking-tight mb-2">Selamat Datang, Gayatri 👋</h1>
+          {{-- Nama panjang dipotong dengan "…" (👋 tetap terlihat); nama lengkap saat kursor diarahkan --}}
+          <h1 class="text-[28px] font-extrabold text-[#0F172A] tracking-tight mb-2 flex items-center gap-2 min-w-0" title="Selamat Datang, {{ $admin->name }}">
+            <span class="truncate">Selamat Datang, {{ $admin->name }}</span>
+            <span class="flex-shrink-0">👋</span>
+          </h1>
           <p class="text-slate-500 text-[14px]">Berikut adalah ringkasan aktivitas di aplikasi BaliHabit hari ini.</p>
+        </div>
+
+        <!-- FILTER PERIODE -->
+        <div class="flex justify-end mb-5">
+          <form method="GET" action="{{ route('admin.dashboard') }}" class="relative w-full sm:w-auto">
+            <select name="periode" onchange="this.form.submit()" class="w-full sm:w-auto appearance-none bg-white border border-slate-200 rounded-[12px] pl-4 pr-10 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition cursor-pointer">
+              @foreach ($periods as $slug => $label)
+                <option value="{{ $slug }}" @selected($slug === $period)>{{ $label }}</option>
+              @endforeach
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25 L12 15.75 L4.5 8.25" />
+              </svg>
+            </div>
+          </form>
         </div>
 
         <!-- STATISTIK CARDS -->
@@ -178,10 +198,11 @@
                   <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">+12%</span>
+              <span class="text-[11px] font-bold {{ $cards['anak']['tone'] }} px-2.5 py-1 rounded-lg">{{ $cards['anak']['badge'] }}</span>
             </div>
             <p class="text-slate-400 text-[12px] font-bold uppercase tracking-wider mb-1">Total Anak</p>
-            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">2,450</h3>
+            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">{{ number_format($cards['anak'][$showToday ? 'now' : 'then'], 0, ',', '.') }}</h3>
+            <p class="text-slate-400 text-[12px] font-medium mt-1.5 {{ $showToday ? 'invisible' : '' }}" @if ($showToday) aria-hidden="true" @endif>Sekarang: {{ number_format($cards['anak']['now'], 0, ',', '.') }}</p>
           </div>
 
           <!-- Card 2 (Total Orang Tua) -->
@@ -193,10 +214,11 @@
                   <path d="M22.75 19.125a7.125 7.125 0 00-10.71-6.173 8.37 8.37 0 013.21 6.173v.003l-.001.119a7.628 7.628 0 01-3.254 5.922 7.63 7.63 0 007.505-6.044l.001-.119v-.003z" />
                 </svg>
               </div>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">+5%</span>
+              <span class="text-[11px] font-bold {{ $cards['orang_tua']['tone'] }} px-2.5 py-1 rounded-lg">{{ $cards['orang_tua']['badge'] }}</span>
             </div>
             <p class="text-slate-400 text-[12px] font-bold uppercase tracking-wider mb-1">Total Orang Tua</p>
-            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">1,832</h3>
+            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">{{ number_format($cards['orang_tua'][$showToday ? 'now' : 'then'], 0, ',', '.') }}</h3>
+            <p class="text-slate-400 text-[12px] font-medium mt-1.5 {{ $showToday ? 'invisible' : '' }}" @if ($showToday) aria-hidden="true" @endif>Sekarang: {{ number_format($cards['orang_tua']['now'], 0, ',', '.') }}</p>
           </div>
 
           <!-- Card 3 (Misi Selesai) -->
@@ -207,10 +229,11 @@
                   <path fill-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clip-rule="evenodd" />
                 </svg>
               </div>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">+24%</span>
+              <span class="text-[11px] font-bold {{ $cards['misi']['tone'] }} px-2.5 py-1 rounded-lg">{{ $cards['misi']['badge'] }}</span>
             </div>
             <p class="text-slate-400 text-[12px] font-bold uppercase tracking-wider mb-1">Misi Selesai</p>
-            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">8,194</h3>
+            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">{{ number_format($cards['misi'][$showToday ? 'now' : 'then'], 0, ',', '.') }}</h3>
+            <p class="text-slate-400 text-[12px] font-medium mt-1.5 {{ $showToday ? 'invisible' : '' }}" @if ($showToday) aria-hidden="true" @endif>Sekarang: {{ number_format($cards['misi']['now'], 0, ',', '.') }}</p>
           </div>
 
           <!-- Card 4 (Lencana Diberikan) -->
@@ -222,10 +245,11 @@
                   <path d="M12 12.75a5.25 5.25 0 005.215-4.607.75.75 0 01.737-.643h1.298v-.75H4.75v.75h1.298a.75.75 0 01.737.643A5.25 5.25 0 0012 12.75zM11.25 15v3.379l-1.689 1.689a.75.75 0 00.53 1.282h3.818a.75.75 0 00.53-1.282L12.75 18.38V15h-1.5z" />
                 </svg>
               </div>
-              <span class="text-[11px] font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg">-2%</span>
+              <span class="text-[11px] font-bold {{ $cards['lencana']['tone'] }} px-2.5 py-1 rounded-lg">{{ $cards['lencana']['badge'] }}</span>
             </div>
             <p class="text-slate-400 text-[12px] font-bold uppercase tracking-wider mb-1">Lencana Diberikan</p>
-            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">342</h3>
+            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">{{ number_format($cards['lencana'][$showToday ? 'now' : 'then'], 0, ',', '.') }}</h3>
+            <p class="text-slate-400 text-[12px] font-medium mt-1.5 {{ $showToday ? 'invisible' : '' }}" @if ($showToday) aria-hidden="true" @endif>Sekarang: {{ number_format($cards['lencana']['now'], 0, ',', '.') }}</p>
           </div>
           
           <!-- Card 5 (Total Cerita) -->
@@ -236,10 +260,11 @@
                   <path d="M11.25 4.533A9.707 9.707 0 006 3a9.735 9.735 0 00-3.25.555.75.75 0 00-.5.707v14.25a.75.75 0 001 .707A8.237 8.237 0 016 18.75c1.995 0 3.823.707 5.25 1.886V4.533zM12.75 20.636A8.214 8.214 0 0118 18.75c1.68 0 3.282.515 4.75 1.407a.75.75 0 001-.707V4.262a.75.75 0 00-.5-.707A9.735 9.735 0 0018 3a9.707 9.707 0 00-5.25 1.533v16.103z" />
                 </svg>
               </div>
-              <span class="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">+8%</span>
+              <span class="text-[11px] font-bold {{ $cards['cerita']['tone'] }} px-2.5 py-1 rounded-lg">{{ $cards['cerita']['badge'] }}</span>
             </div>
             <p class="text-slate-400 text-[12px] font-bold uppercase tracking-wider mb-1">Total Cerita</p>
-            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">45</h3>
+            <h3 class="text-[26px] font-extrabold text-[#0F172A] leading-none">{{ number_format($cards['cerita'][$showToday ? 'now' : 'then'], 0, ',', '.') }}</h3>
+            <p class="text-slate-400 text-[12px] font-medium mt-1.5 {{ $showToday ? 'invisible' : '' }}" @if ($showToday) aria-hidden="true" @endif>Sekarang: {{ number_format($cards['cerita']['now'], 0, ',', '.') }}</p>
           </div>
 
         </div>
@@ -252,39 +277,22 @@
               <a href="{{ url('/admin/aktivitas-pengguna') }}" class="text-[13px] font-bold text-[#10B981] hover:underline">Lihat Semua</a>
             </div>
             <div class="flex flex-col gap-4">
-              <!-- Item 1 -->
-              <div class="flex items-center justify-between p-4 bg-slate-50 rounded-[16px]">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full bg-emerald-100 text-[#10B981] flex items-center justify-center font-bold">AB</div>
-                  <div>
-                    <h4 class="text-[14px] font-bold text-slate-800">Budi Santoso (Orang Tua)</h4>
-                    <p class="text-[12px] text-slate-500">Mendaftarkan misi baru untuk anak.</p>
+              <!-- 3 aktivitas terbaru (App\Support\ActivityLog); hijau = Orang Tua, oranye = Anak -->
+              @forelse ($aktivitas as $item)
+              <div class="flex items-center justify-between gap-4 p-4 bg-slate-50 rounded-[16px]">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="w-10 h-10 rounded-full {{ $item['role'] === 'Anak' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-[#10B981]' }} flex items-center justify-center font-bold flex-shrink-0">{{ $item['initial'] }}</div>
+                  {{-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan --}}
+                  <div class="min-w-0">
+                    <h4 class="text-[14px] font-bold text-slate-800 truncate" title="{{ $item['name'] }}">{{ $item['name'] }} ({{ $item['role'] }})</h4>
+                    <p class="text-[12px] text-slate-500 truncate" title="{{ $item['action'] }}">{{ $item['action'] }}</p>
                   </div>
                 </div>
-                <span class="text-[12px] font-bold text-slate-400">10 Menit lalu</span>
+                <span class="text-[12px] font-bold text-slate-400 whitespace-nowrap">{{ $item['time'] }}</span>
               </div>
-              <!-- Item 2 -->
-              <div class="flex items-center justify-between p-4 bg-slate-50 rounded-[16px]">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold">KS</div>
-                  <div>
-                    <h4 class="text-[14px] font-bold text-slate-800">Kevin Susanto (Anak)</h4>
-                    <p class="text-[12px] text-slate-500">Mendapatkan lencana "Penjelajah Muda".</p>
-                  </div>
-                </div>
-                <span class="text-[12px] font-bold text-slate-400">1 Jam lalu</span>
-              </div>
-              <!-- Item 3 -->
-              <div class="flex items-center justify-between p-4 bg-slate-50 rounded-[16px]">
-                <div class="flex items-center gap-4">
-                  <div class="w-10 h-10 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center font-bold">SR</div>
-                  <div>
-                    <h4 class="text-[14px] font-bold text-slate-800">Siti Rahma (Orang Tua)</h4>
-                    <p class="text-[12px] text-slate-500">Mengisi jurnal refleksi harian.</p>
-                  </div>
-                </div>
-                <span class="text-[12px] font-bold text-slate-400">3 Jam lalu</span>
-              </div>
+              @empty
+              <p class="text-[13px] font-medium text-slate-400">Belum ada aktivitas.</p>
+              @endforelse
             </div>
           </div>
 
@@ -349,5 +357,7 @@
     </div>
   </div>
 
+  <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
+  <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

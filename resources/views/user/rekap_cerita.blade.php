@@ -85,7 +85,7 @@
     <div class="text-center mb-8 px-2">
       <h1 class="text-2xl md:text-3xl font-extrabold text-[#1F2937] mb-3 tracking-tight">Cerita Selesai!</h1>
       <p class="text-slate-500 text-sm md:text-base leading-relaxed">
-        Hebat, <span class="font-bold text-slate-700">{{ $child->name }}</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle ?? 'I Alu Teken I Kedis Puuh' }}</span>".
+        Hebat, <span class="font-bold text-slate-700">{{ $child->short_name }}</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle ?? 'I Alu Teken I Kedis Puuh' }}</span>".
       </p>
     </div>
 
@@ -154,7 +154,7 @@
           <div class="flex items-baseline gap-1.5">
             <span class="font-extrabold text-2xl text-[#1F2937]">2 Kali</span>
           </div>
-          <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dibaca bersama {{ $child->name }}</p>
+          <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dibaca bersama {{ $child->short_name }}</p>
         </div>
       </div>
     </div>

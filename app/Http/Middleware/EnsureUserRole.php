@@ -9,6 +9,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserRole
 {
+    /**
+     * Admin address => matching Orang Tua page. Other admin addresses go to the dashboard.
+     */
+    private const PARENT_EQUIVALENTS = [
+        'admin/dashboard' => '/dashboard',
+        'admin/profil' => '/profil-orangtua',
+    ];
+
     public function handle(
         Request $request,
         Closure $next,
@@ -16,20 +24,27 @@ class EnsureUserRole
     ): Response {
         $guard = Auth::guard('web');
         $user = $guard->user();
+        $loginRoute = $role === 'admin' ? 'admin.login' : 'login';
 
-        // Pengguna belum login.
+        // Pengguna belum login: ke halaman login yang sesuai.
+        // redirect()->guest() menyimpan alamat tujuan, sehingga setelah login
+        // pengguna kembali ke halaman yang tadi dibuka.
         if (! $user) {
-            return redirect()->guest(
-                route($role === 'admin' ? 'admin.login' : 'login')
-            );
+            return redirect()->guest(route($loginRoute))
+                ->with('status', 'Silakan masuk terlebih dahulu.');
         }
 
-        // Periksa role pengguna.
-        abort_unless(
-            $user->role === $role,
-            403,
-            'Anda tidak memiliki akses ke halaman ini.'
-        );
+        // Orang Tua membuka alamat Admin: diam-diam ke halaman Orang Tua yang setara
+        // (atau dashboard), tanpa pesan, supaya tidak terlihat bahwa halaman Admin ada.
+        if ($role === 'admin' && $user->role !== 'admin') {
+            return redirect()->to(self::PARENT_EQUIVALENTS[$request->path()] ?? route('parent.dashboard'));
+        }
+
+        // Admin membuka halaman Orang Tua: ke login Orang Tua dengan pesan.
+        if ($user->role !== $role) {
+            return redirect()->guest(route($loginRoute))
+                ->with('status', 'Silakan masuk sebagai Orang Tua untuk membuka halaman tersebut.');
+        }
 
         // Pemeriksaan tambahan khusus Admin.
         if ($role === 'admin') {

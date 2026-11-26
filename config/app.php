@@ -65,7 +65,10 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    // BaliHabit runs on Bali time (WITA, UTC+8): dates, "Hari Ini" and "x yang lalu"
+    // all follow it. Times saved before this switch were moved +8 hours by the
+    // migration 2026_11_26_000002_shift_saved_times_to_bali_time.
+    'timezone' => 'Asia/Makassar',
 
     /*
     |--------------------------------------------------------------------------

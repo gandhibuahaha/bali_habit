@@ -118,7 +118,7 @@
 
         <!-- Breadcrumb Header -->
         <div class="hidden sm:flex items-center text-[13px] font-bold text-slate-400">
-          <span>Portal Admin</span>
+          <a href="{{ route('admin.dashboard') }}" class="hover:text-[#10B981] transition">Portal Admin</a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 mx-2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
@@ -143,8 +143,8 @@
         <!-- Profil Dropdown Container -->
         <div class="relative">
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
+            <div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>@if ($admin->no_tlp)<span class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-3.5 h-3.5 flex items-center justify-center border-2 border-white" title="Nomor telepon sudah diisi"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-2 h-2 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg></span>@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block truncate max-w-[150px]" title="{{ $admin->name }}">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25 L12 15.75 L4.5 8.25" />
             </svg>
@@ -196,12 +196,12 @@
           <!-- Tab Tidak Aktif (Orang Tua) -->
           <a href="{{ url('/admin/user-management') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
             Orang Tua 
-            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">24</span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">{{ number_format($totalOrangTua, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Tidak Aktif (Anak) -->
           <a href="{{ url('/admin/user-management-anak') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
             Anak
-            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">36</span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">{{ number_format($totalAnak, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Aktif (Aktivitas Pengguna) -->
           <a href="{{ url('/admin/aktivitas-pengguna') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-[#10B981] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition flex items-center gap-2">
@@ -216,7 +216,7 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 class="text-[17px] font-extrabold text-[#0F172A]">Log Aktivitas Pengguna</h2>
-              <p class="text-[12.5px] font-medium text-slate-400 mt-0.5">Pantau seluruh riwayat aktivitas dari Orang Tua dan Anak di aplikasi.</p>
+              <p class="text-[12.5px] font-medium text-slate-400 mt-0.5">Pantau {{ $activityLimit }} aktivitas terbaru dari Orang Tua dan Anak di aplikasi.</p>
             </div>
             
             <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
@@ -253,12 +253,12 @@
 
           <!-- Tabel List Aktivitas -->
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[700px]">
+            <table class="w-full text-left border-collapse min-w-[700px]" style="table-layout: fixed">
               <thead>
                 <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-[0.05em]">
-                  <th class="py-4 px-4 whitespace-nowrap">Pengguna</th>
+                  <th class="py-4 px-4 whitespace-nowrap" style="width: 32%">Pengguna</th>
                   <th class="py-4 px-4">Detail Aktivitas</th>
-                  <th class="py-4 px-4 text-right whitespace-nowrap">Waktu</th>
+                  <th class="py-4 px-4 text-right whitespace-nowrap w-40">Waktu</th>
                 </tr>
               </thead>
               <tbody id="activityTableBody" class="divide-y divide-slate-50 text-[13.5px] font-medium text-[#0F172A]">
@@ -278,7 +278,7 @@
 
           <!-- Footer Tabel: Informasi Data & Paginasi -->
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 mt-2">
-            <p id="paginationInfo" class="text-[12px] font-medium text-slate-400">Menampilkan 1–5 dari 0 aktivitas</p>
+            <p id="paginationInfo" class="text-[12px] font-medium text-slate-400">Menampilkan 0 aktivitas</p>
             <div class="flex items-center gap-1.5">
               <!-- Icon Prev < -->
               <button id="btnPrev" class="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
@@ -333,19 +333,22 @@
 
   <!-- ================= JAVASCRIPT ================= -->
   <script>
-    const activities = [
-      { id: 1, name: "Budi Santoso", role: "Orang Tua", action: "Mendaftarkan misi baru untuk anak.", time: "10 Menit lalu", initial: "AB", colorClass: "bg-emerald-50 text-[#10B981] border-emerald-100" },
-      { id: 2, name: "Kevin Susanto", role: "Anak", action: "Mendapatkan lencana 'Penjelajah Muda'.", time: "1 Jam lalu", initial: "KS", colorClass: "bg-amber-50 text-amber-600 border-amber-100" },
-      { id: 3, name: "Siti Rahma", role: "Orang Tua", action: "Mengisi jurnal refleksi harian.", time: "3 Jam lalu", initial: "SR", colorClass: "bg-blue-50 text-blue-600 border-blue-100" },
-      { id: 4, name: "Lestari Dewi", role: "Orang Tua", action: "Menambahkan cerita baru 'Bawang Merah & Putih'.", time: "Kemarin, 14:20", initial: "LD", colorClass: "bg-purple-50 text-purple-600 border-purple-100" },
-      { id: 5, name: "Wayan Gede", role: "Anak", action: "Membaca cerita 'Sang Kancil'.", time: "Kemarin, 10:15", initial: "WG", colorClass: "bg-emerald-50 text-[#10B981] border-emerald-100" },
-      { id: 6, name: "Ayu Pratiwi", role: "Orang Tua", action: "Memberikan validasi misi anak.", time: "2 Hari lalu", initial: "AP", colorClass: "bg-pink-50 text-pink-600 border-pink-100" },
-      { id: 7, name: "Made Satria", role: "Anak", action: "Menyelesaikan misi 'Merapikan Tempat Tidur'.", time: "2 Hari lalu", initial: "MS", colorClass: "bg-amber-50 text-amber-600 border-amber-100" },
-      { id: 8, name: "Nyoman Bagus", role: "Anak", action: "Mendapatkan lencana 'Rajin Membantu'.", time: "3 Hari lalu", initial: "NB", colorClass: "bg-blue-50 text-blue-600 border-blue-100" },
-    ];
+    // Aktivitas terbaru dari database (App\Support\ActivityLog), urut dari yang terbaru.
+    const activities = @json($activities);
+
+    // Teks dari database selalu di-escape sebelum masuk ke innerHTML,
+    // supaya nama berisi kode HTML tampil sebagai teks biasa.
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
     let currentPage = 1;
-    const itemsPerPage = 5;
+    const itemsPerPage = 10;
     let filteredData = [...activities];
 
     const tbody = document.getElementById('activityTableBody');
@@ -382,18 +385,20 @@
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
               <div class="w-[34px] h-[34px] rounded-full flex items-center justify-center font-extrabold text-[12px] border flex-shrink-0 ${item.colorClass}">
-                ${item.initial}
+                ${escapeHtml(item.initial)}
               </div>
-              <div>
-                <p class="font-extrabold text-[#0F172A]">${item.name} <span class="font-medium text-slate-500">(${item.role})</span></p>
+              <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
+              <div class="min-w-0">
+                <p class="font-extrabold text-[#0F172A] truncate" title="${escapeHtml(item.name)}">${escapeHtml(item.name)} <span class="font-medium text-slate-500">(${escapeHtml(item.role)})</span></p>
               </div>
             </div>
           </td>
           <td class="py-4 px-4 text-slate-500">
-            ${item.action}
+            <!-- Satu baris saja; kalimat panjang dipotong dengan "…", lengkapnya saat kursor diarahkan -->
+            <span class="block truncate" title="${escapeHtml(item.action)}">${escapeHtml(item.action)}</span>
           </td>
           <td class="py-4 px-4 text-right">
-            <span class="text-[12px] font-bold text-slate-400">${item.time}</span>
+            <span class="text-[12px] font-bold text-slate-400 whitespace-nowrap">${escapeHtml(item.time)}</span>
           </td>
         `;
         tbody.appendChild(tr);
@@ -410,7 +415,16 @@
       btnNext.disabled = currentPage === totalPages || totalPages === 0;
 
       pageNumbers.innerHTML = '';
-      for (let i = 1; i <= totalPages; i++) {
+
+      // Paling banyak 5 nomor halaman di sekitar halaman aktif (sama seperti tab Orang Tua)
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, currentPage + 2);
+      if (endPage - startPage < 4) {
+        if (startPage === 1) endPage = Math.min(totalPages, 5);
+        else if (endPage === totalPages) startPage = Math.max(1, totalPages - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
         const btn = document.createElement('button');
         btn.innerText = i;
         btn.className = `w-8 h-8 rounded-lg text-[12px] font-extrabold transition flex items-center justify-center ${
@@ -460,5 +474,7 @@
 
     renderTable();
   </script>
+  <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
+  <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>

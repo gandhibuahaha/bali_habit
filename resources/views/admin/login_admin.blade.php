@@ -84,6 +84,11 @@
         <h1 class="text-2xl font-extrabold text-[#0F172A] tracking-tight mb-2">Selamat Datang</h1>
         <p class="text-[13.5px] text-slate-500 mb-8 font-medium">Otentikasi kredensial administrator Anda.</p>
 
+        {{-- Alasan diarahkan ke halaman login (halaman terkunci / setelah keluar) --}}
+        @if (session('status'))
+          <p class="w-full bg-emerald-50 border border-emerald-100 text-[#10B981] text-[13px] font-bold rounded-[12px] px-4 py-3 mb-5">{{ session('status') }}</p>
+        @endif
+
         <!-- Form Login -->
         <form id="loginAdminForm" action="{{ route('admin.login.store') }}" method="POST" class="w-full flex flex-col gap-5">
           @csrf

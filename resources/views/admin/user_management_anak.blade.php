@@ -107,7 +107,7 @@
           </svg>
         </button>
         <div class="hidden sm:flex items-center text-[13px] font-bold text-slate-400">
-          <span>Portal Admin</span>
+          <a href="{{ route('admin.dashboard') }}" class="hover:text-[#10B981] transition">Portal Admin</a>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 mx-2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
@@ -129,8 +129,8 @@
         <div class="relative">
           <!-- Trigger Button -->
           <button id="profileDropdownBtn" class="flex items-center gap-3 cursor-pointer p-1.5 pr-3 border border-slate-100 rounded-full hover:bg-slate-50 transition focus:outline-none">
-            <div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>
-            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block">{{ $admin->name }}</span>
+            <div class="relative flex-shrink-0"><div class="w-8 h-8 rounded-full bg-emerald-100 text-[#10B981] font-bold flex items-center justify-center text-[12px] overflow-hidden">@if ($adminPhoto)<img src="{{ $adminPhoto }}" alt="Foto {{ $admin->name }}" class="w-full h-full object-cover">@else{{ $adminInitials }}@endif</div>@if ($admin->no_tlp)<span class="absolute -bottom-1.5 -right-1.5 bg-[#10B981] rounded-full w-3.5 h-3.5 flex items-center justify-center border-2 border-white" title="Nomor telepon sudah diisi"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-2 h-2 text-white"><path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clip-rule="evenodd" /></svg></span>@endif</div>
+            <span class="text-[13px] font-bold text-[#1E293B] hidden sm:block truncate max-w-[150px]" title="{{ $admin->name }}">{{ $admin->name }}</span>
             <svg id="profileChevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 text-slate-400 hidden sm:block transition-transform duration-200">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
             </svg>
@@ -186,12 +186,12 @@
           <!-- Tab Tidak Aktif (Orang Tua) -->
           <a href="{{ url('/admin/user-management') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
             Orang Tua 
-            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">24</span>
+            <span class="px-2 py-0.5 rounded-md bg-slate-200 text-slate-500 text-[10px] font-extrabold">{{ number_format($totalOrangTua, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Aktif (Anak) -->
           <a href="{{ url('/admin/user-management-anak') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-[#10B981] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)] transition flex items-center gap-2">
             Anak
-            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-[#10B981] text-[10px] font-extrabold">36</span>
+            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-[#10B981] text-[10px] font-extrabold">{{ number_format($totalAnak, 0, ',', '.') }}</span>
           </a>
           <!-- Tab Baru: Aktivitas Pengguna -->
           <a href="{{ url('/admin/aktivitas-pengguna') }}" class="px-5 py-2.5 rounded-[12px] text-[13px] font-bold text-slate-500 hover:text-slate-700 transition flex items-center gap-2">
@@ -247,14 +247,14 @@
 
           <!-- Tabel Data -->
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse" style="table-layout: fixed">
               <thead>
                 <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-[0.05em]">
                   <th class="py-4 px-4 w-16">No</th>
                   <th class="py-4 px-4">Nama Anak</th>
-                  <th class="py-4 px-4">Usia</th>
+                  <th class="py-4 px-4 w-24">Usia</th>
                   <th class="py-4 px-4">Nama Orang Tua</th>
-                  <th class="py-4 px-4">Total Bintang</th>
+                  <th class="py-4 px-4 w-36">Total Bintang</th>
                   <th class="py-4 px-4 text-right w-32">Aksi</th>
                 </tr>
               </thead>
@@ -269,7 +269,7 @@
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 mt-2">
             
             <span id="paginationInfo" class="text-[12px] font-medium text-slate-400">
-              Menampilkan <span class="font-extrabold text-[#0F172A]">1 – 5</span> dari <span class="font-extrabold text-[#0F172A]">36</span> data
+              Menampilkan <span class="font-extrabold text-[#0F172A]">0</span> data
             </span>
 
             <div id="paginationControls" class="flex items-center gap-1.5">
@@ -326,27 +326,27 @@
               <!-- Background Decoration -->
               <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50/50 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
 
-              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full">
+              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full min-w-0">
                 <!-- Avatar Besar -->
                 <div id="modalAnakInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0">
                   AY
                 </div>
                 <!-- Info Nama & Ortua -->
-                <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
-                  <div class="flex items-center gap-2 mb-1.5">
-                    <h4 id="modalAnakNama" class="text-[17px] font-extrabold text-[#0F172A]">Ayu</h4>
-                    <span class="inline-flex items-center gap-1 text-[#10B981] text-[11px] font-bold">
-                      <div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> Aktif
+                <div class="flex flex-col items-center sm:items-start text-center sm:text-left min-w-0">
+                  <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                    <h4 id="modalAnakNama" class="text-[17px] font-extrabold text-[#0F172A] truncate max-w-xs">Ayu</h4>
+                    <span id="modalAnakLabel" class="inline-flex items-center gap-1 text-[#10B981] text-[11px] font-bold">
+                      <div id="modalAnakLabelDot" class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> <span id="modalAnakLabelText">Aktif</span>
                     </span>
                     <span class="text-slate-300 mx-0.5">•</span>
-                    <span id="modalAnakUsiaGender" class="text-[12px] text-slate-500 font-medium bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">7 Tahun • Perempuan</span>
+                    <span id="modalAnakUsiaGender" class="text-[12px] text-slate-500 font-medium bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100 whitespace-nowrap">7 Tahun • Perempuan</span>
                   </div>
                   <div class="text-[13px] font-medium text-slate-500 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                     <div class="flex items-center gap-1.5">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                       </svg>
-                      <span>Orang Tua: <strong id="modalAnakOrtu" class="text-[#0F172A]">Putri Dewi</strong></span>
+                      <span class="min-w-0">Orang Tua: <strong id="modalAnakOrtu" class="text-[#0F172A] inline-block align-middle truncate max-w-xs">Putri Dewi</strong></span>
                     </div>
                   </div>
                 </div>
@@ -376,7 +376,7 @@
                     </svg>
                     <span class="text-[12px] font-bold">Tanggal Lahir</span>
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">12 Agustus 2018</span>
+                  <span id="modalAnakTanggalLahir" class="text-[14px] font-extrabold text-[#0F172A]">-</span>
                 </div>
                 <!-- Terdaftar Sejak -->
                 <div class="border border-slate-100 rounded-[12px] p-4 flex flex-col gap-1.5 shadow-sm">
@@ -386,7 +386,7 @@
                     </svg>
                     <span class="text-[12px] font-bold">Terdaftar Sejak</span>
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">14 Januari 2026</span>
+                  <span id="modalAnakTerdaftar" class="text-[14px] font-extrabold text-[#0F172A]">-</span>
                 </div>
                 <!-- Status Akun -->
                 <div class="border border-slate-100 rounded-[12px] p-4 flex flex-col gap-1.5 shadow-sm">
@@ -396,9 +396,11 @@
                     </svg>
                     <span class="text-[12px] font-bold">Status Akun</span>
                   </div>
-                  <span class="inline-flex items-center gap-1.5 text-[#10B981] font-extrabold text-[13px]">
-                    <div class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> Aktif Terverifikasi
+                  <!-- Aktif = profil masih ada; Nonaktif = dihapus oleh orang tua -->
+                  <span id="modalAnakStatus" class="inline-flex items-center gap-1.5 text-[#10B981] font-extrabold text-[13px]">
+                    <div id="modalAnakStatusDot" class="w-1.5 h-1.5 rounded-full bg-[#10B981]"></div> <span id="modalAnakStatusText">Aktif</span>
                   </span>
+                  <span id="modalAnakStatusSejak" class="text-[12px] font-medium text-slate-400 hidden"></span>
                 </div>
               </div>
             </div>
@@ -414,21 +416,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                   </svg>
                 </div>
-                <div class="flex-1 flex flex-col gap-1">
+                <div class="flex-1 flex flex-col gap-1 min-w-0">
                   <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Cerita Terakhir Dibaca</span>
-                  <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
-                    <span class="text-[15px] font-extrabold text-[#0F172A]">Kancil dan Buaya</span>
-                    <!-- Progress Bar -->
-                    <div class="flex items-center gap-3 w-full md:w-48">
-                      <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                        <div class="h-full bg-[#10B981] rounded-full w-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="text-[12.5px] font-medium text-slate-500 flex items-center gap-2 mt-1">
-                    <span>Halaman 8 / 8</span>
+                  <span id="modalAnakCeritaJudul" class="text-[15px] font-extrabold text-[#0F172A] truncate">Belum ada cerita</span>
+                  <!-- Status cerita: hijau = selesai dibaca, kuning = sedang dibaca. Nomor halaman tidak disimpan. -->
+                  <div id="modalAnakCeritaInfo" class="text-[12.5px] font-medium text-slate-500 flex items-center gap-2 mt-1 hidden">
+                    <span id="modalAnakCeritaStatus" class="text-[#10B981] font-bold inline-flex items-center gap-1.5"><div id="modalAnakCeritaDot" class="w-1.5 h-1.5 bg-[#10B981] rounded-full"></div> <span id="modalAnakCeritaStatusText">Selesai Dibaca</span></span>
                     <span class="text-slate-300">•</span>
-                    <span class="text-[#10B981] font-bold inline-flex items-center gap-1.5"><div class="w-1.5 h-1.5 bg-[#10B981] rounded-full"></div> Selesai Dibaca</span>
+                    <span id="modalAnakCeritaWaktu"></span>
                   </div>
                 </div>
               </div>
@@ -441,8 +436,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" /></svg>
                     Lencana Diperoleh
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">Benih Kebaikan</span>
-                  <span class="text-[12.5px] font-medium text-slate-500">Tingkat 1 (Selesai)</span>
+                  <span id="modalAnakLencana" class="text-[14px] font-extrabold text-[#0F172A] truncate">Belum ada lencana</span>
+                  <span id="modalAnakLencanaJumlah" class="text-[12.5px] font-medium text-slate-500">0 dari 0 lencana</span>
                 </div>
                 
                 <!-- Misi -->
@@ -451,7 +446,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     Misi Diselesaikan
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">6 Misi</span>
+                  <span id="modalAnakMisi" class="text-[14px] font-extrabold text-[#0F172A]">0 Misi</span>
                   <span class="text-[12.5px] font-medium text-slate-500">Pembiasaan Baik</span>
                 </div>
 
@@ -461,7 +456,7 @@
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" /></svg>
                     Refleksi Terjawab
                   </div>
-                  <span class="text-[14px] font-extrabold text-[#0F172A]">3 Refleksi Moral</span>
+                  <span id="modalAnakRefleksi" class="text-[14px] font-extrabold text-[#0F172A]">0 Refleksi Moral</span>
                   <span class="text-[12.5px] font-medium text-slate-500">Bersama Orang Tua</span>
                 </div>
               </div>
@@ -472,7 +467,7 @@
 
         <!-- Modal Footer (Fixed) -->
         <div class="px-7 py-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between flex-shrink-0">
-          <span class="text-[12px] font-medium text-slate-400">Terakhir aktif: Hari ini, 09:42 WITA</span>
+          <span id="modalAnakTerakhirAktif" class="text-[12px] font-medium text-slate-400">Terakhir aktif: -</span>
           <button type="button" onclick="closeDetailAnakModal()" class="px-5 py-2.5 rounded-[12px] bg-white border border-slate-200 text-slate-600 hover:border-[#10B981] hover:text-[#10B981] font-bold text-[13px] shadow-sm transition">
             Tutup
           </button>
@@ -521,16 +516,69 @@
   <!-- ================= SCRIPT ================= -->
   <script>
 
-    // --- SCRIPT MODAL DETAIL ANAK (DINAMIS) ---
+    // Teks dari database selalu di-escape sebelum masuk ke innerHTML,
+    // supaya nama berisi kode HTML tampil sebagai teks biasa.
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // --- SCRIPT MODAL DETAIL ANAK (DATA ASLI) ---
     function openDetailAnakModal(anakId) {
       if (anakId) {
         const anak = dataAnak.find(a => a.id === anakId);
         if (anak) {
           document.getElementById('modalAnakInisial').innerText = anak.inisial;
           document.getElementById('modalAnakNama').innerText = anak.nama;
-          document.getElementById('modalAnakUsiaGender').innerText = `${anak.usia} • ${anak.gender}`;
+          document.getElementById('modalAnakNama').title = anak.nama; // nama lengkap saat kursor diarahkan
+          document.getElementById('modalAnakUsiaGender').innerText = `${anak.usia} Tahun • ${anak.gender}`;
+
+          // Status: hijau "Aktif", atau abu-abu "Nonaktif" (profil dihapus orang tua) + tanggalnya
+          [['modalAnakLabel', 'modalAnakLabelDot', 'modalAnakLabelText'], ['modalAnakStatus', 'modalAnakStatusDot', 'modalAnakStatusText']]
+            .forEach(([textId, dotId, labelId]) => {
+              document.getElementById(textId).classList.toggle('text-[#10B981]', anak.aktif);
+              document.getElementById(textId).classList.toggle('text-slate-400', !anak.aktif);
+              document.getElementById(dotId).classList.toggle('bg-[#10B981]', anak.aktif);
+              document.getElementById(dotId).classList.toggle('bg-slate-300', !anak.aktif);
+              document.getElementById(labelId).innerText = anak.aktif ? 'Aktif' : 'Nonaktif';
+            });
+          const sejak = document.getElementById('modalAnakStatusSejak');
+          sejak.innerText = anak.nonaktifSejak ? `sejak ${anak.nonaktifSejak}` : '';
+          sejak.classList.toggle('hidden', anak.aktif);
           document.getElementById('modalAnakOrtu').innerText = anak.ortu;
+          document.getElementById('modalAnakOrtu').title = anak.ortu;
           document.getElementById('modalAnakBintang').innerText = `${anak.bintang} Bintang`;
+          document.getElementById('modalAnakTanggalLahir').innerText = anak.tanggalLahir;
+          document.getElementById('modalAnakTerdaftar').innerText = anak.terdaftar;
+          document.getElementById('modalAnakMisi').innerText = `${anak.misi} Misi`;
+          document.getElementById('modalAnakRefleksi').innerText = `${anak.refleksi} Refleksi Moral`;
+          document.getElementById('modalAnakTerakhirAktif').innerText = 'Terakhir aktif: ' + anak.terakhirAktif;
+
+          // Cerita terakhir: judul + selesai/sedang dibaca + kapan
+          const cerita = anak.ceritaTerakhir;
+          document.getElementById('modalAnakCeritaJudul').innerText = cerita ? cerita.judul : 'Belum ada cerita';
+          document.getElementById('modalAnakCeritaJudul').title = cerita ? cerita.judul : ''; // judul lengkap saat kursor diarahkan
+          document.getElementById('modalAnakCeritaInfo').classList.toggle('hidden', !cerita);
+          if (cerita) {
+            const status = document.getElementById('modalAnakCeritaStatus');
+            const dot = document.getElementById('modalAnakCeritaDot');
+            status.classList.toggle('text-[#10B981]', cerita.selesai);
+            status.classList.toggle('text-amber-600', !cerita.selesai);
+            dot.classList.toggle('bg-[#10B981]', cerita.selesai);
+            dot.classList.toggle('bg-amber-500', !cerita.selesai);
+            document.getElementById('modalAnakCeritaStatusText').innerText = cerita.selesai ? 'Selesai Dibaca' : 'Sedang Dibaca';
+            document.getElementById('modalAnakCeritaWaktu').innerText = cerita.waktu;
+          }
+
+          // Lencana: yang terbaru + berapa dari semua lencana
+          const lencana = anak.lencana;
+          document.getElementById('modalAnakLencana').innerText = lencana.terbaru || 'Belum ada lencana';
+          document.getElementById('modalAnakLencana').title = lencana.terbaru || '';
+          document.getElementById('modalAnakLencanaJumlah').innerText = `${lencana.jumlah} dari ${lencana.total} lencana`;
         }
       }
 
@@ -566,32 +614,11 @@
     }
 
     // =========================================================
-    // --- SCRIPT PAGINASI, SEARCH & DATA DUMMY ---
+    // --- SCRIPT PAGINASI, SEARCH & DATA ANAK (DATABASE) ---
     // =========================================================
-    const dataAnak = [
-      { id: 1, inisial: 'AY', nama: 'Ayu', usia: '7 Tahun', gender: 'Perempuan', ortu: 'Putri Dewi', bintang: 12 },
-      { id: 2, inisial: 'MD', nama: 'Made', usia: '5 Tahun', gender: 'Laki-laki', ortu: 'Putri Dewi', bintang: 8 },
-      { id: 3, inisial: 'KD', nama: 'Kadek', usia: '6 Tahun', gender: 'Laki-laki', ortu: 'I Made Surya', bintang: 20 },
-      { id: 4, inisial: 'KM', nama: 'Komang', usia: '8 Tahun', gender: 'Perempuan', ortu: 'I Made Surya', bintang: 5 },
-      { id: 5, inisial: 'LH', nama: 'Luh', usia: '6 Tahun', gender: 'Perempuan', ortu: 'Komang Ayu', bintang: 15 }
-    ];
 
-    const baseNames = ['Wayan', 'Putu', 'Ketut', 'Ngurah', 'Gede', 'Agus', 'Bagus', 'Dian', 'Santi', 'Rama'];
-    const baseOrtu = ['Ni Ketut', 'I Nyoman', 'I Ketut', 'I Gusti', 'Ni Luh'];
-    const genders = ['Laki-laki', 'Perempuan'];
-    
-    for(let i = 6; i <= 36; i++) {
-      let randomName = baseNames[i % baseNames.length];
-      dataAnak.push({
-        id: i,
-        inisial: randomName.substring(0, 2).toUpperCase(),
-        nama: randomName + (i > 15 ? ' ' + Math.floor(i/10) : ''), 
-        usia: `${Math.floor(Math.random() * 4) + 5} Tahun`,
-        gender: genders[Math.floor(Math.random() * genders.length)],
-        ortu: baseOrtu[i % baseOrtu.length],
-        bintang: Math.floor(Math.random() * 25) + 1
-      });
-    }
+    // Semua anak dari database, terbaru dulu (urutan ini = "Urutkan: Default").
+    const dataAnak = @json($children).map((anak, index) => ({ ...anak, urutan: index }));
 
     let filteredDataAnak = [...dataAnak];
     const itemsPerPage = 5;
@@ -631,17 +658,19 @@
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
               <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] font-bold text-[12px] flex items-center justify-center border border-emerald-100 flex-shrink-0">
-                ${anak.inisial}
+                ${escapeHtml(anak.inisial)}
               </div>
-              <span class="font-extrabold text-[#0F172A]">${anak.nama}</span>
+              <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
+              <span class="font-extrabold text-[#0F172A] truncate" title="${escapeHtml(anak.nama)}">${escapeHtml(anak.nama)}</span>
+              ${anak.aktif ? '' : '<span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[10px] font-extrabold whitespace-nowrap">Nonaktif</span>'}
             </div>
           </td>
-          <td class="py-4 px-4 text-slate-500">${anak.usia}</td>
-          <td class="py-4 px-4 text-slate-500">${anak.ortu}</td>
+          <td class="py-4 px-4 text-slate-500 whitespace-nowrap">${escapeHtml(anak.usia)} Tahun</td>
+          <td class="py-4 px-4 text-slate-500"><span class="block truncate" title="${escapeHtml(anak.ortu)}">${escapeHtml(anak.ortu)}</span></td>
           <td class="py-4 px-4">
             <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-600 px-2.5 py-1 rounded-[8px] text-[12px] font-extrabold border border-amber-100/50">
               <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-              ${anak.bintang}
+              ${escapeHtml(anak.bintang)}
             </span>
           </td>
           <td class="py-4 px-4 text-right">
@@ -725,15 +754,15 @@
       } else if (filterValue === 'nama_za') {
         filteredDataAnak.sort((a, b) => b.nama.localeCompare(a.nama));
       } else if (filterValue === 'usia_asc') {
-        filteredDataAnak.sort((a, b) => parseInt(a.usia) - parseInt(b.usia));
+        filteredDataAnak.sort((a, b) => a.usia - b.usia);
       } else if (filterValue === 'usia_desc') {
-        filteredDataAnak.sort((a, b) => parseInt(b.usia) - parseInt(a.usia));
+        filteredDataAnak.sort((a, b) => b.usia - a.usia);
       } else if (filterValue === 'bintang_desc') {
         filteredDataAnak.sort((a, b) => b.bintang - a.bintang);
       } else if (filterValue === 'bintang_asc') {
         filteredDataAnak.sort((a, b) => a.bintang - b.bintang);
       } else {
-        filteredDataAnak.sort((a, b) => a.id - b.id);
+        filteredDataAnak.sort((a, b) => a.urutan - b.urutan);
       }
       
       changePage(1);
@@ -745,5 +774,7 @@
     changePage(1);
   </script>
 
+  <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
+  <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>
 </html>
