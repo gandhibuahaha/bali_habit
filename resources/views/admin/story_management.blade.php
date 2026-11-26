@@ -183,23 +183,47 @@
           </a>
         </div>
 
+        @if (session('success'))
+          <div class="rounded-[12px] border border-emerald-200 bg-emerald-50 px-4 py-3 text-[13px] font-semibold text-emerald-700" role="status">
+            {{ session('success') }}
+          </div>
+        @endif
+
+        @if (session('error'))
+          <div class="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] font-semibold text-red-700" role="alert">
+            {{ session('error') }}
+          </div>
+        @endif
+
         <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-7 flex flex-col gap-6 mt-2">
           
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <form id="storyFilterForm" method="GET" action="{{ route('admin.stories.index') }}" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <!-- Pencarian judul cerita -->
             <div class="relative w-full sm:w-[320px]">
               <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                 </svg>
               </span>
-              <input id="searchInput" type="text" placeholder="Cari judul cerita..." class="w-full bg-slate-50 border border-slate-200 rounded-[12px] pl-10 pr-4 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition">
+              <input
+                id="searchInput"
+                name="search"
+                type="search"
+                value="{{ request('search') }}"
+                placeholder="Cari judul cerita..."
+                class="w-full bg-slate-50 border border-slate-200 rounded-[12px] pl-10 pr-4 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition">
             </div>
 
+            <!-- Filter status cerita -->
             <div class="relative w-full sm:w-48">
-              <select id="filterSelect" class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition appearance-none cursor-pointer">
-                <option value="all">Semua Status</option>
-                <option value="Published">Published</option>
-                <option value="Draft">Draft</option>
+              <select
+                id="filterSelect"
+                name="status"
+                onchange="this.form.submit()"
+                class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-2.5 text-[13px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition appearance-none cursor-pointer">
+                <option value="">Semua Status</option>
+                <option value="active" @selected(request('status') === 'active')>Published</option>
+                <option value="inactive" @selected(request('status') === 'inactive')>Draft</option>
               </select>
               <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
@@ -207,7 +231,7 @@
                 </svg>
               </span>
             </div>
-          </div>
+          </form>
 
           <!-- TABEL DATA CERITA -->
           <div class="overflow-x-auto">
@@ -221,18 +245,103 @@
                   <th class="py-4 px-4 text-center w-36">Aksi</th>
                 </tr>
               </thead>
-              <tbody id="tableBody" class="divide-y divide-slate-50 text-[13.5px] font-medium text-[#0F172A]">
-                <!-- Konten akan dirender oleh JavaScript -->
+              <tbody class="divide-y divide-slate-50 text-[13.5px] font-medium text-[#0F172A]">
+                @forelse ($stories as $index => $story)
+                  <tr class="hover:bg-slate-50/50 transition">
+                    <!-- Nomor urut -->
+                    <td class="py-4 px-4 text-slate-400 font-bold text-[12px] text-center">
+                      {{ $stories->firstItem() + $index }}
+                    </td>
+
+                    <!-- Judul dan cover cerita -->
+                    <td class="py-4 px-4">
+                      <div class="flex items-center gap-3.5">
+                        @if ($story->cover_image)
+                          <img
+                            src="{{ asset('storage/' . $story->cover_image) }}"
+                            alt="Cover {{ $story->title }}"
+                            class="w-10 h-10 rounded-[12px] object-cover border border-slate-100 flex-shrink-0">
+                        @else
+                          <div class="w-10 h-10 rounded-[12px] bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 flex-shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25z" />
+                            </svg>
+                          </div>
+                        @endif
+                        <span class="font-extrabold text-[#0F172A]">{{ $story->title }}</span>
+                      </div>
+                    </td>
+
+                    <!-- Jumlah halaman -->
+                    <td class="py-4 px-4 text-slate-500 font-bold text-center">
+                      {{ $story->pages_count }} Halaman
+                    </td>
+
+                    <!-- Status publikasi -->
+                    <td class="py-4 px-4 text-center">
+                      @if ($story->status === 'active')
+                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-[8px] bg-emerald-50 text-[#10B981] border border-emerald-100/50 text-[12px] font-extrabold">Published</span>
+                      @else
+                        <span class="inline-flex items-center justify-center px-2.5 py-1 rounded-[8px] bg-amber-50 text-amber-600 border border-amber-100/50 text-[12px] font-extrabold">Draft</span>
+                      @endif
+                    </td>
+
+                    <!-- Aksi cerita -->
+                    <td class="py-4 px-4">
+                      <div class="flex items-center justify-center gap-2">
+                        <a
+                          href="{{ route('admin.stories.edit', $story->story_id) }}"
+                          title="Edit"
+                          class="w-8 h-8 p-0 rounded-lg border border-slate-200 hover:border-[#10B981] hover:text-[#10B981] text-slate-500 flex items-center justify-center transition shadow-sm bg-white cursor-pointer">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/></svg>
+                        </a>
+
+                        <a
+                          href="{{ route('admin.stories.show', $story->story_id) }}"
+                          title="Lihat"
+                          class="w-8 h-8 p-0 rounded-lg border border-slate-200 hover:border-[#10B981] hover:text-[#10B981] text-slate-500 flex items-center justify-center transition shadow-sm bg-white cursor-pointer">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </a>
+
+                        <button
+                          type="button"
+                          onclick="openDeleteModal(@js(route('admin.stories.destroy', $story->story_id)))"
+                          title="Hapus"
+                          class="w-8 h-8 p-0 rounded-lg border border-slate-200 hover:border-red-500 hover:text-red-500 hover:bg-red-50 text-slate-500 flex items-center justify-center transition shadow-sm bg-white cursor-pointer">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                @empty
+                  <tr>
+                    <td colspan="5" class="py-10 text-center text-slate-400 font-medium text-[13px]">
+                      @if (request()->filled('search'))
+                        Tidak ditemukan cerita dengan judul "{{ request('search') }}".
+                      @elseif (request('status') === 'active')
+                        Belum ada cerita dengan status Published.
+                      @elseif (request('status') === 'inactive')
+                        Belum ada cerita dengan status Draft.
+                      @else
+                        Belum ada data cerita.
+                      @endif
+                    </td>
+                  </tr>
+                @endforelse
               </tbody>
             </table>
           </div>
 
           <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-5 border-t border-slate-100 mt-2">
-            <span id="paginationInfo" class="text-[12px] font-medium text-slate-400">
-              Menampilkan <span class="font-extrabold text-[#0F172A]">1 – 4</span> dari <span class="font-extrabold text-[#0F172A]">4</span> data
+            <span class="text-[12px] font-medium text-slate-400">
+              Menampilkan
+              <span class="font-extrabold text-[#0F172A]">{{ $stories->firstItem() ?? 0 }} – {{ $stories->lastItem() ?? 0 }}</span>
+              dari
+              <span class="font-extrabold text-[#0F172A]">{{ $stories->total() }}</span>
+              data
             </span>
-            <div id="paginationControls" class="flex items-center gap-1.5">
-              <!-- Kontrol Paginasi akan dirender oleh JavaScript -->
+            <div class="flex items-center gap-1.5">
+              {{ $stories->links() }}
             </div>
           </div>
         </div>
@@ -254,14 +363,18 @@
         <p class="text-[13.5px] text-slate-500 font-medium mb-8 leading-relaxed">
           Apakah Anda yakin ingin menghapus cerita ini? Data yang dihapus tidak dapat dikembalikan lagi.
         </p>
-        <div class="flex items-center justify-center gap-3">
-          <button type="button" onclick="closeDeleteModal()" class="flex-1 px-5 py-3 rounded-[12px] border border-slate-200 text-slate-600 text-[13.5px] font-bold hover:bg-slate-50 hover:text-[#0F172A] transition shadow-sm">
-            Batal
-          </button>
-          <button type="button" onclick="confirmDelete()" class="flex-1 px-5 py-3 rounded-[12px] bg-red-500 hover:bg-red-600 text-white text-[13.5px] font-bold transition shadow-sm shadow-red-500/20">
-            Hapus
-          </button>
-        </div>
+        <form id="deleteStoryForm" method="POST" action="">
+          @csrf
+          @method('DELETE')
+          <div class="flex items-center justify-center gap-3">
+            <button type="button" onclick="closeDeleteModal()" class="flex-1 px-5 py-3 rounded-[12px] border border-slate-200 text-slate-600 text-[13.5px] font-bold hover:bg-slate-50 hover:text-[#0F172A] transition shadow-sm">
+              Batal
+            </button>
+            <button type="submit" class="flex-1 px-5 py-3 rounded-[12px] bg-red-500 hover:bg-red-600 text-white text-[13.5px] font-bold transition shadow-sm shadow-red-500/20">
+              Hapus
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
@@ -292,15 +405,48 @@
     </div>
   </div>
 
-  <!-- ================= SCRIPT ================= -->
+  <!-- ================= SCRIPT MODAL ================= -->
   <script>
-    // --- SCRIPT MODAL HAPUS CERITA ---
-    function openDeleteModal() {
+    // Pencarian otomatis: kirim form GET setelah pengguna berhenti mengetik.
+    document.addEventListener('DOMContentLoaded', function () {
+      const filterForm = document.getElementById('storyFilterForm');
+      const searchInput = document.getElementById('searchInput');
+      let searchDebounceTimer = null;
+
+      if (filterForm && searchInput) {
+        searchInput.addEventListener('input', function () {
+          window.clearTimeout(searchDebounceTimer);
+
+          searchDebounceTimer = window.setTimeout(function () {
+            if (typeof filterForm.requestSubmit === 'function') {
+              filterForm.requestSubmit();
+            } else {
+              filterForm.submit();
+            }
+          }, 450);
+        });
+
+        // Jika pengguna menekan Enter, kirim pencarian tanpa menunggu debounce.
+        searchInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Enter') {
+            window.clearTimeout(searchDebounceTimer);
+          }
+        });
+      }
+    });
+
+    // Membuka modal hapus dan memasang URL cerita yang dipilih.
+    function openDeleteModal(actionUrl) {
       const modal = document.getElementById('deleteModal');
       const backdrop = document.getElementById('deleteBackdrop');
       const content = document.getElementById('deleteContent');
-      
+      const deleteForm = document.getElementById('deleteStoryForm');
+
+      if (!modal || !backdrop || !content || !deleteForm) return;
+
+      deleteForm.action = actionUrl;
       modal.classList.remove('hidden');
+
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
         content.classList.remove('scale-95', 'opacity-0');
@@ -312,223 +458,17 @@
       const modal = document.getElementById('deleteModal');
       const backdrop = document.getElementById('deleteBackdrop');
       const content = document.getElementById('deleteContent');
-      
+
+      if (!modal || !backdrop || !content) return;
+
       backdrop.classList.add('opacity-0');
       content.classList.remove('scale-100', 'opacity-100');
       content.classList.add('scale-95', 'opacity-0');
-      
+
       setTimeout(() => {
         modal.classList.add('hidden');
       }, 300);
     }
-
-    function confirmDelete() {
-      closeDeleteModal();
-    }
-
-    // =========================================================
-    // --- SCRIPT DATA CERITA, SEARCH, FILTER & PAGINASI ---
-    // =========================================================
-
-    const dataCerita = [
-      { 
-        id: 1, 
-        judul: 'I Alu Teken I Kedis Puuh', 
-        halaman: 10, 
-        status: 'Published',
-        deskripsi: 'Kisah fabel tradisional Bali tentang persahabatan, tipu daya, dan kecerdikan antara I Alu (seekor biawak) dan I Kedis Puuh (burung puyuh) dalam menghadapi tantangan di alam liar.',
-        cover: 'cover_alu_kedis_puuh.jpg'
-      },
-      { 
-        id: 2, 
-        judul: 'Lelipi Selem Bukit', 
-        halaman: 10, 
-        status: 'Published',
-        deskripsi: 'Kisah mitologi Bali tentang ular hitam penguasa bukit yang mengajarkan pesan moral mengenai keserakahan dan pentingnya menjaga keseimbangan alam.',
-        cover: 'cover_lelipi_selem.jpg'
-      },
-      { 
-        id: 3, 
-        judul: 'I Lutung Teken I Kekua', 
-        halaman: 10, 
-        status: 'Published',
-        deskripsi: 'Kisah jenaka antara I Lutung (kera) dan I Kekua (kura-kura) saat mereka bekerja sama menanam pisang, yang berujung pada ujian persahabatan.',
-        cover: 'cover_lutung_kekua.jpg'
-      },
-      { 
-        id: 4, 
-        judul: 'I Lutung Dadi Pecalang', 
-        halaman: 10, 
-        status: 'Draft',
-        deskripsi: 'Kisah lucu saat I Lutung mencoba menjadi Pecalang (penjaga keamanan desa adat) dan kekacauan yang terjadi karena ulah konyolnya.',
-        cover: 'cover_lutung_pecalang.jpg'
-      }
-    ];
-
-    let filteredDataCerita = [...dataCerita];
-    const itemsPerPage = 5;
-    let currentPage = 1;
-    let totalPages = Math.ceil(filteredDataCerita.length / itemsPerPage);
-
-    const tableBody = document.getElementById('tableBody');
-    const paginationInfo = document.getElementById('paginationInfo');
-    const paginationControls = document.getElementById('paginationControls');
-    const searchInput = document.getElementById('searchInput');
-    const filterSelect = document.getElementById('filterSelect');
-
-    function getStatusBadge(status) {
-      if (status === 'Published') {
-        return `<span class="inline-flex items-center justify-center px-2.5 py-1 rounded-[8px] bg-emerald-50 text-[#10B981] border border-emerald-100/50 text-[12px] font-extrabold">Published</span>`;
-      } else {
-        return `<span class="inline-flex items-center justify-center px-2.5 py-1 rounded-[8px] bg-amber-50 text-amber-600 border border-amber-100/50 text-[12px] font-extrabold">Draft</span>`;
-      }
-    }
-
-    // --- FUNGSI PINDAH KE EDIT CERITA ---
-    function goToEditCerita(id) {
-      const ceritaTerpilih = dataCerita.find(cerita => cerita.id === id);
-      if(ceritaTerpilih) {
-        localStorage.setItem('editCeritaData', JSON.stringify(ceritaTerpilih));
-        window.location.href = "{{ url('/admin/edit-cerita') }}";
-      }
-    }
-
-    // --- FUNGSI PINDAH KE DETAIL CERITA ---
-    function goToDetailCerita(id) {
-      const ceritaTerpilih = dataCerita.find(cerita => cerita.id === id);
-      if(ceritaTerpilih) {
-        localStorage.setItem('editCeritaData', JSON.stringify(ceritaTerpilih));
-        window.location.href = "{{ url('/admin/detail-cerita') }}";
-      }
-    }
-
-    function renderTable(page) {
-      tableBody.innerHTML = '';
-      const start = (page - 1) * itemsPerPage;
-      const end = start + itemsPerPage;
-      const paginatedItems = filteredDataCerita.slice(start, end);
-
-      if (paginatedItems.length === 0) {
-        tableBody.innerHTML = `
-          <tr>
-            <td colspan="5" class="py-8 text-center text-slate-400 font-medium text-[13px]">
-              Data cerita tidak ditemukan.
-            </td>
-          </tr>
-        `;
-        paginationInfo.innerHTML = `Menampilkan <span class="font-extrabold text-[#0F172A]">0</span> data`;
-        return;
-      }
-
-      paginatedItems.forEach((cerita, index) => {
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-slate-50/50 transition';
-        
-        tr.innerHTML = `
-          <td class="py-4 px-4 text-slate-400 font-bold text-[12px] text-center">${start + index + 1}</td>
-          <td class="py-4 px-4">
-            <div class="flex items-center gap-3.5">
-              <div class="w-10 h-10 rounded-[12px] bg-slate-50 text-slate-400 flex items-center justify-center border border-slate-100 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                </svg>
-              </div>
-              <span class="font-extrabold text-[#0F172A]">${cerita.judul}</span>
-            </div>
-          </td>
-          <td class="py-4 px-4 text-slate-500 font-bold text-center">${cerita.halaman} Halaman</td>
-          <td class="py-4 px-4 text-center">
-            ${getStatusBadge(cerita.status)}
-          </td>
-          <td class="py-4 px-4">
-            <div class="flex items-center justify-center gap-2">
-              <button type="button" onclick="goToEditCerita(${cerita.id})" title="Edit" class="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#10B981] hover:text-[#10B981] text-slate-500 flex items-center justify-center transition shadow-sm bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/></svg>
-              </button>
-              
-              <button type="button" onclick="goToDetailCerita(${cerita.id})" title="Lihat" class="w-8 h-8 rounded-lg border border-slate-200 hover:border-[#10B981] hover:text-[#10B981] text-slate-500 flex items-center justify-center transition shadow-sm bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-              </button>
-              
-              <button type="button" onclick="openDeleteModal()" title="Hapus" class="w-8 h-8 rounded-lg border border-slate-200 hover:border-red-500 hover:text-red-500 hover:bg-red-50 text-slate-500 flex items-center justify-center transition shadow-sm bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
-              </button>
-            </div>
-          </td>
-        `;
-        tableBody.appendChild(tr);
-      });
-
-      const currentEnd = end > filteredDataCerita.length ? filteredDataCerita.length : end;
-      paginationInfo.innerHTML = `Menampilkan <span class="font-extrabold text-[#0F172A]">${start + 1} – ${currentEnd}</span> dari <span class="font-extrabold text-[#0F172A]">${filteredDataCerita.length}</span> data`;
-    }
-
-    function renderPagination(page) {
-      paginationControls.innerHTML = '';
-      
-      totalPages = Math.ceil(filteredDataCerita.length / itemsPerPage);
-      if(totalPages === 0) totalPages = 1;
-
-      const prevBtn = document.createElement('button');
-      prevBtn.onclick = () => { if(currentPage > 1) changePage(currentPage - 1); };
-      prevBtn.className = `w-8 h-8 rounded-lg border flex items-center justify-center transition ${page === 1 ? 'border-slate-100 text-slate-300 cursor-not-allowed' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`;
-      prevBtn.disabled = page === 1;
-      prevBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 L8.25 12 L15.75 4.5" /></svg>`;
-      paginationControls.appendChild(prevBtn);
-
-      let startPage = Math.max(1, page - 2);
-      let endPage = Math.min(totalPages, page + 2);
-      
-      if(endPage - startPage < 4) {
-        if(startPage === 1) endPage = Math.min(totalPages, 5);
-        else if(endPage === totalPages) startPage = Math.max(1, totalPages - 4);
-      }
-
-      for (let i = startPage; i <= endPage; i++) {
-        const btn = document.createElement('button');
-        btn.onclick = () => changePage(i);
-        if (i === page) {
-          btn.className = 'w-8 h-8 rounded-lg bg-[#10B981] text-white text-[12px] font-extrabold flex items-center justify-center shadow-sm';
-        } else {
-          btn.className = 'w-8 h-8 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 text-[12px] font-extrabold flex items-center justify-center transition';
-        }
-        btn.innerText = i;
-        paginationControls.appendChild(btn);
-      }
-
-      const nextBtn = document.createElement('button');
-      nextBtn.onclick = () => { if(currentPage < totalPages) changePage(currentPage + 1); };
-      nextBtn.className = `w-8 h-8 rounded-lg border flex items-center justify-center transition ${page === totalPages || filteredDataCerita.length === 0 ? 'border-slate-100 text-slate-300 cursor-not-allowed' : 'border-slate-200 text-slate-500 hover:bg-slate-50'}`;
-      nextBtn.disabled = page === totalPages || filteredDataCerita.length === 0;
-      nextBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 L15.75 12 L8.25 19.5" /></svg>`;
-      paginationControls.appendChild(nextBtn);
-    }
-
-    function changePage(page) {
-      currentPage = page;
-      renderTable(currentPage);
-      renderPagination(currentPage);
-    }
-
-    function applySearchAndFilter() {
-      const query = searchInput.value.toLowerCase().trim();
-      const filterValue = filterSelect.value;
-      
-      filteredDataCerita = dataCerita.filter(cerita => 
-        cerita.judul.toLowerCase().includes(query)
-      );
-
-      if (filterValue !== 'all') {
-        filteredDataCerita = filteredDataCerita.filter(cerita => cerita.status === filterValue);
-      }
-
-      changePage(1);
-    }
-
-    searchInput.addEventListener('input', applySearchAndFilter);
-    filterSelect.addEventListener('change', applySearchAndFilter);
-
-    changePage(1);
   </script>
 
 </body>

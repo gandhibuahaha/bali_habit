@@ -5,6 +5,9 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminProfileController;
+use App\Http\Controllers\Admin\StoryController;
+use App\Http\Controllers\Admin\StoryPageController;
+use App\Http\Controllers\StoryCatalogController;
 
 /* Halaman publik */
 Route::view('/', 'user.index')->name('home');
@@ -31,7 +34,7 @@ Route::middleware(EnsureUserRole::class . ':parent')->group(function () {
     Route::view('/halaman-anak', 'user.halaman_anak');
     Route::view('/profil-orangtua', 'user.profil_orangtua');
     Route::view('/progress-anak', 'user.progress_anak');
-    Route::view('/belajar-bersama', 'user.belajar_bersama');
+    Route::get('/belajar-bersama', [StoryCatalogController::class, 'index']);
     Route::view('/tambah-anak', 'user.tambah_anak');
     Route::view('/edit-anak', 'user.edit_anak');
     Route::view('/halaman-baca', 'user.halaman_baca');
@@ -71,12 +74,60 @@ Route::prefix('admin')->middleware(EnsureUserRole::class . ':admin')->group(func
     Route::view('/user-management-anak', 'admin.user_management_anak');
     Route::view('/aktivitas-pengguna', 'admin.aktivitas_pengguna');
 
-    Route::view('/story-management', 'admin.story_management');
-    Route::view('/tambah-cerita', 'admin.tambah_cerita');
-    Route::view('/edit-cerita', 'admin.edit_cerita');
-    Route::view('/detail-cerita', 'admin.detail_cerita');
+   /*
+    |--------------------------------------------------------------------------
+    | STORY MANAGEMENT
+    |--------------------------------------------------------------------------
+    */
+
+    // Menampilkan daftar cerita
+    Route::get('/story-management', [
+        StoryController::class,
+        'index'
+    ])->name('admin.stories.index');
+
+    // Menampilkan form tambah cerita
+    Route::get('/tambah-cerita', [
+        StoryController::class,
+        'create'
+    ])->name('admin.stories.create');
+
+    // Menyimpan cerita baru
+    Route::post('/story-management', [
+        StoryController::class,
+        'store'
+    ])->name('admin.stories.store');
+
+    // Menampilkan detail cerita
+    Route::get('/detail-cerita/{storyId}', [
+        StoryController::class,
+        'show'
+    ])->name('admin.stories.show');
+
+    // Menampilkan form edit cerita
+    Route::get('/edit-cerita/{storyId}', [
+        StoryController::class,
+        'edit'
+    ])->name('admin.stories.edit');
+
+    // Menyimpan perubahan cerita
+    Route::put('/edit-cerita/{storyId}', [
+        StoryController::class,
+        'update'
+    ])->name('admin.stories.update');
+
+    // Menghapus cerita
+    Route::delete('/story-management/{storyId}', [
+        StoryController::class,
+        'destroy'
+    ])->name('admin.stories.destroy');
+
+    Route::get('/tambah-halaman-cerita', [StoryPageController::class, 'create'])
+        ->name('admin.story-pages.create');
+
+    Route::post('/tambah-halaman-cerita/{storyId}', [StoryPageController::class, 'store'])
+        ->name('admin.story-pages.store');
     Route::view('/edit-halaman-cerita', 'admin.edit_halaman_cerita');
-    Route::view('/tambah-halaman-cerita', 'admin.tambah_halaman_cerita');
 
     Route::view('/refleksi-management', 'admin.refleksi_management');
     Route::view('/tambah-refleksi', 'admin.tambah_refleksi');

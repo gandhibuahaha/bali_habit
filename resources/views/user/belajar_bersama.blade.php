@@ -83,137 +83,65 @@
     <div>
       <div class="flex items-center gap-3 mb-5">
         <h2 class="text-xl font-bold text-[#1F2937]">Daftar Cerita</h2>
-        <span class="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-2.5 py-1 rounded-full">4 Koleksi</span>
+        <span class="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-2.5 py-1 rounded-full">{{ $stories->count() }} Koleksi</span>
       </div>
 
-      <!-- GRID CERITA -->
+      <!-- GRID CERITA: DATA DIAMBIL DARI DATABASE -->
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
-
-        <!-- Cerita 1 (Selesai Penuh) -->
-        <div class="bg-white border border-gray-100 rounded-[1.5rem] p-3 shadow-sm flex flex-col h-full">
-          <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
-            <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/alu_puuh.png') }}');"></div>
-          </div>
-          <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">I Alu teken I Kedis Puuh</h3>
-          <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Tentang kecerdikan menjaga rumah dan alam.</p>
-
-          <!-- Indikator Progress Cerita -->
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-[#10B981] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">3/3 Selesai</span>
+        @forelse ($stories as $story)
+          <div class="bg-white border border-gray-100 rounded-[1.5rem] p-3 shadow-sm flex flex-col h-full">
+            <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
+              @if ($story->cover_image)
+                <img
+                  src="{{ asset('storage/' . $story->cover_image) }}"
+                  alt="Cover {{ $story->title }}"
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                >
+              @else
+                <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                  Cover belum tersedia
+                </div>
+              @endif
             </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-yellow-600 font-bold bg-yellow-50 px-1.5 py-0.5 rounded">2/2 Selesai</span>
+
+            <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">
+              {{ $story->title }}
+            </h3>
+            <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">
+              {{ $story->description }}
+            </p>
+
+            <!-- Progres anak belum dihubungkan pada tahap Content Management -->
+            <div class="mb-4 space-y-1.5">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="flex items-center gap-1 text-slate-500 font-medium">Refleksi</span>
+                <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">Belum tersedia</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="flex items-center gap-1 text-slate-500 font-medium">Misi</span>
+                <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">Belum tersedia</span>
+              </div>
+              <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">
+                Progres akan tersedia setelah aktivitas membaca terintegrasi.
+              </p>
             </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: Hari ini, O...</p>
+
+            <a
+              href="{{ url('/halaman-baca') }}?story_id={{ urlencode($story->story_id) }}"
+              class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer"
+            >
+              Mulai Baca
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+            </a>
           </div>
-
-          <a href="{{ url('/halaman-baca?cerita=kedis-puuh') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
-            Mulai Baca
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-          </a>
-
-        </div>
-
-        <!-- Cerita 2 (Sedang Dikerjakan) -->
-        <div class="bg-white border border-gray-100 rounded-[1.5rem] p-3 shadow-sm flex flex-col h-full">
-          <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
-            <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lutung_kekua.png') }}');"></div>
+        @empty
+          <div class="col-span-2 md:col-span-3 lg:col-span-4 bg-white border border-dashed border-gray-200 rounded-[1.5rem] p-8 text-center">
+            <p class="font-bold text-slate-600 text-sm">Belum ada cerita yang dipublikasikan.</p>
+            <p class="text-slate-400 text-xs mt-1">Cerita akan muncul di sini setelah admin mengubah statusnya menjadi Published.</p>
           </div>
-          <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">I Lutung teken I Kekua</h3>
-          <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Tentang peduli dan merawat lingkungan sekitar.</p>
-
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-[#10B981] font-bold bg-emerald-50 px-1.5 py-0.5 rounded">2/3 Selesai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-yellow-600 font-bold bg-yellow-50 px-1.5 py-0.5 rounded">1/2 Selesai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: Kemarin</p>
-          </div>
-
-          <a href="{{ url('/halaman-baca?cerita=lutung-kekua') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
-            Mulai Baca
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-          </a>
-
-        </div>
-
-        <!-- Cerita 3 (Lama Tidak Dibaca) -->
-        <div class="bg-white border border-gray-100 rounded-[1.5rem] p-3 shadow-sm flex flex-col h-full">
-          <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
-            <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lelipi_selem.png') }}');"></div>
-          </div>
-          <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">Lelipi Selem Bukit</h3>
-          <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Menjaga Alam & Lingkungan</p>
-
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/3 Mulai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-slate-300"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/2 Mulai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Terakhir dibaca: 2 hari lalu</p>
-          </div>
-
-          <a href="{{ url('/halaman-baca?cerita=lelipi-selem') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
-            Mulai Baca
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-          </a>
-
-        </div>
-
-        <!-- Cerita 4 (Belum Dibaca) -->
-        <div class="bg-white border border-gray-100 rounded-[1.5rem] p-3 shadow-sm flex flex-col h-full">
-          <div class="w-full aspect-[4/3] bg-gray-200 rounded-2xl mb-3 flex items-center justify-center overflow-hidden">
-            <div class="w-full h-full bg-cover bg-center" style="background-image: url('{{ asset('assets/images/lutung_pecalang.png') }}');"></div>
-          </div>
-          <h3 class="font-extrabold text-[13px] md:text-sm text-[#1F2937] leading-tight mb-1">I Lutung Dadi Pecalang</h3>
-          <p class="text-[10px] md:text-[11px] text-slate-500 leading-relaxed mb-3 line-clamp-2">Penjaga yang berusaha memahami masalah</p>
-
-          <div class="mb-4 space-y-1.5">
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3 text-slate-300"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg> Refleksi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/3 Mulai</span>
-            </div>
-            <div class="flex items-center justify-between text-[11px]">
-              <span class="flex items-center gap-1 text-slate-500 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3 text-slate-300"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg> Misi
-              </span>
-              <span class="text-slate-500 font-bold bg-slate-100 px-1.5 py-0.5 rounded">0/2 Mulai</span>
-            </div>
-            <p class="text-[9px] md:text-[10px] text-slate-400 mt-2 border-t border-gray-50 pt-2">Belum pernah dibaca</p>
-          </div>
-
-          <a href="{{ url('/halaman-baca?cerita=lutung-pecalang') }}" class="mt-auto w-full bg-[#10B981] text-white font-bold py-2.5 rounded-xl text-[11px] md:text-xs flex items-center justify-center gap-1.5 hover:bg-[#059669] transition cursor-pointer">
-            Mulai Baca
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
-          </a>
-
-        </div>
-
+        @endforelse
+      </div>
       </div>
     </div>
   </main>
