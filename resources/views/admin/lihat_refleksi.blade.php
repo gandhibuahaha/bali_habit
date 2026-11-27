@@ -187,7 +187,7 @@
             Kembali ke Refleksi Management
           </a>
           <h1 class="text-[28px] font-extrabold text-[#0F172A] tracking-tight mb-1">Lihat Refleksi</h1>
-          <p class="text-slate-500 text-[13.5px]">Detail pertanyaan refleksi untuk cerita "Kancil dan Buaya".</p>
+          <p class="text-slate-500 text-[13.5px]">Detail pertanyaan refleksi untuk cerita "{{ $story->title }}".</p>
         </div>
 
         <div class="flex flex-col gap-6">
@@ -197,15 +197,19 @@
             <h2 class="text-[18px] font-extrabold text-[#0F172A] mb-6">Informasi Cerita</h2>
             
             <div class="bg-slate-50 border border-slate-100 rounded-[16px] p-5 flex gap-6 items-center">
-              <div class="w-[140px] h-[100px] bg-slate-200/80 rounded-[12px] flex flex-col items-center justify-center text-slate-400 border border-slate-200 flex-shrink-0 shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-1">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                </svg>
-                <span class="text-[10px] font-bold uppercase tracking-wider">Thumbnail</span>
-              </div>
+              @if ($story->cover_image)
+                <img src="{{ asset('storage/' . $story->cover_image) }}" alt="Sampul {{ $story->title }}" class="w-[140px] h-[100px] rounded-[12px] object-cover border border-slate-200 flex-shrink-0 shadow-sm">
+              @else
+                <div class="w-[140px] h-[100px] bg-slate-200/80 rounded-[12px] flex flex-col items-center justify-center text-slate-400 border border-slate-200 flex-shrink-0 shadow-sm">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 mb-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                  <span class="text-[10px] font-bold uppercase tracking-wider">Thumbnail</span>
+                </div>
+              @endif
               <div class="flex flex-col gap-1.5 flex-1">
-                <h3 class="text-[16px] font-extrabold text-[#0F172A]">Kancil dan Buaya</h3>
-                <p class="text-[13px] font-medium text-slate-500 leading-relaxed">Kisah tentang kecerdikan Kancil dalam menghadapi situasi sulit dan pentingnya berpikir jernih.</p>
+                <h3 class="text-[16px] font-extrabold text-[#0F172A]">{{ $story->title }}@if ($story->status !== 'active') <span class="ml-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 text-[11px] font-bold">Draft</span>@endif</h3>
+                <p class="text-[13px] font-medium text-slate-500 leading-relaxed">{{ $story->description }}</p>
               </div>
             </div>
           </div>
@@ -221,28 +225,25 @@
                   <tr class="bg-slate-50 border-b border-slate-200 text-[12.5px] font-bold text-slate-500 uppercase tracking-wider">
                     <th class="py-4 px-6 w-20 text-center">No</th>
                     <th class="py-4 px-6">Pertanyaan Refleksi</th>
+                    <th class="py-4 px-6 w-40 text-center">Jawaban Benar</th>
                     <th class="py-4 px-6 w-28 text-center">Urutan</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-[13.5px] font-medium text-slate-700">
-                  <!-- Baris 1 -->
+                  @forelse ($questions as $question)
                   <tr class="hover:bg-slate-50/50 transition">
-                    <td class="py-4 px-6 text-center font-bold text-slate-400">1</td>
-                    <td class="py-4 px-6 text-slate-800 font-semibold">Apakah kamu sudah mengetahui cara Kancil mengatasi masalah?</td>
-                    <td class="py-4 px-6 text-center font-bold text-slate-600">1</td>
+                    <td class="py-4 px-6 text-center font-bold text-slate-400">{{ $loop->iteration }}</td>
+                    <td class="py-4 px-6 text-slate-800 font-semibold">{{ $question->question }}</td>
+                    <td class="py-4 px-6 text-center">
+                      <span class="inline-flex items-center px-3 py-1 rounded-full text-[12px] font-bold {{ $question->answer ? 'bg-emerald-50 text-[#10B981] border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-200' }}">{{ $question->answer ? 'Iya' : 'Tidak' }}</span>
+                    </td>
+                    <td class="py-4 px-6 text-center font-bold text-slate-600">{{ $question->order_number }}</td>
                   </tr>
-                  <!-- Baris 2 -->
-                  <tr class="hover:bg-slate-50/50 transition">
-                    <td class="py-4 px-6 text-center font-bold text-slate-400">2</td>
-                    <td class="py-4 px-6 text-slate-800 font-semibold">Apakah kamu mau membantu teman ketika mereka kesulitan?</td>
-                    <td class="py-4 px-6 text-center font-bold text-slate-600">2</td>
+                  @empty
+                  <tr>
+                    <td colspan="4" class="py-8 text-center text-slate-400 font-medium text-[13px]">Cerita ini belum punya pertanyaan refleksi.</td>
                   </tr>
-                  <!-- Baris 3 -->
-                  <tr class="hover:bg-slate-50/50 transition">
-                    <td class="py-4 px-6 text-center font-bold text-slate-400">3</td>
-                    <td class="py-4 px-6 text-slate-800 font-semibold">Apakah menurutmu penting untuk berpikir jernih sebelum mengambil keputusan?</td>
-                    <td class="py-4 px-6 text-center font-bold text-slate-600">3</td>
-                  </tr>
+                  @endforelse
                 </tbody>
               </table>
             </div>

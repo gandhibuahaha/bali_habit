@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Builder;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -46,33 +48,87 @@ class Child extends Model
         return Attribute::get(fn () => Str::limit((string) $this->name, 20, '…'));
     }
 
+    /** Stars for one mission marked "Sudah". Every mission gives the same amount. */
+    public const STARS_PER_MISSION = 2;
+
     /**
      * Stars earned per child: [child_id => stars]. Children without stars are left out.
      *
-     * Rule (from the story flow):
-     * - Refleksi: 1 star per correct answer (the child's answer equals reflections.answer).
-     * - Misi: 1 star per mission marked "Sudah". The demo page gives missions their own
-     *   values, but the missions table has no stars column yet.
+     * Star rule (the one place it lives; always reuse it):
+     * - Stars come only from missions. Reflections give none.
+     * - Each mission marked "Sudah" gives STARS_PER_MISSION stars, so the most a story
+     *   can give is STARS_PER_MISSION x the number of missions the admin added to it.
+     * - Per story, only the child's best finished try counts. A better try adds just
+     *   the difference, a worse try takes nothing away, and a try that was never
+     *   finished is ignored.
+     * Stars are counted from the saved answers each time, never stored.
+     *
+     * With $before, only tries finished before that moment count: the stars the child
+     * had then. "Stars gained today" = starTotals(...) - starTotals(..., start of today).
      *
      * @param  iterable<int>  $childIds
      * @return array<int, int>
      */
-    public static function starTotals(iterable $childIds): array
+    public static function starTotals(iterable $childIds, ?CarbonInterface $before = null): array
     {
         return array_filter(array_map(
-            fn (array $totals) => $totals['refleksi_benar'] + $totals['misi_sudah'],
-            self::learningTotals($childIds)
+            fn (array $perStory) => array_sum($perStory) * self::STARS_PER_MISSION,
+            self::bestMissionsDone($childIds, $before)
         ));
     }
 
     /**
-     * What each child did in the reflections and missions:
-     * [child_id => ['refleksi_dijawab' => int, 'refleksi_benar' => int, 'misi_sudah' => int]].
-     * Only the latest completed attempt per child + story counts, so redoing a story
-     * does not count twice. Children with nothing done are left out.
+     * Per child and story: the most missions marked "Sudah" in one finished try,
+     * [child_id => [story_id => count]]. Stories with no "Sudah" are left out.
+     * With $before, only tries finished before that moment count.
      *
      * @param  iterable<int>  $childIds
-     * @return array<int, array{refleksi_dijawab: int, refleksi_benar: int, misi_sudah: int}>
+     * @return array<int, array<string, int>>
+     */
+    public static function bestMissionsDone(iterable $childIds, ?CarbonInterface $before = null): array
+    {
+        $childIds = collect($childIds)->values();
+        if ($childIds->isEmpty()) {
+            return [];
+        }
+
+        $donePerTry = self::finishedMissionTries()
+            ->whereIn('a.child_id', $childIds)
+            ->when($before, fn ($query) => $query->where('a.completed_at', '<', $before));
+
+        $best = [];
+        foreach (DB::query()->fromSub($donePerTry, 't')->groupBy('child_id', 'story_id')->selectRaw('child_id, story_id, MAX(done) AS best')->get() as $row) {
+            $best[$row->child_id][$row->story_id] = (int) $row->best;
+        }
+
+        return $best;
+    }
+
+    /**
+     * Finished mission tries with their "Sudah" count, one row each:
+     * child_id, story_id, mission_attempt_id, attempt_number, done.
+     * Tries with no "Sudah" at all are left out (they are worth 0 stars).
+     * The base of the star rule: bestMissionsDone() and Rekap Cerita both build on it.
+     */
+    public static function finishedMissionTries(): Builder
+    {
+        return DB::table('mission_attempts as a')
+            ->join('mission_answers as ans', 'ans.mission_attempt_id', '=', 'a.mission_attempt_id')
+            ->where('a.status', 'completed')
+            ->where('ans.answer', true)
+            ->groupBy('a.mission_attempt_id', 'a.child_id', 'a.story_id', 'a.attempt_number')
+            ->selectRaw('a.child_id, a.story_id, a.mission_attempt_id, a.attempt_number, COUNT(*) AS done');
+    }
+
+    /**
+     * What each child did in the reflections and missions:
+     * [child_id => ['refleksi_dijawab' => int, 'refleksi_benar' => int, 'misi_sudah' => int, 'bintang' => int]].
+     * - Reflections: answered and correct in the latest finished try per story (shown only, no stars).
+     * - Missions and stars: from the best finished try per story (the star rule above).
+     * Children with nothing done are left out.
+     *
+     * @param  iterable<int>  $childIds
+     * @return array<int, array{refleksi_dijawab: int, refleksi_benar: int, misi_sudah: int, bintang: int}>
      */
     public static function learningTotals(iterable $childIds): array
     {
@@ -98,23 +154,14 @@ class Child extends Model
             ->selectRaw('a.child_id, COUNT(*) AS answered, SUM(ans.answer = r.answer) AS correct')
             ->get();
 
-        $missions = DB::table('mission_answers as ans')
-            ->join('mission_attempts as a', 'a.mission_attempt_id', '=', 'ans.mission_attempt_id')
-            ->whereIn('a.child_id', $childIds)
-            ->where('a.status', 'completed')
-            ->where('a.attempt_number', $latestCompleted('mission_attempts'))
-            ->where('ans.answer', true)
-            ->groupBy('a.child_id')
-            ->selectRaw('a.child_id, COUNT(*) AS done')
-            ->pluck('done', 'child_id');
-
-        $empty = ['refleksi_dijawab' => 0, 'refleksi_benar' => 0, 'misi_sudah' => 0];
+        $empty = ['refleksi_dijawab' => 0, 'refleksi_benar' => 0, 'misi_sudah' => 0, 'bintang' => 0];
         $totals = [];
         foreach ($reflections as $row) {
             $totals[$row->child_id] = ['refleksi_dijawab' => (int) $row->answered, 'refleksi_benar' => (int) $row->correct] + $empty;
         }
-        foreach ($missions as $childId => $done) {
-            $totals[$childId] = ['misi_sudah' => (int) $done] + ($totals[$childId] ?? $empty);
+        foreach (self::bestMissionsDone($childIds) as $childId => $perStory) {
+            $done = array_sum($perStory);
+            $totals[$childId] = ['misi_sudah' => $done, 'bintang' => $done * self::STARS_PER_MISSION] + ($totals[$childId] ?? $empty);
         }
 
         return $totals;

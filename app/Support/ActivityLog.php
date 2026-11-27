@@ -10,8 +10,9 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Admin activity log: what parents and children did, newest first, built from the
- * existing tables (no separate log table). Used by the admin Beranda ("Aktivitas
- * Pengguna Terbaru") and the "Aktivitas Pengguna" tab.
+ * existing tables (no separate log table, D-12). Used by the admin Beranda ("Aktivitas
+ * Pengguna Terbaru") and the "Aktivitas Pengguna" tab. Kid-profile edits show only
+ * the latest edit per kid (D-30).
  *
  * Children deleted by their parent (Nonaktif) still show their past events.
  */
@@ -30,7 +31,7 @@ class ActivityLog
     /**
      * The newest $limit events.
      *
-     * @return Collection<int, array{name: string, role: string, initial: string, action: string, time: string, colorClass: string}>
+     * @return Collection<int, array{name: string, role: string, initial: string, photo: ?string, action: string, time: string, colorClass: string}>
      */
     public static function latest(int $limit): Collection
     {
@@ -40,19 +41,29 @@ class ActivityLog
         $queries = [
             // Parent registered.
             DB::table('users')->where('role', 'parent')
-                ->select(['name', 'created_at as time'])
+                ->select(['name', 'profile_picture as photo', 'created_at as time'])
                 ->selectRaw("'register' as type, NULL as subject, NULL as done, NULL as total"),
 
             // Parent added a child.
             DB::table('children')->join('users', 'users.user_id', '=', 'children.parent_id')
-                ->select(['users.name', 'children.created_at as time', 'children.name as subject'])
+                ->select(['users.name', 'users.profile_picture as photo', 'children.created_at as time', 'children.name as subject'])
                 ->selectRaw("'child_added' as type, NULL as done, NULL as total"),
 
             // Parent deleted a child (the child is now Nonaktif).
             DB::table('children')->join('users', 'users.user_id', '=', 'children.parent_id')
                 ->whereNotNull('children.deleted_at')
-                ->select(['users.name', 'children.deleted_at as time', 'children.name as subject'])
+                ->select(['users.name', 'users.profile_picture as photo', 'children.deleted_at as time', 'children.name as subject'])
                 ->selectRaw("'child_deleted' as type, NULL as done, NULL as total"),
+
+            // Parent edited a child's profile (name, birth date, gender or photo), D-30.
+            // Only the LATEST edit per child is known: children.updated_at. A delete also
+            // sets updated_at (= deleted_at), so that case is left out here.
+            DB::table('children')->join('users', 'users.user_id', '=', 'children.parent_id')
+                ->whereColumn('children.updated_at', '>', 'children.created_at')
+                ->where(fn (Builder $q) => $q->whereNull('children.deleted_at')
+                    ->orWhereColumn('children.updated_at', '!=', 'children.deleted_at'))
+                ->select(['users.name', 'users.profile_picture as photo', 'children.updated_at as time', 'children.name as subject'])
+                ->selectRaw("'child_edited' as type, NULL as done, NULL as total"),
 
             // Child started / finished reading a story.
             self::storyQuery('started_at', 'story_started'),
@@ -73,7 +84,7 @@ class ActivityLog
             DB::table('child_badges')
                 ->join('children', 'children.child_id', '=', 'child_badges.child_id')
                 ->join('badges', 'badges.badge_id', '=', 'child_badges.badge_id')
-                ->select(['children.name', 'child_badges.earned_at as time', 'badges.name as subject'])
+                ->select(['children.name', 'children.profile_picture as photo', 'child_badges.earned_at as time', 'badges.name as subject'])
                 ->selectRaw("'badge' as type, NULL as done, NULL as total"),
         ];
 
@@ -82,12 +93,14 @@ class ActivityLog
             ->sortByDesc('time')
             ->take($limit)
             ->map(function (object $event) {
-                $role = in_array($event->type, ['register', 'child_added', 'child_deleted'], true) ? self::PARENT : self::CHILD;
+                $role = in_array($event->type, ['register', 'child_added', 'child_edited', 'child_deleted'], true) ? self::PARENT : self::CHILD;
 
                 return [
                     'name' => $event->name,
                     'role' => $role,
                     'initial' => User::initialsOf($event->name),
+                    // Profile photo of the person (parent or child), or null: the page shows the initial.
+                    'photo' => $event->photo ? asset('storage/'.$event->photo) : null,
                     'action' => self::describe($event),
                     'time' => self::timeLabel(Carbon::parse($event->time)),
                     'colorClass' => self::COLORS[$role],
@@ -110,7 +123,7 @@ class ActivityLog
         return DB::table('story_progress')
             ->join('children', 'children.child_id', '=', 'story_progress.child_id')
             ->leftJoin('stories', 'stories.story_id', '=', 'story_progress.story_id')
-            ->select(['children.name', "story_progress.{$timeColumn} as time"])
+            ->select(['children.name', 'children.profile_picture as photo', "story_progress.{$timeColumn} as time"])
             ->selectRaw("COALESCE(stories.title, story_progress.story_id) as subject, '{$type}' as type, NULL as done, NULL as total");
     }
 
@@ -122,7 +135,7 @@ class ActivityLog
             ->join('children', 'children.child_id', '=', 'a.child_id')
             ->leftJoin('stories', 'stories.story_id', '=', 'a.story_id')
             ->where('a.status', 'completed')
-            ->select(['children.name', 'a.completed_at as time'])
+            ->select(['children.name', 'children.profile_picture as photo', 'a.completed_at as time'])
             ->selectRaw("COALESCE(stories.title, a.story_id) as subject, '{$type}' as type")
             ->selectSub($doneCount, 'done')
             ->selectSub(DB::table("{$answers} as t")->whereColumn("t.{$key}", "a.{$key}")->selectRaw('COUNT(*)'), 'total');
@@ -135,6 +148,7 @@ class ActivityLog
         return match ($event->type) {
             'register' => 'Mendaftar akun BaliHabit.',
             'child_added' => "Menambahkan profil anak '{$subject}'.",
+            'child_edited' => "Mengubah profil anak '{$subject}'.",
             'child_deleted' => "Menghapus profil anak '{$subject}'.",
             'story_started' => "Mulai membaca cerita '{$subject}'.",
             'story_completed' => "Selesai membaca cerita '{$subject}'.",

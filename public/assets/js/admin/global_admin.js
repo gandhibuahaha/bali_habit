@@ -1,3 +1,12 @@
+// --- Keamanan setelah logout (D-32) ---
+// Jika browser menampilkan salinan lama halaman admin (tombol Back / back-forward cache),
+// muat ulang dari server: server memeriksa login dan mengirim ke halaman login bila sudah keluar.
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && document.getElementById('adminLogoutForm')) {
+    window.location.reload();
+  }
+});
+
 // --- Fungsi Global Modal & Dropdown (langsung terdaftar sebelum DOMContentLoaded) ---
 window.closeProfileMenu = function() {
   const profileMenu = document.getElementById('profileDropdownMenu');

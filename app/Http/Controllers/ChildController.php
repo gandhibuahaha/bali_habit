@@ -26,7 +26,10 @@ class ChildController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('user.halaman_anak', ['children' => $children]);
+        return view('user.halaman_anak', [
+            'children' => $children,
+            'stars' => Child::starTotals($children->pluck('child_id')), // [child_id => stars]
+        ]);
     }
 
     public function create(): View

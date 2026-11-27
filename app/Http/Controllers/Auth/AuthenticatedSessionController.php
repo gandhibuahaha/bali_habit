@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 class AuthenticatedSessionController extends Controller
 {
     /**
+     * Set by destroy(): this browser session logged out on purpose. Holds the path of the
+     * page the logout happened on (or true when unknown). See redirectAfterLogin(), D-33.
+     */
+    private const LOGGED_OUT_KEY = 'logged_out';
+
+    /**
      * Login Parent.
      */
     public function store(Request $request): RedirectResponse
@@ -95,9 +101,19 @@ class AuthenticatedSessionController extends Controller
     private function redirectAfterLogin(Request $request, bool $isAdmin, string $fallback): RedirectResponse
     {
         $intended = $request->session()->pull('url.intended');
+        $loggedOutFrom = $request->session()->pull(self::LOGGED_OUT_KEY);
+
+        // Logged out on purpose earlier in this browser session (D-33):
+        // - coming back to the page they logged out from (e.g. with Back) -> dashboard;
+        // - any other page they opened (e.g. a typed address) -> that page, as usual;
+        // - page of the logout unknown -> dashboard.
+        if ($loggedOutFrom !== null
+            && (! is_string($loggedOutFrom) || ! is_string($intended) || self::pathOf($intended) === $loggedOutFrom)) {
+            return redirect()->to($fallback);
+        }
 
         if (is_string($intended)) {
-            $path = '/'.ltrim((string) parse_url($intended, PHP_URL_PATH), '/');
+            $path = self::pathOf($intended);
             $isAdminPage = $path === '/admin' || str_starts_with($path, '/admin/');
 
             if ($isAdminPage === $isAdmin) {
@@ -106,6 +122,12 @@ class AuthenticatedSessionController extends Controller
         }
 
         return redirect()->to($fallback);
+    }
+
+    /** "/admin/user-management" for "http://host/admin/user-management?x=1". */
+    private static function pathOf(string $url): string
+    {
+        return '/'.ltrim((string) parse_url($url, PHP_URL_PATH), '/');
     }
 
     /**
@@ -119,10 +141,19 @@ class AuthenticatedSessionController extends Controller
         // Simpan informasi role sebelum sesi diakhiri.
         $isAdmin = $guard->user()?->role === 'admin';
 
+        // Halaman tempat tombol Keluar ditekan (form logout dikirim dari halaman itu).
+        $referer = $request->headers->get('referer');
+        $loggedOutFrom = is_string($referer) && $referer !== '' ? self::pathOf($referer) : true;
+
         $guard->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        // Tandai: keluar atas kemauan sendiri, dari halaman ini. Login berikutnya lewat
+        // halaman yang sama (mis. tombol Back) ke dashboard; lewat halaman lain ke halaman
+        // itu (lihat redirectAfterLogin(), D-33).
+        $request->session()->put(self::LOGGED_OUT_KEY, $loggedOutFrom);
 
         // Admin kembali ke halaman login Admin.
         if ($isAdmin) {

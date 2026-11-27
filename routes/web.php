@@ -6,6 +6,7 @@ use App\Http\Middleware\EnsureUserRole;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ReflectionController;
 use App\Http\Controllers\Admin\StoryController;
 use App\Http\Controllers\Admin\StoryPageController;
 use App\Http\Controllers\Admin\UserManagementController as AdminUserManagementController;
@@ -34,7 +35,9 @@ Route::post('/register', [RegisteredUserController::class, 'store'])
 Route::view('/lupa-sandi', 'user.lupa_sandi')->name('password.request');
 
 /* Halaman yang hanya dapat diakses akun Parent */
-Route::middleware(EnsureUserRole::class . ':parent')->group(function () {
+// cache.headers no_store: the browser keeps no copy of logged-in pages, so after logout
+// the Back button can't show them again (D-32).
+Route::middleware([EnsureUserRole::class . ':parent', 'cache.headers:no_store;private'])->group(function () {
     Route::get('/dashboard', [ParentDashboardController::class, 'index'])->name('parent.dashboard');
     Route::get('/halaman-anak', [ChildController::class, 'index'])->name('children.index');
     Route::view('/profil-orangtua', 'user.profil_orangtua');
@@ -45,10 +48,14 @@ Route::middleware(EnsureUserRole::class . ':parent')->group(function () {
     Route::get('/edit-anak/{child}', [ChildController::class, 'edit'])->whereNumber('child')->name('children.edit');
     Route::put('/edit-anak/{child}', [ChildController::class, 'update'])->whereNumber('child')->name('children.update');
     Route::delete('/edit-anak/{child}', [ChildController::class, 'destroy'])->whereNumber('child')->name('children.destroy');
-    Route::get('/halaman-baca', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_baca');
-    Route::get('/halaman-refleksi', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_refleksi');
-    Route::get('/halaman-misi', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.halaman_misi');
-    Route::get('/rekap-cerita', [ChildProgressController::class, 'storyPage'])->defaults('page', 'user.rekap_cerita');
+    Route::get('/halaman-baca', [ChildProgressController::class, 'readingPage'])->name('stories.read.show');
+    // Selesai membaca (dihitung sekali per kunjungan). block(): permintaan bersamaan dari sesi yang sama dijalankan bergantian.
+    Route::post('/halaman-baca', [ChildProgressController::class, 'finishReading'])->name('stories.read')->block(10, 10);
+    Route::get('/halaman-refleksi', [ChildProgressController::class, 'reflectionPage'])->name('reflections.show');
+    Route::post('/halaman-refleksi', [ChildProgressController::class, 'saveReflections'])->name('reflections.store');
+    Route::get('/halaman-misi', [ChildProgressController::class, 'missionPage'])->name('missions.show');
+    Route::post('/halaman-misi', [ChildProgressController::class, 'saveMissions'])->name('missions.store');
+    Route::get('/rekap-cerita', [ChildProgressController::class, 'recapPage'])->name('stories.recap');
     Route::view('/edit-profil', 'user.edit_profil');
     Route::put('/edit-profil', [ParentProfileController::class, 'update'])->name('parent.profile.update');
     Route::view('/ubah-sandi', 'user.ubah_sandi');
@@ -78,7 +85,7 @@ Route::view('/admin/lupa-sandi', 'admin.lupa_sandi_admin')
 
 
 /* Seluruh halaman manajemen Admin memerlukan role admin */
-Route::prefix('admin')->middleware(EnsureUserRole::class . ':admin')->group(function () {
+Route::prefix('admin')->middleware([EnsureUserRole::class . ':admin', 'cache.headers:no_store;private'])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/user-management', [AdminUserManagementController::class, 'parents'])->name('admin.users.parents');
     Route::get('/user-management-anak', [AdminUserManagementController::class, 'children'])->name('admin.users.children');
@@ -139,10 +146,16 @@ Route::prefix('admin')->middleware(EnsureUserRole::class . ':admin')->group(func
         ->name('admin.story-pages.store');
     Route::view('/edit-halaman-cerita', 'admin.edit_halaman_cerita');
 
-    Route::view('/refleksi-management', 'admin.refleksi_management');
-    Route::view('/tambah-refleksi', 'admin.tambah_refleksi');
-    Route::view('/edit-refleksi', 'admin.edit_refleksi');
-    Route::view('/lihat-refleksi', 'admin.lihat_refleksi');
+    /*
+    | REFLEKSI MANAGEMENT (D-35, D-36)
+    */
+    Route::get('/refleksi-management', [ReflectionController::class, 'index'])->name('admin.reflections.index');
+    Route::get('/tambah-refleksi', [ReflectionController::class, 'create'])->name('admin.reflections.create');
+    Route::post('/refleksi-management', [ReflectionController::class, 'store'])->name('admin.reflections.store');
+    Route::get('/lihat-refleksi/{storyId}', [ReflectionController::class, 'show'])->name('admin.reflections.show');
+    Route::get('/edit-refleksi/{storyId}', [ReflectionController::class, 'edit'])->name('admin.reflections.edit');
+    Route::put('/edit-refleksi/{storyId}', [ReflectionController::class, 'update'])->name('admin.reflections.update');
+    Route::delete('/refleksi-management/{storyId}', [ReflectionController::class, 'destroy'])->name('admin.reflections.destroy');
 
     Route::view('/mission-management', 'admin.mission_management');
     Route::view('/edit-misi', 'admin.edit_misi');

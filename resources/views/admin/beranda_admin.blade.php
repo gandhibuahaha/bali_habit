@@ -281,7 +281,13 @@
               @forelse ($aktivitas as $item)
               <div class="flex items-center justify-between gap-4 p-4 bg-slate-50 rounded-[16px]">
                 <div class="flex items-center gap-4 min-w-0">
-                  <div class="w-10 h-10 rounded-full {{ $item['role'] === 'Anak' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-[#10B981]' }} flex items-center justify-center font-bold flex-shrink-0">{{ $item['initial'] }}</div>
+                  <div class="w-10 h-10 rounded-full {{ $item['role'] === 'Anak' ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-[#10B981]' }} flex items-center justify-center font-bold flex-shrink-0 overflow-hidden">
+                    @if ($item['photo'])
+                      <img src="{{ $item['photo'] }}" alt="Foto {{ $item['name'] }}" class="w-full h-full object-cover">
+                    @else
+                      {{ $item['initial'] }}
+                    @endif
+                  </div>
                   {{-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan --}}
                   <div class="min-w-0">
                     <h4 class="text-[14px] font-bold text-slate-800 truncate" title="{{ $item['name'] }}">{{ $item['name'] }} ({{ $item['role'] }})</h4>

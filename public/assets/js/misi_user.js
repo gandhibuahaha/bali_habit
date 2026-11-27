@@ -1,62 +1,23 @@
-    // Data Misi
-    const missionData = [
-      { 
-        label: "Misi 1", 
-        title: "Sudahkah mencium ibumu hari ini?", 
-        stars: 2,
-        image: "./assets/images/cium_ibu.png"
-      },
-      { 
-        label: "Misi 2", 
-        title: "Apakah kamu sudah merapikan tempat tidurmu?", 
-        stars: 3,
-        image: "./assets/images/merapikan.png"
-      },
-      { 
-        label: "Misi 3", 
-        title: "Sudahkah kamu menyiram tanaman di rumah?", 
-        stars: 1,
-        image: "./assets/images/menyiram_tanaman.png"
-      }
-    ];
-
+    // Misi cerita yang dibuka, dari database: [{ id, text }] (lihat halaman_misi.blade.php).
+    // Bintang per misi sama untuk semua misi, jadi sudah ditulis di halaman.
+    const missionData = window.BALIHABIT_MISSIONS || [];
+    const missionAnswers = []; // per misi: 1 = "Sudah!", 0 = "Nanti Saja"
     let currentMission = 0;
-    
-    // Inisialisasi total misi pada indikator
+    let missionSent = false;
+
     document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById('total-mission-text').innerText = missionData.length;
+      // Cerita tanpa misi: halaman menampilkan pesan kosong, tidak ada yang diatur.
+      if (missionData.length === 0 || !document.getElementById('mission-title')) return;
       updateMissionPage();
     });
 
     function updateMissionPage() {
       const data = missionData[currentMission];
 
-      // Update Label & Judul Misi
-      document.getElementById('mission-label').innerHTML = `<div class="w-1.5 h-1.5 bg-[#10B981] rounded-full"></div> ${data.label}`;
-      document.getElementById('mission-title').innerText = data.title;
+      // Label & teks misi (innerText: teks dari database tidak dibaca sebagai HTML)
+      document.getElementById('mission-label').innerHTML = `<div class="w-1.5 h-1.5 bg-[#10B981] rounded-full"></div> Misi ${currentMission + 1}`;
+      document.getElementById('mission-title').innerText = data.text;
       document.getElementById('page-indicator-text').innerText = currentMission + 1;
-
-      // Update Gambar Ilustrasi
-      const imgElement = document.getElementById('mission-image');
-      const placeholderElement = document.getElementById('mission-image-placeholder');
-      
-      if(data.image && data.image !== "") {
-        imgElement.src = data.image;
-        imgElement.classList.remove('hidden');
-        placeholderElement.classList.add('hidden');
-      } else {
-        imgElement.src = "";
-        imgElement.classList.add('hidden');
-        placeholderElement.classList.remove('hidden');
-      }
-
-      // Update Jumlah Bintang
-      const starsContainer = document.getElementById('stars-container');
-      starsContainer.innerHTML = '';
-      for (let i = 0; i < data.stars; i++) {
-        starsContainer.innerHTML += `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>`;
-      }
-      document.getElementById('mission-reward').innerText = `Dapatkan ${data.stars} Bintang dengan menyelesaikan misi ini.`;
 
       // Update Progress Bar / Indikator Bulat
       const progressContainer = document.getElementById('progress-container');
@@ -84,21 +45,39 @@
       }
     }
 
-    // Fungsi Lanjut ke Misi Berikutnya
-    function goNext() {
+    // "Sudah!" (1) atau "Nanti Saja" (0): catat jawaban, lalu ke misi berikutnya.
+    // Setelah misi terakhir, semua jawaban dikirim sekali ke server (saveMissions),
+    // yang menyimpan percobaan ini dan kembali ke halaman ini dengan popup hasil.
+    function answerMission(answer) {
+      if (missionSent) return;
+      missionAnswers[currentMission] = answer;
+
       if (currentMission < missionData.length - 1) {
         currentMission++;
         updateMissionPage();
       } else {
-        // Jika sudah misi terakhir, tampilkan popup sukses
-        const popup = document.getElementById('success-popup');
-        popup.classList.remove('hidden');
-        popup.classList.add('flex'); 
+        sendMissionAnswers();
       }
     }
 
-    // Fungsi Kembali ke Misi Sebelumnya
+    function sendMissionAnswers() {
+      missionSent = true; // ketukan ganda tidak mengirim dua kali
+      document.querySelectorAll('.mission-answer-btn, #btn-prev').forEach(btn => { btn.disabled = true; });
+
+      const form = document.getElementById('missionForm');
+      missionData.forEach((mission, i) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = `answers[${mission.id}]`;
+        input.value = missionAnswers[i];
+        form.appendChild(input);
+      });
+      form.submit();
+    }
+
+    // Fungsi Kembali ke Misi Sebelumnya (jawaban bisa diganti)
     function goPrev() {
+      if (missionSent) return;
       if (currentMission > 0) {
         currentMission--;
         updateMissionPage();

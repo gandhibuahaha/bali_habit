@@ -5,29 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Misi Hari Ini - BaliHabit</title>
   <link href="{{ asset('assets/css/output.css') }}" rel="stylesheet">
-  <style>
-    /* Animasi Kedut (Twitch / Heartbeat) untuk Bintang */
-    @keyframes heartbeat {
-      0% { transform: scale(1); }
-      14% { transform: scale(1.15); }
-      28% { transform: scale(1); }
-      42% { transform: scale(1.15); }
-      70% { transform: scale(1); }
-      100% { transform: scale(1); }
-    }
-    .animasi-kedut {
-      animation: heartbeat 2s infinite ease-in-out;
-    }
-
-    /* Animasi Popup Muncul (Pop In) */
-    @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.9); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    .popup-muncul {
-      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-  </style>
 </head>
 <body class="bg-slate-50 text-[#1F2937] min-h-screen flex flex-col relative">
 
@@ -83,17 +60,29 @@
         <h1 class="text-3xl md:text-4xl font-extrabold text-[#1F2937] mb-1 tracking-tight">Misi Hari Ini</h1>
         <p class="text-slate-500 text-sm md:text-base">Yuk, lakukan misi ini bersama {{ $child->short_name }}!</p>
       </div>
-      <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold shadow-sm text-xl flex-shrink-0">
-        👧🏼
+      @php $isGirl = $child->gender === 'female'; @endphp
+      {{-- Foto anak yang dipilih; tanpa foto: emoji sesuai jenis kelamin --}}
+      <div class="w-12 h-12 {{ $isGirl ? 'bg-orange-50' : 'bg-cyan-50' }} rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden flex-shrink-0 text-xl">
+        @if ($child->profile_picture)
+          <img src="{{ asset('storage/' . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
+        @else
+          {{ $isGirl ? '👧🏼' : '👦🏽' }}
+        @endif
       </div>
     </div>
+
+    @if ($missions->isNotEmpty())
+
+    @if ($errors->any())
+      <p class="text-red-500 text-sm font-bold mb-4">Misi belum tersimpan. Yuk, coba jawab lagi ya!</p>
+    @endif
 
     <div class="flex items-center justify-between mb-8">
       <div id="progress-container" class="flex items-center gap-3">
         <!-- JS Generate -->
       </div>
       <div class="text-slate-400 font-bold text-sm">
-        <span id="page-indicator-text">1</span> / <span id="total-mission-text">3</span>
+        <span id="page-indicator-text">1</span> / <span id="total-mission-text">{{ $missions->count() }}</span>
       </div>
     </div>
 
@@ -107,9 +96,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
         </div>
 
-        <!-- Gambar Dinamis dari JavaScript -->
-        <img id="mission-image" src="" alt="Ilustrasi Misi" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 hidden" />
-
+        <!-- Tabel missions belum punya kolom gambar (Mission Management), jadi selalu placeholder -->
         <!-- Placeholder -->
         <div id="mission-image-placeholder" class="absolute inset-0 flex items-center justify-center text-orange-300 font-medium text-sm px-4 bg-orange-50 z-0">
           Belum ada <br> gambar ilustrasi
@@ -122,27 +109,30 @@
       </div>
 
       <h2 id="mission-title" class="text-xl sm:text-2xl font-extrabold text-[#1F2937] leading-snug mb-6">
-        Sudahkah mencium ibumu hari ini?
+        {{ $missions->first()['text'] }}
       </h2>
 
+      <!-- Setiap misi memberi bintang yang sama (Child::STARS_PER_MISSION) -->
       <div class="w-full bg-yellow-50/50 rounded-2xl p-4 border border-yellow-100 flex flex-col items-center">
         <div id="stars-container" class="flex gap-1 mb-2 text-yellow-400">
-          <!-- JS Generate -->
+          @for ($i = 0; $i < $starsPerMission; $i++)
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+          @endfor
         </div>
         <p id="mission-reward" class="text-yellow-700 text-xs sm:text-sm font-medium">
-          Dapatkan 2 Bintang dengan menyelesaikan misi ini.
+          Dapatkan {{ $starsPerMission }} Bintang dengan menyelesaikan misi ini.
         </p>
       </div>
     </div>
 
-    <!-- TOMBOL AKSI -->
+    <!-- TOMBOL AKSI: "Sudah!" = 1, "Nanti Saja" = 0; setelah misi terakhir semua jawaban disimpan -->
     <div class="space-y-3">
-      <button onclick="goNext()" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl shadow-md hover:bg-[#059669] transition flex justify-center items-center gap-2 text-base cursor-pointer">
+      <button onclick="answerMission(1)" class="mission-answer-btn w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl shadow-md hover:bg-[#059669] transition flex justify-center items-center gap-2 text-base cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-300"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
         Sudah!
       </button>
 
-      <button onclick="goNext()" class="w-full bg-white border border-gray-200 text-slate-500 font-extrabold py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition flex justify-center items-center text-sm sm:text-base cursor-pointer">
+      <button onclick="answerMission(0)" class="mission-answer-btn w-full bg-white border border-gray-200 text-slate-500 font-extrabold py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition flex justify-center items-center text-sm sm:text-base cursor-pointer">
         Nanti Saja
       </button>
 
@@ -151,53 +141,53 @@
         Misi Sebelumnya
       </button>
     </div>
+
+    @else
+    <!-- Cerita ini belum punya misi: tidak ada yang disimpan -->
+    <div class="bg-white border-2 border-emerald-50 rounded-[2rem] p-5 sm:p-8 shadow-sm mb-6 flex flex-col items-center text-center">
+      <h2 class="text-xl sm:text-2xl font-extrabold text-[#1F2937] leading-snug mb-6">
+        Belum ada misi untuk cerita ini
+      </h2>
+      <a href="{{ url('/rekap-cerita') }}" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl shadow-md hover:bg-[#059669] transition flex justify-center items-center gap-2 text-base cursor-pointer">
+        Lanjut ke Rekap
+      </a>
+    </div>
+    @endif
   </main>
 
-  <!-- ================= POPUP BERHASIL MISI ================= -->
-  <div id="success-popup" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm px-4 items-center justify-center">
-    <div class="bg-white rounded-[2rem] px-6 py-8 w-full max-w-[320px] flex flex-col items-center text-center shadow-2xl popup-muncul">
-
-      <div class="relative flex flex-col items-center justify-center mb-6 mt-2">
-        <div class="relative w-32 h-32 flex items-center justify-center">
-          <div class="absolute w-28 h-28 bg-yellow-100/80 rounded-full blur-[2px]"></div>
-
-          <svg class="absolute w-32 h-32 text-orange-400 drop-shadow-sm" viewBox="0 0 100 100">
-            <line x1="50" y1="6" x2="50" y2="14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="50" y1="94" x2="50" y2="86" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="6" y1="50" x2="14" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="94" y1="50" x2="86" y2="50" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="81" y1="19" x2="75" y2="25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="19" y1="19" x2="25" y2="25" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="81" y1="81" x2="75" y2="75" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="19" y1="81" x2="25" y2="75" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-[72px] h-[72px] text-yellow-400 drop-shadow-md animasi-kedut z-10">
-            <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
-          </svg>
-        </div>
-
-        <div class="bg-yellow-50 text-orange-400 font-extrabold text-[11px] px-3.5 py-1.5 rounded-full flex items-center gap-1 z-20 border border-yellow-100 shadow-sm -mt-3">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
-            <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
-          </svg>
-          Misi Selesai!
-        </div>
-      </div>
-
-      <h2 class="text-[28px] font-extrabold text-[#F97316] leading-[1.1] mb-3">
-        +6 Bintang<br>Diperoleh!
-      </h2>
-
-      <p class="text-[#1F2937] text-[13px] sm:text-sm font-bold mb-7 px-1 leading-relaxed">
-        Hebat, {{ $child->short_name }}! Semua Misi Hari Ini<br>Berhasil Diselesaikan! 🎉
-      </p>
+  {{-- ================= POPUP BERHASIL MISI =================
+       Muncul setelah jawaban tersimpan ($result dari saveMissions()): bintang bertambah,
+       atau +0 tapi belum penuh. "Bintang Sudah Penuh" muncul di Rekap Cerita (D-29). --}}
+  @if ($result)
+  <x-mission-popup id="success-popup">
+      @if ($result['gained'] > 0)
+        <h2 class="text-[28px] font-extrabold text-[#F97316] leading-[1.1] mb-3">
+          +{{ $result['gained'] }} Bintang<br>Diperoleh!
+        </h2>
+        <p class="text-[#1F2937] text-[13px] sm:text-sm font-bold mb-7 px-1 leading-relaxed" style="text-wrap: balance">
+          <span class="block">Hebat, {{ $child->short_name }}!</span>
+          {{-- "Semua misi" hanya kalau semua misi di percobaan ini "Sudah" --}}
+          @if (! isset($result['done'], $result['total']) || $result['done'] >= $result['total'])
+            Semua Misi Hari Ini Berhasil Diselesaikan! 🎉
+          @else
+            Kamu menyelesaikan {{ $result['done'] }} dari {{ $result['total'] }} misi! 🎉
+          @endif
+        </p>
+      @else
+        <h2 class="text-[28px] font-extrabold text-[#F97316] leading-[1.1] mb-3">
+          +0 Bintang
+        </h2>
+        <p class="text-[#1F2937] text-[13px] sm:text-sm font-bold mb-7 px-1 leading-relaxed" style="text-wrap: balance">
+          <span class="block">Ayo coba lagi, {{ $child->short_name }}!</span>
+          Selesaikan lebih banyak misi untuk dapat bintang tambahan.
+        </p>
+      @endif
 
       <button onclick="window.location.href='{{ url('/rekap-cerita') }}'" class="w-full bg-[#10B981] text-white font-extrabold py-3.5 rounded-2xl shadow-md hover:bg-[#059669] transition text-sm sm:text-base cursor-pointer">
         Selesai
       </button>
-    </div>
-  </div>
+  </x-mission-popup>
+  @endif
 
   <!-- ================= FOOTER UTAMA ================= -->
   <footer class="bg-slate-50 pt-10 pb-16 mt-auto border-t border-gray-100">
@@ -286,6 +276,10 @@
       </div>
     </div>
   </div>
+
+  <!-- Misi cerita yang dibuka (dari database) untuk misi_user.js, dan form simpan jawabannya -->
+  <script>window.BALIHABIT_MISSIONS = @json($missions);</script>
+  <form id="missionForm" action="{{ route('missions.store') }}" method="POST" class="hidden">@csrf</form>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
   <script src="{{ asset('assets/js/misi_user.js') }}"></script>

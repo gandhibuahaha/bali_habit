@@ -1,3 +1,12 @@
+// ================= KEAMANAN SETELAH LOGOUT (D-32) =================
+// Halaman orang tua yang sudah login (punya form logout): jika browser menampilkan salinan
+// lamanya (tombol Back / back-forward cache), muat ulang dari server yang memeriksa login.
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && document.getElementById('logoutForm')) {
+    window.location.reload();
+  }
+});
+
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const mobileMenu = document.getElementById('mobileMenu');

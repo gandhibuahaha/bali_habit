@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Child;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
@@ -93,6 +95,19 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
+     * Put a demo cover where Story Management keeps uploaded covers
+     * (public disk, "stories/covers/"), and return the path to save in
+     * stories.cover_image. $source is a picture under public/.
+     */
+    public static function storeCover(string $source): string
+    {
+        $path = 'stories/covers/'.basename($source);
+        Storage::disk('public')->put($path, file_get_contents(public_path($source)));
+
+        return $path;
+    }
+
+    /**
      * @return array{0: array<string, list<int>>, 1: array<string, list<array{id: int, correct: bool}>>, 2: array<string, array{id: int, min: int}>}
      */
     private function seedStoriesAndBadges(): array
@@ -106,7 +121,7 @@ class DemoDataSeeder extends Seeder
             $order++;
             $time = $this->claim($created->copy()->addHours($order));
             DB::table('stories')->insert([
-                'story_id' => $id, 'title' => $title, 'description' => $description, 'cover_image' => $cover,
+                'story_id' => $id, 'title' => $title, 'description' => $description, 'cover_image' => self::storeCover($cover),
                 'status' => 'active', 'story_order' => $order, 'created_at' => $time, 'updated_at' => $time,
             ]);
 
@@ -226,6 +241,7 @@ class DemoDataSeeder extends Seeder
             DB::table('story_progress')->insert([
                 'child_id' => $childId, 'story_id' => $storyId,
                 'status' => $completed ? 'completed' : 'progress',
+                'read_count' => $completed ? mt_rand(1, 3) : 0, // Frekuensi Baca on Rekap
                 'started_at' => $started, 'completed_at' => $completed, 'updated_at' => $completed ?? $started,
             ]);
             $lastActivity = $this->latest($lastActivity, $completed ?? $started);
@@ -240,10 +256,11 @@ class DemoDataSeeder extends Seeder
                 array_map(fn ($id) => ['id' => $id, 'correct' => true], $missionIds[$storyId]),
                 6 * 60, 75
             );
-            [$right, $reflectionEnd] = $this->seedAttempt(
+            [, $reflectionEnd] = $this->seedAttempt(
                 'reflection', $childId, $storyId, $completed, $reflections[$storyId], 30, 80
             );
-            $score += $done + $right;
+            // Same as Child::starTotals(): only missions give stars (one try per story here).
+            $score += $done * Child::STARS_PER_MISSION;
             $lastActivity = $this->latest($lastActivity, $this->latest($missionEnd, $reflectionEnd));
         }
 
@@ -276,7 +293,7 @@ class DemoDataSeeder extends Seeder
      * kid's Iya/Tidak, right $goodChance % of the time.
      *
      * @param  list<array{id: int, correct: bool}>  $items
-     * @return array{0: int, 1: Carbon} [good answers, time of the last step]
+     * @return array{0: int, 1: Carbon} [good answers (0 if the try is not finished), time of the last step]
      */
     private function seedAttempt(string $type, int $childId, string $storyId, Carbon $after, array $items, int $maxGapMinutes, int $goodChance): array
     {
@@ -318,7 +335,8 @@ class DemoDataSeeder extends Seeder
             'updated_at' => $time,
         ]);
 
-        return [$good, $time];
+        // An unfinished try earns nothing (star rule in Child::starTotals()).
+        return [$finished ? $good : 0, $time];
     }
 
     /**

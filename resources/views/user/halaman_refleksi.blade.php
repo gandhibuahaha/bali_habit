@@ -58,8 +58,14 @@
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" /></svg>
         Kembali Kecerita
       </a>
-      <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold shadow-sm">
-        👧🏼
+      @php $isGirl = $child->gender === 'female'; @endphp
+      {{-- Foto anak yang dipilih; tanpa foto: emoji sesuai jenis kelamin --}}
+      <div class="w-10 h-10 {{ $isGirl ? 'bg-orange-50' : 'bg-cyan-50' }} rounded-full flex items-center justify-center font-bold shadow-sm overflow-hidden flex-shrink-0">
+        @if ($child->profile_picture)
+          <img src="{{ asset('storage/' . $child->profile_picture) }}" alt="Foto {{ $child->name }}" class="w-full h-full object-cover">
+        @else
+          {{ $isGirl ? '👧🏼' : '👦🏽' }}
+        @endif
       </div>
     </div>
 
@@ -68,99 +74,88 @@
       <p class="text-slate-500 text-sm md:text-base">Yuk, pikirkan bersama {{ $child->short_name }}!</p>
     </header>
 
-    <!-- KARTU RIWAYAT REFLEKSI TERAKHIR -->
+    <!-- KARTU RIWAYAT REFLEKSI TERAKHIR: percobaan selesai terakhir untuk cerita ini (tanpa bintang:
+         refleksi tidak memberi bintang). Belum pernah dikerjakan = kartu tidak tampil. -->
+    @if ($lastTry)
     <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm mb-6">
       <div class="flex justify-between items-center mb-3">
         <div class="bg-emerald-100 text-[#10B981] text-[11px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
           Riwayat Refleksi Terakhir
         </div>
-        <span class="text-xs text-slate-400 font-medium">Hari ini, 09:45</span>
+        <span class="text-xs text-slate-400 font-medium">{{ $lastTry['time'] }}</span>
       </div>
 
       <div class="flex justify-between items-center mb-3">
-        <div>
-          <h2 class="font-extrabold text-base md:text-lg text-[#1F2937] flex items-center gap-1.5">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-            Skor: 3/3 Tepat (100%)
-          </h2>
-          <p class="text-[11px] text-slate-500 mt-0.5">+3 Bintang Kebaikan Terkumpul ⭐</p>
-        </div>
+        <h2 class="font-extrabold text-base md:text-lg text-[#1F2937] flex items-center gap-1.5">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+          Skor: {{ $lastTry['correct'] }}/{{ $lastTry['total'] }} Tepat ({{ $lastTry['percent'] }}%)
+        </h2>
         <span class="bg-yellow-50 text-yellow-800 text-xs font-extrabold px-3 py-1.5 rounded-full border border-yellow-100">
-          Sempurna
+          {{ $lastTry['percent'] === 100 ? 'Sempurna' : ($lastTry['percent'] >= 50 ? 'Bagus' : 'Terus Belajar') }}
         </span>
       </div>
 
       <div class="bg-slate-50 rounded-2xl p-3.5 flex items-start gap-2.5 text-xs text-slate-600 border border-slate-100/80">
         <span class="text-base">😊</span>
-        <p class="leading-relaxed">Hebat! Pemahaman {{ $child->short_name }} tentang pesan cerita I Kedis Puuh & I Alu sangat baik.</p>
+        @if ($lastTry['percent'] === 100)
+          <p class="leading-relaxed">Hebat! Pemahaman {{ $child->short_name }} tentang pesan cerita "{{ $storyTitle }}" sangat baik.</p>
+        @else
+          <p class="leading-relaxed">{{ $child->short_name }} sudah berusaha! Yuk, baca ceritanya lagi bersama untuk memahami pesannya.</p>
+        @endif
       </div>
     </div>
+    @endif
 
-    <!-- KARTU PERTANYAAN KUIS REFLEKSI (INTERAKTIF) -->
+    @if ($questions->isNotEmpty())
+
+    @if ($errors->any())
+      <p class="text-red-500 text-sm font-bold mb-4">Refleksi belum tersimpan. Yuk, coba jawab lagi ya!</p>
+    @endif
+
+    <!-- KARTU PERTANYAAN KUIS REFLEKSI: pertanyaan cerita yang dibuka, dari database (urutan admin) -->
     <div class="space-y-5 mb-8">
-
-      <!-- Pertanyaan 1 -->
+      @foreach ($questions as $question)
       <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm">
         <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-6 h-6 bg-emerald-100 text-[#10B981] rounded-full flex items-center justify-center font-extrabold text-xs">1</div>
-          <h3 class="font-bold text-sm md:text-base text-[#1F2937]">Apakah I Kedis Puuh cerdik saat menjaga rumahnya?</h3>
+          <div class="w-6 h-6 bg-emerald-100 text-[#10B981] rounded-full flex items-center justify-center font-extrabold text-xs">{{ $loop->iteration }}</div>
+          <h3 class="font-bold text-sm md:text-base text-[#1F2937]">{{ $question['text'] }}</h3>
         </div>
         <div class="grid grid-cols-2 gap-3 mt-4">
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          <!-- Iya = tanda centang, Tidak = tanda silang (refleksi_user.js memakai ikon yang sama) -->
+          <button type="button" data-question="{{ $question['id'] }}" data-answer="1" onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
             Iya
           </button>
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
+          <button type="button" data-question="{{ $question['id'] }}" data-answer="0" onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
             Tidak
           </button>
         </div>
       </div>
-
-      <!-- Pertanyaan 2 -->
-      <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm">
-        <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-6 h-6 bg-emerald-100 text-[#10B981] rounded-full flex items-center justify-center font-extrabold text-xs">2</div>
-          <h3 class="font-bold text-sm md:text-base text-[#1F2937]">Apakah I Alu adalah karakter yang jahat?</h3>
-        </div>
-        <div class="grid grid-cols-2 gap-3 mt-4">
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            Iya
-          </button>
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            Tidak
-          </button>
-        </div>
-      </div>
-
-      <!-- Pertanyaan 3 -->
-      <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm">
-        <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-6 h-6 bg-emerald-100 text-[#10B981] rounded-full flex items-center justify-center font-extrabold text-xs">3</div>
-          <h3 class="font-bold text-sm md:text-base text-[#1F2937]">Ketika alam hancur apakah kita masih mendapatkan tempat untuk tinggal?</h3>
-        </div>
-        <div class="grid grid-cols-2 gap-3 mt-4">
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            Iya
-          </button>
-          <button onclick="selectAnswer(this)" class="ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-            Tidak
-          </button>
-        </div>
-      </div>
-
+      @endforeach
     </div>
 
-    <!-- TOMBOL LANJUT KE MISI -->
+    <!-- Muncul kalau ada pertanyaan yang belum dijawab (refleksi_user.js) -->
+    <p id="reflection-missing" class="hidden text-red-500 text-sm font-bold mb-4">Jawab semua pertanyaan dulu, ya!</p>
+
+    <!-- TOMBOL LANJUT KE MISI: menyimpan semua jawaban, lalu ke Halaman Misi -->
+    <button type="button" id="btn-save-reflection" onclick="submitReflections()" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl shadow-md hover:bg-[#059669] transition flex justify-center items-center gap-2 text-base cursor-pointer">
+      Lanjut ke Misi
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
+    </button>
+
+    @else
+    <!-- Cerita ini belum punya pertanyaan refleksi: tidak ada yang disimpan -->
+    <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm mb-8 text-center">
+      <h3 class="font-bold text-sm md:text-base text-[#1F2937]">Belum ada pertanyaan refleksi untuk cerita ini</h3>
+    </div>
+
     <a href="{{ url('/halaman-misi') }}" class="w-full bg-[#10B981] text-white font-extrabold py-4 rounded-2xl shadow-md hover:bg-[#059669] transition flex justify-center items-center gap-2 text-base cursor-pointer">
       Lanjut ke Misi
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
     </a>
+    @endif
   </main>
 
   <!-- ================= FOOTER UTAMA ================= -->
@@ -249,30 +244,11 @@
     </div>
   </div>
 
-  <!-- ================= JAVASCRIPT KHUSUS KUIS REFLEKSI ================= -->
-  <script>
-    // Fungsi Interaksi Pilihan Jawaban Kuis
-    function selectAnswer(clickedButton) {
-      const container = clickedButton.parentElement;
-      const buttons = container.querySelectorAll('.ans-btn');
-
-      buttons.forEach(btn => {
-        btn.className = "ans-btn bg-slate-50 hover:bg-slate-100 text-slate-500 font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm border border-slate-100 transition cursor-pointer";
-        const svg = btn.querySelector('svg');
-        if (svg) {
-          svg.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4 text-slate-400"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>`;
-        }
-      });
-
-      clickedButton.className = "ans-btn bg-[#10B981] text-white font-extrabold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 text-xs md:text-sm shadow-sm transition cursor-pointer";
-      const activeSvg = clickedButton.querySelector('svg');
-      if (activeSvg) {
-        activeSvg.outerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>`;
-      }
-    }
-  </script>
+  <!-- Form simpan jawaban refleksi (diisi refleksi_user.js), lalu ke Halaman Misi -->
+  <form id="reflectionForm" action="{{ route('reflections.store') }}" method="POST" class="hidden">@csrf</form>
 
   <script src="{{ asset('assets/js/script.js') }}"></script>
+  <script src="{{ asset('assets/js/refleksi_user.js') }}"></script>
 
   <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->
   <form id="logoutForm" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>

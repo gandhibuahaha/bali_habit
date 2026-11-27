@@ -322,7 +322,7 @@
 
               <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full min-w-0">
                 <!-- Avatar -->
-                <div id="modalOrtuInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0">
+                <div id="modalOrtuInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0 overflow-hidden">
                   PD
                 </div>
                 <!-- Info Utama -->
@@ -453,6 +453,13 @@
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     }
+    // Foto profil (dari database) di dalam lingkaran avatar; tanpa foto: inisial.
+    function avatarInner(person) {
+      return person.foto
+        ? `<img src="${escapeHtml(person.foto)}" alt="Foto ${escapeHtml(person.nama)}" class="w-full h-full object-cover">`
+        : escapeHtml(person.inisial);
+    }
+
 
     // --- SCRIPT MODAL DETAIL ORANG TUA (DATA ASLI) ---
     function openDetailOrtuModal(ortuId) {
@@ -460,7 +467,7 @@
         const ortu = dataOrtu.find(o => o.id === ortuId);
 
         if(ortu) {
-          document.getElementById('modalOrtuInisial').innerText = ortu.inisial;
+          document.getElementById('modalOrtuInisial').innerHTML = avatarInner(ortu);
           document.getElementById('modalOrtuNama').innerText = ortu.nama;
           document.getElementById('modalOrtuNama').title = ortu.nama; // teks lengkap saat kursor diarahkan
           document.getElementById('modalOrtuEmail').innerText = ortu.email;
@@ -510,7 +517,7 @@
       return daftarAnak.map(anak => `
           <div class="border border-slate-100 rounded-[12px] p-4 shadow-sm flex items-center justify-between gap-3 hover:border-[#10B981] transition group ${anak.aktif ? '' : 'opacity-70'}">
             <div class="flex items-center gap-4 min-w-0">
-              <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0">${escapeHtml(anak.inisial)}</div>
+              <div class="w-10 h-10 rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0 overflow-hidden">${avatarInner(anak)}</div>
               <div class="flex flex-col gap-0.5 min-w-0">
                 <span class="flex items-center gap-1.5 min-w-0">
                   <span class="text-[14px] font-extrabold text-[#0F172A] truncate" title="${escapeHtml(anak.nama)}">${escapeHtml(anak.nama)}</span>
@@ -594,8 +601,8 @@
           <td class="py-4 px-4 text-slate-400 font-bold text-[12px]">${start + index + 1}</td>
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
-              <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0">
-                ${escapeHtml(ortu.inisial)}
+              <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] flex items-center justify-center border border-emerald-100 text-[12px] font-extrabold flex-shrink-0 overflow-hidden">
+                ${avatarInner(ortu)}
               </div>
               <!-- Nama/email panjang dipotong dengan "…"; teks lengkap muncul saat kursor diarahkan -->
               <span class="font-extrabold text-[#0F172A] truncate" title="${escapeHtml(ortu.nama)}">${escapeHtml(ortu.nama)}</span>

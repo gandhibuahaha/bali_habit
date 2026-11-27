@@ -269,12 +269,24 @@
       }
     }
 
+    let readSent = false;
+
     function goNext() {
       if (currentPage < storyData.length - 1) {
         currentPage++;
         updatePage();
       } else {
-        window.location.href = "/halaman-refleksi";
+        // Halaman terakhir: kirim "selesai membaca" sekali (dihitung server), lalu ke Refleksi.
+        // Tanpa form (belum ada cerita yang dibuka): langsung ke Refleksi seperti biasa.
+        const readForm = document.getElementById('readForm');
+        if (!readForm) {
+          window.location.href = "/halaman-refleksi";
+          return;
+        }
+        if (readSent) return; // ketukan ganda tidak mengirim dua kali
+        readSent = true;
+        document.getElementById('btn-next').disabled = true;
+        readForm.submit();
       }
     }
 

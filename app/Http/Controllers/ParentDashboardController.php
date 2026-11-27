@@ -31,8 +31,9 @@ class ParentDashboardController extends Controller
             ->get();
 
         $activities = $this->recentActivities($ownChildren->pluck('child_id'));
+        $stars = Child::starTotals($children->pluck('child_id')); // [child_id => stars]
 
-        return view('user.dashboard', compact('children', 'activities'));
+        return view('user.dashboard', compact('children', 'activities', 'stars'));
     }
 
     /**

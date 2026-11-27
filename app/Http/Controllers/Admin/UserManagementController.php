@@ -29,7 +29,7 @@ class UserManagementController extends Controller
             ->with(['children' => fn ($q) => $q->withTrashed()->orderBy('created_at')])
             ->orderByDesc('created_at')
             ->orderByDesc('user_id')
-            ->get(['user_id', 'name', 'email', 'no_tlp', 'created_at', 'updated_at']);
+            ->get(['user_id', 'name', 'email', 'no_tlp', 'profile_picture', 'created_at', 'updated_at']);
 
         $children = $parents->flatMap->children;
         $stars = Child::starTotals($children->pluck('child_id'));
@@ -48,6 +48,7 @@ class UserManagementController extends Controller
                 'nama' => $parent->name,
                 'email' => $parent->email,
                 'inisial' => User::initialsOf($parent->name),
+                'foto' => $this->photoUrl($parent->profile_picture),
                 'telepon' => $this->formatPhone($parent->no_tlp),
                 'terdaftar' => $parent->created_at->locale('id')->translatedFormat('j F Y'),
                 'terakhirAktif' => $lastActive->locale('id')->diffForHumans(),
@@ -55,6 +56,7 @@ class UserManagementController extends Controller
                 'anak' => $parent->children->map(fn (Child $child) => [
                     'nama' => $child->name,
                     'inisial' => User::initialsOf($child->name),
+                    'foto' => $this->photoUrl($child->profile_picture),
                     'gender' => $this->genderLabel($child->gender),
                     'usia' => $child->birth_date->age,
                     'bintang' => $stars[$child->child_id] ?? 0,
@@ -87,7 +89,7 @@ class UserManagementController extends Controller
         $badgeTotal = DB::table('badges')->count();
 
         $rows = $children->map(function (Child $child) use ($learning, $lastActivity, $lastStory, $badges, $badgeTotal) {
-            $done = $learning[$child->child_id] ?? ['refleksi_dijawab' => 0, 'refleksi_benar' => 0, 'misi_sudah' => 0];
+            $done = $learning[$child->child_id] ?? ['refleksi_dijawab' => 0, 'refleksi_benar' => 0, 'misi_sudah' => 0, 'bintang' => 0];
             $story = $lastStory[$child->child_id] ?? null;
             $badge = $badges[$child->child_id] ?? null;
 
@@ -95,12 +97,13 @@ class UserManagementController extends Controller
                 'id' => $child->child_id,
                 'nama' => $child->name,
                 'inisial' => User::initialsOf($child->name),
+                'foto' => $this->photoUrl($child->profile_picture),
                 'usia' => $child->birth_date->age,
                 'gender' => $this->genderLabel($child->gender),
                 'ortu' => $child->parent?->name ?? '-',
                 'aktif' => ! $child->trashed(),
                 'nonaktifSejak' => $child->deleted_at?->locale('id')->translatedFormat('j F Y'),
-                'bintang' => $done['refleksi_benar'] + $done['misi_sudah'],
+                'bintang' => $done['bintang'], // star rule: Child::starTotals()
                 'tanggalLahir' => $child->birth_date->locale('id')->translatedFormat('j F Y'),
                 'terdaftar' => $child->created_at->locale('id')->translatedFormat('j F Y'),
                 'ceritaTerakhir' => $story ? [
@@ -220,6 +223,16 @@ class UserManagementController extends Controller
     private function genderLabel(string $gender): string
     {
         return $gender === 'female' ? 'Perempuan' : 'Laki-laki';
+    }
+
+    /**
+     * Public address of a profile photo stored on the public disk (same as the parent
+     * and admin pages: asset('storage/...')), or null when there is none: the page
+     * then shows the initials.
+     */
+    private function photoUrl(?string $path): ?string
+    {
+        return $path ? asset('storage/'.$path) : null;
     }
 
     /**

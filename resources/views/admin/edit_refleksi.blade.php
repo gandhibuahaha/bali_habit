@@ -175,8 +175,17 @@
           <p class="text-slate-500 text-[13.5px]">Ubah pertanyaan refleksi untuk cerita ini sesuai kebutuhan.</p>
         </div>
 
-        <form id="editReflectionForm" action="#" method="POST" class="flex flex-col gap-6">
+        @if ($errors->any())
+          <div class="rounded-[12px] border border-red-200 bg-red-50 px-4 py-3 text-[13px] font-semibold text-red-600 mb-6" role="alert">
+            @foreach (collect($errors->all())->unique() as $message)
+              <p>{{ $message }}</p>
+            @endforeach
+          </div>
+        @endif
+
+        <form id="editReflectionForm" action="{{ route('admin.reflections.update', $story->story_id) }}" method="POST" class="flex flex-col gap-6" novalidate>
           @csrf
+          @method('PUT')
           
           <!-- CARD 1: Informasi Cerita -->
           <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-8">
@@ -191,19 +200,10 @@
             </div>
 
             <div class="max-w-2xl">
-              <label class="block text-[13.5px] font-bold text-[#0F172A] mb-2">
-                Pilih Cerita <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <select id="storySelect" class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3.5 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white appearance-none transition cursor-pointer" required>
-                  <option value="1">I Alu Teken I Kedis Puuh</option>
-                  <option value="2">Lelipi Selem Bukit</option>
-                  <option value="3">I Lutung Teken I Kekua</option>
-                  <option value="4">I Lutung Dadi Pecalang</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-                </div>
+              <label class="block text-[13.5px] font-bold text-[#0F172A] mb-2">Cerita</label>
+              {{-- Cerita tidak bisa diganti di sini: pertanyaan ini milik cerita ini --}}
+              <div class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3.5 text-[13.5px] font-semibold text-[#0F172A]">
+                {{ $story->title }}{{ $story->status !== 'active' ? ' (Draft)' : '' }}
               </div>
               <p class="text-[12px] font-medium text-slate-400 mt-2.5">
                 Materi cerita ini terhubung langsung dengan Story Management.
@@ -233,42 +233,16 @@
             <!-- List Items Container -->
             <div id="reflectionListContainer" class="flex flex-col">
               
-              <!-- Item 1 -->
-              <div class="reflection-item px-6 py-5 border-b border-slate-100 flex items-start gap-4 hover:bg-slate-50/50 transition">
-                <div class="flex items-center gap-3 mt-3 w-8 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-300 cursor-grab active:cursor-grabbing"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-                  <span class="reflection-number text-[16px] font-extrabold text-[#0F172A]">1</span>
-                </div>
-                <textarea rows="2" class="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] resize-y min-h-[60px]" required>Apakah kamu selalu mengingat untuk mencuci tangan sebelum memakan buah bersama kawan?</textarea>
-                <button type="button" onclick="removeReflection(this)" class="mt-3 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[10px] transition shrink-0" title="Hapus Pertanyaan">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-                </button>
-              </div>
 
-              <!-- Item 2 -->
-              <div class="reflection-item px-6 py-5 border-b border-slate-100 flex items-start gap-4 hover:bg-slate-50/50 transition">
-                <div class="flex items-center gap-3 mt-3 w-8 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-300 cursor-grab active:cursor-grabbing"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-                  <span class="reflection-number text-[16px] font-extrabold text-[#0F172A]">2</span>
-                </div>
-                <textarea rows="2" class="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] resize-y min-h-[60px]" required>Maukah kamu membantu temanmu merapikan mainan setelah selesai bermain?</textarea>
-                <button type="button" onclick="removeReflection(this)" class="mt-3 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[10px] transition shrink-0" title="Hapus Pertanyaan">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-                </button>
-              </div>
-
-              <!-- Item 3 -->
-              <div class="reflection-item px-6 py-5 flex items-start gap-4 hover:bg-slate-50/50 transition rounded-b-[12px]">
-                <div class="flex items-center gap-3 mt-3 w-8 shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-300 cursor-grab active:cursor-grabbing"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-                  <span class="reflection-number text-[16px] font-extrabold text-[#0F172A]">3</span>
-                </div>
-                <textarea rows="2" class="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] resize-y min-h-[60px]" required>Apakah bersikap jujur membuat perasaanmu menjadi lebih tenang dan ceria?</textarea>
-                <button type="button" onclick="removeReflection(this)" class="mt-3 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[10px] transition shrink-0" title="Hapus Pertanyaan">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-                </button>
-              </div>
+              @foreach ($questions as $i => $question)
+                @include('admin.partials.reflection_row', ['index' => $i, 'number' => $i + 1, 'question' => $question])
+              @endforeach
             </div>
+
+            {{-- Baris kosong untuk tombol "Tambah Pertanyaan" (reflection_form.js) --}}
+            <template id="reflectionRowTemplate">
+              @include('admin.partials.reflection_row', ['index' => '__INDEX__', 'number' => '', 'question' => ['id' => null, 'text' => '', 'answer' => null]])
+            </template>
 
             <!-- Tombol Tambah Pertanyaan -->
             <button type="button" id="addReflectionBtn" class="w-full mt-4 py-3.5 border-2 border-dashed border-slate-200 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 hover:text-[#10B981] rounded-[12px] text-slate-600 text-[13.5px] font-bold flex items-center justify-center gap-2 transition-all">
@@ -287,7 +261,7 @@
               </div>
               <div>
                 <h4 class="text-[13px] font-extrabold text-[#1E293B]">Format Penilaian Otomatis</h4>
-                <p class="text-[12.5px] text-slate-500 mt-1">Setiap pertanyaan refleksi akan memiliki jawaban Ya atau Tidak secara otomatis di antarmuka murid.</p>
+                <p class="text-[12.5px] text-slate-500 mt-1">Anak menjawab setiap pertanyaan dengan Iya atau Tidak. Jawaban dihitung benar jika sama dengan <strong>Jawaban Benar</strong> yang dipilih di sini.</p>
               </div>
             </div>
 
@@ -355,6 +329,7 @@
         <h3 class="text-[20px] font-extrabold text-[#0F172A] tracking-tight mb-2">Simpan Perubahan?</h3>
         <p class="text-[13.5px] text-slate-500 font-medium mb-8 leading-relaxed">
           Apakah Anda yakin ingin menyimpan perubahan pada daftar pertanyaan refleksi ini?
+          Pertanyaan yang dihapus ikut menghapus jawaban anak.
         </p>
 
         <div class="flex items-center justify-center gap-3">
@@ -372,23 +347,12 @@
   <!-- ================= SCRIPT JAVASCRIPT ================= -->
   <script>
 
-    // --- Script Otomatis Pilih Cerita Berdasarkan Parameter URL ---
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const storyParam = urlParams.get('story');
-      const storySelect = document.getElementById('storySelect');
-      
-      if (storyParam && storySelect) {
-        storySelect.value = storyParam;
-      }
-    });
-
     // --- Script Modal Simpan ---
     function openSaveModal() {
       const form = document.getElementById('editReflectionForm');
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return; 
+      // Pesan merah di bawah kolom, bukan gelembung bawaan browser (reflection_form.js)
+      if (!window.validateReflectionForm(form)) {
+        return;
       }
 
       const modal = document.getElementById('saveModal');
@@ -418,54 +382,11 @@
     }
 
     function confirmSave() {
-      window.location.href = "{{ url('/admin/refleksi-management') }}";
+      document.getElementById('editReflectionForm').submit();
     }
 
-    // --- SCRIPT TAMBAH & HAPUS REFLEKSI DINAMIS ---
-    const reflectionListContainer = document.getElementById('reflectionListContainer');
-    const addReflectionBtn = document.getElementById('addReflectionBtn');
-    const questionCountBadge = document.getElementById('questionCountBadge');
-
-    if (addReflectionBtn && reflectionListContainer) {
-      addReflectionBtn.addEventListener('click', () => {
-        const newItem = document.createElement('div');
-        newItem.className = 'reflection-item px-6 py-5 border-b border-slate-100 flex items-start gap-4 hover:bg-slate-50/50 transition last:border-0 rounded-b-[12px]';
-        
-        newItem.innerHTML = `
-          <div class="flex items-center gap-3 mt-3 w-8 shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-300 cursor-grab active:cursor-grabbing"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM8.25 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z" /></svg>
-            <span class="reflection-number text-[16px] font-extrabold text-[#0F172A]"></span>
-          </div>
-          <textarea rows="2" placeholder="Masukkan pertanyaan refleksi..." class="flex-1 bg-[#F8FAFC] border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] resize-y min-h-[60px]" required></textarea>
-          <button type="button" onclick="removeReflection(this)" class="mt-3 w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-[10px] transition shrink-0" title="Hapus Pertanyaan">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-          </button>
-        `;
-        
-        reflectionListContainer.appendChild(newItem);
-        updateReflectionNumbers();
-      });
-    }
-
-    function removeReflection(btn) {
-      const item = btn.closest('.reflection-item');
-      if (item) {
-        item.remove();
-        updateReflectionNumbers();
-      }
-    }
-
-    function updateReflectionNumbers() {
-      const items = document.querySelectorAll('.reflection-item .reflection-number');
-      items.forEach((span, index) => {
-        span.textContent = index + 1;
-      });
-      
-      if (questionCountBadge) {
-        questionCountBadge.textContent = items.length + ' Pertanyaan';
-      }
-    }
   </script>
+  <script src="{{ asset('assets/js/admin/reflection_form.js') }}"></script>
   <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
   <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>
 </body>

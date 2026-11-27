@@ -79,10 +79,10 @@
         </div>
         <h2 class="font-extrabold text-base md:text-lg text-[#1F2937] truncate" title="{{ $child->name }}">{{ $child->name }}</h2>
       </div>
-      <!-- Bintang: belum ada aturan perhitungan -->
+      <!-- Bintang anak (Child::starTotals) -->
       <div class="bg-yellow-100/80 text-yellow-800 px-3 py-1.5 rounded-full text-xs md:text-sm font-extrabold flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-        0 Bintang
+        {{ $totalStars }} Bintang
       </div>
     </div>
 
@@ -139,6 +139,26 @@
       </div>
     </div>
   </main>
+
+  {{-- ================= POPUP PILIH CERITA DULU (D-31) =================
+       Muncul sekali saat orang tua membuka halaman cerita (Baca/Refleksi/Misi/Rekap)
+       tanpa memilih cerita atau melompati langkah. Tombol hanya menutup popup. --}}
+  @if ($showPickStoryPopup)
+  <div id="pick-story-popup" role="dialog" aria-modal="true" aria-labelledby="pick-story-title" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm px-4 flex items-center justify-center">
+    <div class="bg-white rounded-[2rem] px-6 py-8 w-full max-w-[320px] flex flex-col items-center text-center shadow-2xl">
+      <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center text-[#10B981] mb-5">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" /></svg>
+      </div>
+      <h2 id="pick-story-title" class="text-xl font-extrabold text-[#1F2937] mb-2 tracking-tight">Pilih Cerita Dulu, Ya!</h2>
+      <p class="text-sm text-slate-500 mb-7 leading-relaxed" style="text-wrap: balance">
+        Silakan pilih salah satu cerita di bawah untuk mulai membaca bersama {{ $child->short_name }}.
+      </p>
+      <button type="button" onclick="document.getElementById('pick-story-popup').remove()" class="w-full bg-[#10B981] text-white font-extrabold py-3.5 rounded-2xl shadow-md hover:bg-[#059669] transition text-sm sm:text-base cursor-pointer">
+        Oke
+      </button>
+    </div>
+  </div>
+  @endif
 
 <!-- ================= FOOTER UTAMA (KONSISTEN) ================= -->
   <footer class="bg-slate-50 pt-10 pb-16 mt-auto border-t border-gray-100">

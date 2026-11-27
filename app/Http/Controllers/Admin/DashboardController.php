@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Child;
 use App\Support\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -42,7 +43,6 @@ class DashboardController extends Controller
         $sources = [
             'anak' => ['children', 'created_at', fn ($q) => $q->whereNull('deleted_at')],
             'orang_tua' => ['users', 'created_at', fn ($q) => $q->where('role', 'parent')],
-            'misi' => ['mission_attempts', 'completed_at', fn ($q) => $q->where('status', 'completed')],
             'lencana' => ['child_badges', 'earned_at', null],
             'cerita' => ['stories', 'created_at', null],
         ];
@@ -56,6 +56,15 @@ class DashboardController extends Controller
 
             $cards[$key] = ['then' => $before, 'now' => $total] + $this->badge($total, $before);
         }
+
+        // Misi Selesai: missions marked "Sudah", counted like the stars (best finished
+        // try per child and story, D-20), so redos never count twice. All children's
+        // history counts, Nonaktif ones too (same as before this change).
+        $allChildIds = DB::table('children')->pluck('child_id');
+        $missionsDone = fn (?Carbon $before = null) => array_sum(array_map('array_sum', Child::bestMissionsDone($allChildIds, $before)));
+        $missionsNow = $missionsDone();
+        $missionsThen = $missionsDone($since);
+        $cards['misi'] = ['then' => $missionsThen, 'now' => $missionsNow] + $this->badge($missionsNow, $missionsThen);
 
         return view('admin.beranda_admin', [
             'cards' => $cards,

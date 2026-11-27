@@ -295,6 +295,15 @@
     </div>
   </div>
 
+  <!-- Selesai membaca: "Lanjut Refleksi" di halaman terakhir mengirim form ini sekali (halaman_baca.js).
+       Tiket sekali pakai: satu kunjungan Halaman Baca dihitung paling banyak satu kali bacaan. -->
+  @if ($readTicket)
+    <form id="readForm" action="{{ route('stories.read') }}" method="POST" class="hidden">
+      @csrf
+      <input type="hidden" name="ticket" value="{{ $readTicket }}">
+    </form>
+  @endif
+
   <script src="{{ asset('assets/js/script.js') }}"></script>
   <script src="{{ asset('assets/js/halaman_baca.js') }}"></script>
   <!-- Form logout (POST + CSRF): dipakai tombol "Ya, Keluar" -->

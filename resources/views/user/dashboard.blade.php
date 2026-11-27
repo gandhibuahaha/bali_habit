@@ -94,10 +94,10 @@
                   <p class="text-xs text-slate-500 font-medium">{{ $child->birth_date->age }} tahun</p>
                 </div>
               </div>
-              <!-- Bintang: belum ada data, diisi oleh fitur progress -->
+              <!-- Bintang anak (Child::starTotals) -->
               <div class="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center gap-1.5 whitespace-nowrap flex-shrink-0">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-yellow-500"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
-                0
+                {{ $stars[$child->child_id] ?? 0 }}
               </div>
             </div>
             <div class="flex gap-2.5">
@@ -148,9 +148,9 @@
                 'badge' => 'mendapatkan lencana',
               ][$activity['type']];
             @endphp
-            {{-- Satu baris saja; kalimat panjang dipotong dengan "…", lengkapnya saat kursor diarahkan --}}
+            {{-- Kalimat lengkap, boleh turun ke baris berikutnya (tidak dipotong "…") --}}
             <div class="min-w-0 flex-1">
-              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed truncate" title="{{ $activity['child'] }} {{ $verb }} &quot;{{ $activity['subject'] }}&quot;">
+              <p class="text-[13px] md:text-sm text-[#1F2937] leading-relaxed" style="overflow-wrap: anywhere">
                 <span class="font-extrabold">{{ $activity['child'] }}</span> {{ $verb }} "{{ $activity['subject'] }}"
               </p>
               <p class="text-[11px] text-slate-400 mt-1 font-medium">{{ $activity['time_label'] }}</p>

@@ -83,55 +83,62 @@
 
     <!-- TEKS UCAPAN SELAMAT -->
     <div class="text-center mb-8 px-2">
-      <h1 class="text-2xl md:text-3xl font-extrabold text-[#1F2937] mb-3 tracking-tight">Cerita Selesai!</h1>
-      <p class="text-slate-500 text-sm md:text-base leading-relaxed">
-        Hebat, <span class="font-bold text-slate-700">{{ $child->short_name }}</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle ?? 'I Alu Teken I Kedis Puuh' }}</span>".
-      </p>
+      {{-- "Cerita Selesai!" hanya kalau Halaman Misi cerita ini sudah pernah diselesaikan --}}
+      @if ($storyFinished)
+        <h1 class="text-2xl md:text-3xl font-extrabold text-[#1F2937] mb-3 tracking-tight">Cerita Selesai!</h1>
+        <p class="text-slate-500 text-sm md:text-base leading-relaxed">
+          Hebat, <span class="font-bold text-slate-700">{{ $child->short_name }}</span>! Kamu sudah menyelesaikan semua refleksi dan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle }}</span>".
+        </p>
+      @else
+        <h1 class="text-2xl md:text-3xl font-extrabold text-[#1F2937] mb-3 tracking-tight">Yuk, Selesaikan Ceritanya!</h1>
+        <p class="text-slate-500 text-sm md:text-base leading-relaxed">
+          <span class="font-bold text-slate-700">{{ $child->short_name }}</span> belum menyelesaikan misi pada cerita "<span class="font-bold text-[#10B981]">{{ $storyTitle }}</span>". Yuk, kerjakan refleksi dan misinya bersama!
+        </p>
+      @endif
     </div>
 
-    <!-- KARTU 1: TOTAL BINTANG -->
+    <!-- KARTU 1: TOTAL BINTANG dari cerita ini = percobaan Misi terbaik x 2 (Child::starTotals) -->
     <div class="bg-[#FFFBEB] border border-yellow-200 rounded-[1.5rem] p-5 shadow-sm mb-6 flex justify-between items-center">
       <div>
         <h2 class="font-bold text-xs sm:text-sm text-yellow-900 mb-1 uppercase tracking-wider">Total Bintang Diperoleh</h2>
-        <p class="text-[11px] sm:text-xs text-yellow-700">Dari Refleksi & Misi Hari Ini</p>
+        <p class="text-[11px] sm:text-xs text-yellow-700">Dari Misi di Cerita Ini</p>
       </div>
       <div class="bg-white border border-yellow-100 rounded-2xl px-5 py-2.5 flex items-center gap-2 shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-yellow-400">
           <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" />
         </svg>
-        <span class="font-extrabold text-2xl text-[#1F2937]">8</span>
+        <span class="font-extrabold text-2xl text-[#1F2937]">{{ $storyStars }}</span>
       </div>
     </div>
 
-    <!-- KARTU 2: RINGKASAN BELAJAR -->
+    <!-- KARTU 2: RINGKASAN BELAJAR, dari percobaan terbaik (Misi: paling banyak "Sudah";
+         Refleksi: paling banyak benar; sama banyak = yang terbaru) -->
     <div class="bg-white border border-gray-100 rounded-[1.5rem] p-5 shadow-sm mb-6">
       <div class="flex justify-between items-center mb-5">
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 bg-[#10B981] rounded-full"></div>
-          <h2 class="font-bold text-xs sm:text-sm text-slate-600 uppercase tracking-wider">Ringkasan Belajar Hari Ini</h2>
+          <h2 class="font-bold text-xs sm:text-sm text-slate-600 uppercase tracking-wider">Ringkasan Belajar</h2>
         </div>
         <span class="bg-emerald-50 text-[#10B981] font-extrabold text-[10px] px-3 py-1 rounded-full">Hebat!</span>
       </div>
 
-      <!-- Misi Selesai -->
+      <!-- Misi Selesai: misi yang ditandai "Sudah" di percobaan terbaik -->
       <div class="mb-5">
         <div class="flex justify-between items-center mb-3">
           <div class="flex items-center gap-2">
             <span class="text-lg">🎯</span>
-            <h3 class="font-bold text-sm text-[#1F2937]">2 Misi Kebaikan Selesai</h3>
+            <h3 class="font-bold text-sm text-[#1F2937]">{{ $missionsDone->isEmpty() ? 'Belum ada misi selesai' : $missionsDone->count().' Misi Kebaikan Selesai' }}</h3>
           </div>
           <span class="text-yellow-600 font-extrabold text-xs flex items-center gap-1">
-            +4 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
+            +{{ $storyStars }} <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5"><path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z" clip-rule="evenodd" /></svg>
           </span>
         </div>
-        <div class="bg-[#F0FDF4] text-slate-600 text-[11px] sm:text-xs py-2 px-3.5 rounded-xl mb-2 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-          Mencium ibu dengan penuh kasih
+        @foreach ($missionsDone as $missionText)
+        <div class="bg-[#F0FDF4] text-slate-600 text-[11px] sm:text-xs py-2 px-3.5 rounded-xl {{ $loop->last ? '' : 'mb-2' }} flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5 text-[#10B981] flex-shrink-0"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+          {{ $missionText }}
         </div>
-        <div class="bg-[#F0FDF4] text-slate-600 text-[11px] sm:text-xs py-2 px-3.5 rounded-xl flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3.5 h-3.5 text-[#10B981]"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
-          Merapikan mainan setelah bermain
-        </div>
+        @endforeach
       </div>
 
       <!-- Grid Refleksi & Frekuensi -->
@@ -142,36 +149,58 @@
             <span class="font-bold text-[11px] text-slate-600">Refleksi Benar</span>
           </div>
           <div class="flex items-baseline gap-1.5">
-            <span class="font-extrabold text-2xl text-[#10B981]">3/3</span>
-            <span class="text-[10px] text-slate-400 font-medium">(100% tepat)</span>
+            <span class="font-extrabold text-2xl text-[#10B981]">{{ $reflection['correct'] }}/{{ $reflection['total'] }}</span>
+            <span class="text-[10px] text-slate-400 font-medium">({{ $reflection['done'] ? $reflection['percent'].'% tepat' : 'belum dijawab' }})</span>
           </div>
         </div>
+        <!-- Frekuensi Baca: berapa kali cerita ini selesai dibaca (story_progress.read_count) -->
         <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
           <div class="flex items-center gap-1.5 mb-2">
             <span class="text-sm">📖</span>
             <span class="font-bold text-[11px] text-slate-600">Frekuensi Baca</span>
           </div>
           <div class="flex items-baseline gap-1.5">
-            <span class="font-extrabold text-2xl text-[#1F2937]">2 Kali</span>
+            <span class="font-extrabold text-2xl text-[#1F2937]">{{ $readCount }} Kali</span>
           </div>
           <p class="text-[10px] text-slate-400 font-medium mt-0.5">Dibaca bersama {{ $child->short_name }}</p>
         </div>
       </div>
     </div>
 
-    <!-- KARTU 3: LENCANA -->
+    <!-- KARTU 3: LENCANA BERIKUTNYA: total bintang anak (semua cerita) menuju lencana berikutnya
+         (minimum_stars terkecil di atas total). Tidak ada lencana di database = kartu tidak tampil. -->
+    @if ($hasBadges)
     <div class="bg-white border border-emerald-100 rounded-[1.5rem] p-5 shadow-sm mb-8 flex items-start gap-4">
       <div class="w-14 h-14 bg-[#ECFDF5] rounded-2xl flex items-center justify-center flex-shrink-0 text-[#10B981] border border-emerald-50 shadow-sm">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043A3.745 3.745 0 011.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043A3.746 3.746 0 0121 12z" />
         </svg>
       </div>
-      <div>
-        <div class="bg-[#ECFDF5] text-[#10B981] font-extrabold text-[9px] px-2.5 py-1 rounded-md inline-block mb-1.5 uppercase tracking-wide">Lencana Diperoleh</div>
-        <h3 class="font-extrabold text-sm md:text-base text-[#1F2937] mb-1">Pemikir Cerdas</h3>
-        <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">Mampu menemukan solusi dalam setiap situasi.</p>
+      <div class="flex-1 min-w-0">
+        @if ($nextBadge)
+          <div class="bg-[#ECFDF5] text-[#10B981] font-extrabold text-[9px] px-2.5 py-1 rounded-md inline-block mb-1.5 uppercase tracking-wide">Lencana Berikutnya</div>
+          <h3 class="font-extrabold text-sm md:text-base text-[#1F2937] mb-1">{{ $nextBadge->name }}</h3>
+          @if ($nextBadge->description)
+            <p class="text-[11px] sm:text-xs text-slate-500 leading-relaxed">{{ $nextBadge->description }}</p>
+          @endif
+          <div class="w-full h-2.5 bg-emerald-100 rounded-full overflow-hidden mt-3">
+            <div class="h-full bg-[#10B981] rounded-full" style="width: {{ min(100, (int) floor($totalStars / max(1, $nextBadge->minimum_stars) * 100)) }}%"></div>
+          </div>
+          <div class="flex justify-between items-center mt-2 text-[11px] sm:text-xs">
+            <span class="font-extrabold text-[#1F2937]">{{ $totalStars }} / {{ $nextBadge->minimum_stars }} Bintang</span>
+            <span class="text-slate-500">{{ $nextBadge->minimum_stars - $totalStars }} bintang lagi untuk lencana {{ $nextBadge->name }}!</span>
+          </div>
+        @else
+          <div class="bg-[#ECFDF5] text-[#10B981] font-extrabold text-[9px] px-2.5 py-1 rounded-md inline-block mb-1.5 uppercase tracking-wide">Lencana</div>
+          <h3 class="font-extrabold text-sm md:text-base text-[#1F2937] mb-1">Semua lencana sudah terkumpul! 🏆</h3>
+          <div class="w-full h-2.5 bg-emerald-100 rounded-full overflow-hidden mt-3">
+            <div class="h-full bg-[#10B981] rounded-full" style="width: 100%"></div>
+          </div>
+          <p class="mt-2 text-[11px] sm:text-xs font-extrabold text-[#1F2937]">{{ $totalStars }} Bintang</p>
+        @endif
       </div>
     </div>
+    @endif
 
     <!-- TOMBOL AKSI BAWAH -->
     <div class="space-y-3 mt-auto">
@@ -179,12 +208,35 @@
         Yuk, Pilih Cerita Lain
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
       </a>
-      <a href="{{ url('/halaman-anak') }}" class="w-full bg-white border border-gray-200 text-slate-600 font-extrabold py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition flex justify-center items-center text-sm sm:text-base cursor-pointer">
+      <a href="{{ route('children.progress') }}" class="w-full bg-white border border-gray-200 text-slate-600 font-extrabold py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition flex justify-center items-center text-sm sm:text-base cursor-pointer">
         Lihat Progress
+      </a>
+      {{-- Coba Lagi: cerita yang sama dari awal (Halaman Baca), lewat jalur "Mulai Baca" yang biasa (D-31) --}}
+      <a href="{{ url('/halaman-baca') }}?cerita={{ urlencode($storyId) }}" class="w-full bg-white border border-gray-200 text-slate-600 font-extrabold py-4 rounded-2xl shadow-sm hover:bg-gray-50 transition flex justify-center items-center gap-2 text-sm sm:text-base cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" /></svg>
+        Coba Lagi
       </a>
     </div>
 
   </main>
+
+  <!-- ================= POPUP BINTANG SUDAH PENUH (D-29) =================
+       Muncul sekali, tepat setelah Halaman Misi disimpan tanpa bintang baru karena
+       bintang cerita ini sudah penuh. Tombol hanya menutup popup; rekap tetap terlihat. -->
+  @if ($showFullPopup)
+  <x-mission-popup id="full-stars-popup" role="dialog" aria-modal="true" aria-labelledby="full-stars-title">
+      <h2 id="full-stars-title" class="text-[28px] font-extrabold text-[#F97316] leading-[1.1] mb-3">
+        Bintang Sudah<br>Penuh! 🌟
+      </h2>
+      <p class="text-[#1F2937] text-[13px] sm:text-sm font-bold mb-7 px-1 leading-relaxed" style="text-wrap: balance">
+        <span class="block">Hebat, {{ $child->short_name }}!</span>
+        Kamu sudah mendapat semua bintang dari cerita ini. Yuk, pilih cerita baru untuk mengumpulkan bintang lagi!
+      </p>
+      <button type="button" onclick="document.getElementById('full-stars-popup').remove()" class="w-full bg-[#10B981] text-white font-extrabold py-3.5 rounded-2xl shadow-md hover:bg-[#059669] transition text-sm sm:text-base cursor-pointer">
+        Lihat Rekap
+      </button>
+  </x-mission-popup>
+  @endif
 
   <!-- ================= FOOTER UTAMA ================= -->
   <footer class="bg-slate-50 pt-10 pb-16 mt-auto border-t border-gray-100">

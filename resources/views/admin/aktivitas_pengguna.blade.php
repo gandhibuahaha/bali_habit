@@ -384,8 +384,8 @@
         tr.innerHTML = `
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
-              <div class="w-[34px] h-[34px] rounded-full flex items-center justify-center font-extrabold text-[12px] border flex-shrink-0 ${item.colorClass}">
-                ${escapeHtml(item.initial)}
+              <div class="w-[34px] h-[34px] rounded-full flex items-center justify-center font-extrabold text-[12px] border flex-shrink-0 overflow-hidden ${item.colorClass}">
+                ${item.photo ? `<img src="${escapeHtml(item.photo)}" alt="Foto ${escapeHtml(item.name)}" class="w-full h-full object-cover">` : escapeHtml(item.initial)}
               </div>
               <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
               <div class="min-w-0">

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Removes all fake demo data added by DemoDataSeeder.
@@ -11,8 +12,9 @@ use Illuminate\Support\Facades\DB;
  *   php artisan db:seed --class=RemoveDemoDataSeeder
  *
  * Only demo rows are removed: parents with an email ending in @demo.balihabit.test
- * (and their children + activity), the 4 demo stories with their missions and
- * reflections, and the 4 demo badges. Real accounts and data are not touched.
+ * (and their children + activity), the 4 demo stories with their missions,
+ * reflections, pages and cover files, and the 4 demo badges. Real accounts and
+ * data are not touched.
  */
 class RemoveDemoDataSeeder extends Seeder
 {
@@ -56,7 +58,11 @@ class RemoveDemoDataSeeder extends Seeder
         DB::table('missions')->whereIn('story_id', self::STORY_IDS)->delete();
         DB::table('reflections')->whereIn('story_id', self::STORY_IDS)->delete();
         DB::table('story_pages')->whereIn('story_id', self::STORY_IDS)->delete();
+        $covers = DB::table('stories')->whereIn('story_id', self::STORY_IDS)->whereNotNull('cover_image')->pluck('cover_image');
         DB::table('stories')->whereIn('story_id', self::STORY_IDS)->delete();
         DB::table('badges')->whereIn('badge_id', $badgeIds)->delete();
+
+        // Their cover files on the public disk (where Story Management keeps covers).
+        Storage::disk('public')->delete($covers->all());
     }
 }

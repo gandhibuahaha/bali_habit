@@ -196,12 +196,15 @@
       const referrer = document.referrer;
       const homeUrl = "{{ url('/') }}";
 
-      // Daftar halaman internal admin yang tidak dijadikan tujuan "kembali" setelah logout/lupa sandi
-      const isFromAdminInternal = referrer && (
-        referrer.includes('/admin/dashboard') ||
-        referrer.includes('/admin/lupa-sandi') ||
-        referrer.includes('/admin/login')
-      );
+      // SEMUA halaman admin (/admin/...) tidak dijadikan tujuan "kembali": setelah logout,
+      // kembali ke halaman admin bisa menampilkan salinan lama dari browser. Tombol ke beranda publik (D-32).
+      let referrerPath = '';
+      try {
+        referrerPath = referrer ? new URL(referrer).pathname : '';
+      } catch (e) {
+        referrerPath = '';
+      }
+      const isFromAdminInternal = referrerPath === '/admin' || referrerPath.startsWith('/admin/');
 
       // Jika datang dari halaman publik/user
       if (referrer && !isFromAdminInternal) {

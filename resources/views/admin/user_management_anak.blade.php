@@ -328,7 +328,7 @@
 
               <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4 z-10 w-full min-w-0">
                 <!-- Avatar Besar -->
-                <div id="modalAnakInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0">
+                <div id="modalAnakInisial" class="w-14 h-14 rounded-full bg-emerald-50 text-[#10B981] text-[16px] font-extrabold flex items-center justify-center border border-emerald-100 flex-shrink-0 overflow-hidden">
                   AY
                 </div>
                 <!-- Info Nama & Ortua -->
@@ -527,12 +527,20 @@
         .replace(/'/g, '&#039;');
     }
 
+    // Foto profil (dari database) di dalam lingkaran avatar; tanpa foto: inisial.
+    function avatarInner(person) {
+      return person.foto
+        ? `<img src="${escapeHtml(person.foto)}" alt="Foto ${escapeHtml(person.nama)}" class="w-full h-full object-cover">`
+        : escapeHtml(person.inisial);
+    }
+
+
     // --- SCRIPT MODAL DETAIL ANAK (DATA ASLI) ---
     function openDetailAnakModal(anakId) {
       if (anakId) {
         const anak = dataAnak.find(a => a.id === anakId);
         if (anak) {
-          document.getElementById('modalAnakInisial').innerText = anak.inisial;
+          document.getElementById('modalAnakInisial').innerHTML = avatarInner(anak);
           document.getElementById('modalAnakNama').innerText = anak.nama;
           document.getElementById('modalAnakNama').title = anak.nama; // nama lengkap saat kursor diarahkan
           document.getElementById('modalAnakUsiaGender').innerText = `${anak.usia} Tahun • ${anak.gender}`;
@@ -657,8 +665,8 @@
           <td class="py-4 px-4 text-slate-400 font-bold text-[12px]">${start + index + 1}</td>
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
-              <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] font-bold text-[12px] flex items-center justify-center border border-emerald-100 flex-shrink-0">
-                ${escapeHtml(anak.inisial)}
+              <div class="w-[34px] h-[34px] rounded-full bg-emerald-50 text-[#10B981] font-bold text-[12px] flex items-center justify-center border border-emerald-100 flex-shrink-0 overflow-hidden">
+                ${avatarInner(anak)}
               </div>
               <!-- Nama panjang dipotong dengan "…"; nama lengkap muncul saat kursor diarahkan -->
               <span class="font-extrabold text-[#0F172A] truncate" title="${escapeHtml(anak.nama)}">${escapeHtml(anak.nama)}</span>
