@@ -178,7 +178,19 @@
     <!-- KONTEN DETAIL CERITA -->
     <div class="p-8 mb-10 flex-1">
       <div class="max-w-[1400px] mx-auto flex flex-col gap-6">
-        
+
+        @if (session('success'))
+          <div class="rounded-[14px] border border-emerald-200 bg-emerald-50 px-5 py-3 text-[13px] font-medium text-emerald-800" role="status">
+            {{ session('success') }}
+          </div>
+        @endif
+
+        @if (session('error'))
+          <div class="rounded-[14px] border border-red-200 bg-red-50 px-5 py-3 text-[13px] font-medium text-red-700" role="alert">
+            {{ session('error') }}
+          </div>
+        @endif
+
         <!-- Link Kembali -->
         <div>
           <a href="{{ url('/admin/story-management') }}" class="inline-flex items-center gap-2 text-[13.5px] font-bold text-slate-500 hover:text-[#10B981] transition">
@@ -191,34 +203,53 @@
 
         <!-- Kartu Informasi Cerita (Atas) -->
         <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-7 flex flex-col md:flex-row gap-8 mt-1">
-          <!-- Gambar Cover Placeholder -->
+          <!-- Cover Cerita dari Database -->
           <div class="w-full md:w-56 h-56 bg-emerald-50/50 rounded-[20px] border border-emerald-100 flex flex-col items-center justify-center text-emerald-600 flex-shrink-0 shadow-sm relative overflow-hidden group">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-2 group-hover:scale-110 transition">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-            <span class="text-[11px] font-extrabold tracking-[0.1em] uppercase text-emerald-600/80">Cover</span>
+            @if ($story->cover_image)
+              <img
+                src="{{ asset('storage/' . $story->cover_image) }}"
+                alt="Cover {{ $story->title }}"
+                class="w-full h-full object-cover"
+                onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
+              >
+              <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-emerald-50/50">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5z" />
+                </svg>
+                <span class="text-[11px] font-extrabold tracking-[0.1em] uppercase">Cover tidak tersedia</span>
+              </div>
+            @else
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12 mb-2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5z" />
+              </svg>
+              <span class="text-[11px] font-extrabold tracking-[0.1em] uppercase text-emerald-600/80">Belum ada cover</span>
+            @endif
           </div>
 
-          <!-- Detail Informasi Cerita -->
+          <!-- Detail Informasi Cerita dari Database -->
           <div class="flex-1 flex flex-col items-start gap-4">
             <div class="flex flex-col sm:flex-row sm:items-center gap-3">
-              <h1 id="detailJudul" class="text-[26px] font-extrabold text-[#0F172A] tracking-tight leading-none">Judul Cerita</h1>
-              <span id="detailStatus" class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[12px] font-bold border border-emerald-100">
-                <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Published
-              </span>
+              <h1 class="text-[26px] font-extrabold text-[#0F172A] tracking-tight leading-tight">{{ $story->title }}</h1>
+              @if ($story->status === 'active')
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[12px] font-bold border border-emerald-100">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+                </span>
+              @else
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[12px] font-bold border border-amber-100">
+                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft
+                </span>
+              @endif
             </div>
-            
-            <p id="detailDeskripsi" class="text-slate-500 text-[13.5px] leading-relaxed max-w-3xl">
-              Memuat deskripsi cerita...
-            </p>
 
-            <!-- Badges Statistik (Buku, Bahasa, Refleksi) -->
+            <p class="text-slate-500 text-[13.5px] leading-relaxed max-w-3xl whitespace-pre-line">{{ $story->description }}</p>
+
+            <!-- Statistik dan Identitas Cerita -->
             <div class="flex flex-wrap items-center gap-2.5 mt-1">
-              <span id="detailHalaman" class="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center gap-1.5">
+              <span class="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                 </svg>
-                0 Halaman
+                {{ $story->pages_count }} Halaman
               </span>
               <span class="px-3.5 py-1.5 bg-slate-50 border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400">
@@ -227,24 +258,24 @@
                 3 Bahasa (Bali, ID, EN)
               </span>
               <span class="px-3.5 py-1.5 bg-emerald-50 border border-emerald-100 rounded-[10px] text-emerald-600 text-[12.5px] font-bold flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 4.5h9m-9 4.5h9m-9 4.5h5.25M6 2.25h12A1.5 1.5 0 0119.5 3.75v16.5L12 16.5l-7.5 3.75V3.75A1.5 1.5 0 016 2.25z" />
                 </svg>
-                Refleksi Terisi
+                ID: {{ $story->story_id }}
               </span>
             </div>
 
-            <!-- Tombol Edit Info -->
-            <a href="{{ url('/admin/edit-cerita') }}" class="mt-auto px-4 py-2.5 bg-white border border-slate-200 rounded-[12px] text-slate-600 text-[13px] font-bold flex items-center gap-2 hover:border-[#10B981] hover:text-[#10B981] transition shadow-sm w-fit">
+            <!-- Tombol Edit Informasi Cerita -->
+            <a href="{{ route('admin.stories.edit', $story->story_id) }}" class="mt-auto px-4 py-2.5 bg-white border border-slate-200 rounded-[12px] text-slate-600 text-[13px] font-bold flex items-center gap-2 hover:border-[#10B981] hover:text-[#10B981] transition shadow-sm w-fit">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8-.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
               </svg>
               Edit Informasi Cerita
             </a>
           </div>
         </div>
 
-        <!-- Section List Halaman Cerita -->
+                <!-- Section List Halaman Cerita -->
         <div class="mt-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -252,7 +283,7 @@
               <p class="text-slate-500 text-[13.5px] mt-0.5">Kelola halaman cerita. Minimal 5, maksimal 8 halaman.</p>
             </div>
             <!-- Tombol Tambah Halaman -->
-            <a href="{{ url('/admin/tambah-halaman-cerita') }}" class="px-5 py-2.5 border-2 border-[#10B981] text-[#10B981] bg-white rounded-[12px] text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-emerald-50 transition shadow-sm w-fit">
+            <a href="{{ url('/admin/tambah-halaman-cerita') . '?' . http_build_query(['story_id' => $story->story_id]) }}" class="px-5 py-2.5 border-2 border-[#10B981] text-[#10B981] bg-white rounded-[12px] text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-emerald-50 transition shadow-sm w-fit">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
@@ -260,129 +291,67 @@
             </a>
           </div>
 
-          <!-- Grid Halaman -->
+          <!-- Grid Halaman dari Database -->
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5 mt-5">
-            <!-- Card Halaman 1 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                </svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#1</div>
+            @forelse ($story->pages as $page)
+              <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition">
+                <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative overflow-hidden">
+                  @if ($page->illustration)
+                    <img
+                      src="{{ asset('storage/' . $page->illustration) }}"
+                      alt="Ilustrasi halaman {{ $page->page_number }}"
+                      class="w-full h-full object-cover"
+                      onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');"
+                    >
+                    <div class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-50 text-slate-300">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5z" />
+                      </svg>
+                      <span class="mt-1 text-[10px] font-bold">Ilustrasi tidak tersedia</span>
+                    </div>
+                  @else
+                    <div class="flex flex-col items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5z" />
+                      </svg>
+                      <span class="mt-1 text-[10px] font-bold">Belum ada ilustrasi</span>
+                    </div>
+                  @endif
+                  <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#{{ $page->page_number }}</div>
+                </div>
+
+                <div class="flex items-center justify-between px-1 gap-2">
+                  <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman {{ $page->page_number }}</span>
+                  <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1 whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Tersimpan
+                  </span>
+                </div>
+
+                <a href="{{ url('/admin/edit-halaman-cerita') . '?' . http_build_query(['page_id' => $page->page_id, 'story_id' => $story->story_id]) }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8-.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                  </svg>
+                  Edit
+                </a>
               </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 1</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap
-                </span>
+            @empty
+              <div class="col-span-full bg-white border border-dashed border-slate-200 rounded-[20px] p-10 text-center">
+                <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.7" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0118 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+                  </svg>
+                </div>
+                <p class="text-[14px] font-bold text-slate-700">Belum ada halaman cerita</p>
+                <p class="text-[12.5px] text-slate-400 mt-1">Tambahkan halaman untuk mulai melengkapi cerita ini.</p>
               </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 2 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#2</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 2</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 3 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#3</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 3</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 4 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#4</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 4</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 5 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#5</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 5</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 6 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#6</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 6</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 7 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#7</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 7</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            <!-- Card Halaman 8 -->
-            <div class="bg-white border border-slate-100 rounded-[20px] p-4 flex flex-col gap-4 shadow-sm relative group hover:border-[#10B981]/50 transition cursor-pointer">
-              <div class="w-full aspect-[4/3] bg-slate-50 rounded-[12px] border border-slate-100 flex items-center justify-center text-slate-300 group-hover:bg-emerald-50/40 transition relative">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 group-hover:scale-105 transition"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                <div class="absolute top-2 right-2 bg-slate-500/80 backdrop-blur-sm text-white text-[10.5px] font-extrabold px-2.5 py-1 rounded-[6px] shadow-sm tracking-wider">#8</div>
-              </div>
-              <div class="flex items-center justify-between px-1">
-                <span class="font-extrabold text-[13.5px] text-[#0F172A]">Halaman 8</span>
-                <span class="text-[#10B981] text-[12px] font-bold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Lengkap</span>
-              </div>
-              <a href="{{ url('/admin/edit-halaman-cerita') }}" class="w-full py-2 bg-white border border-slate-200 rounded-[10px] text-slate-600 text-[12.5px] font-bold flex items-center justify-center gap-2 hover:border-[#10B981] hover:text-[#10B981] hover:bg-emerald-50/50 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" /></svg> Edit
-              </a>
-            </div>
-            
+            @endforelse
           </div>
         </div>
 
-        <!-- Alert Informasi (Bawah) -->
+        <!-- Alert Informasi (Dinamis) -->
         <div class="bg-emerald-50/50 border border-emerald-100 rounded-[16px] p-5 flex items-start sm:items-center gap-4 mt-2 shadow-sm">
           <div class="w-7 h-7 rounded-full bg-[#10B981] text-white flex items-center justify-center flex-shrink-0 mt-0.5 sm:mt-0 shadow-sm">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
@@ -390,7 +359,12 @@
             </svg>
           </div>
           <p class="text-[13px] text-emerald-900 leading-relaxed font-medium">
-            <strong class="font-extrabold">Cerita ini sudah lengkap dan dipublikasikan.</strong> Anda tetap dapat menambah atau mengedit halaman serta teks cerita jika diperlukan pembaruan.
+            @if ($story->status === 'active')
+              <strong class="font-extrabold">Cerita ini berstatus Published.</strong>
+            @else
+              <strong class="font-extrabold">Cerita ini masih berstatus Draft.</strong>
+            @endif
+            Saat ini terdapat {{ $story->pages_count }} halaman. Panduan pengelolaan cerita adalah minimal 5 dan maksimal 8 halaman. Anda dapat menambah atau mengedit halaman melalui bagian Halaman Cerita.
           </p>
         </div>
 
@@ -433,44 +407,7 @@
     </div>
   </div>
 
-  <!-- ================= SCRIPT ================= -->
-  <script>
-    // ================= SCRIPT DATA DINAMIS =================
-    document.addEventListener('DOMContentLoaded', () => {
-      const savedData = localStorage.getItem('editCeritaData');
-      
-      if (savedData) {
-        const cerita = JSON.parse(savedData);
-        
-        const judulEl = document.getElementById('detailJudul');
-        const deskripsiEl = document.getElementById('detailDeskripsi');
-        const statusEl = document.getElementById('detailStatus');
-        const halamanEl = document.getElementById('detailHalaman');
-        
-        if (judulEl) judulEl.textContent = cerita.judul;
-        if (deskripsiEl) deskripsiEl.textContent = cerita.deskripsi;
-        
-        if (halamanEl) {
-          halamanEl.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-slate-400">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
-            </svg>
-            ${cerita.halaman} Halaman
-          `;
-        }
-
-        if (statusEl) {
-          if (cerita.status.toLowerCase() === 'published') {
-            statusEl.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[12px] font-bold border border-emerald-100';
-            statusEl.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Published';
-          } else {
-            statusEl.className = 'inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 rounded-full text-[12px] font-bold border border-amber-100';
-            statusEl.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-amber-500"></div> Draft';
-          }
-        }
-      }
-    });
-  </script>
+  <!-- Detail cerita dan daftar halaman dirender langsung dari data Laravel. -->
 
   <!-- Form logout Admin (POST + CSRF): dikirim oleh tombol "Ya, Keluar" lewat confirmLogout() -->
   <form id="adminLogoutForm" action="{{ route('admin.logout') }}" method="POST" class="hidden">@csrf</form>

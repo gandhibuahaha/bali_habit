@@ -169,7 +169,7 @@
         
         <!-- Link Kembali -->
         <div class="mb-4">
-          <a href="{{ url('/admin/detail-cerita') }}" class="inline-flex items-center gap-2 text-[13.5px] font-bold text-slate-500 hover:text-[#10B981] transition">
+          <a href="{{ route('admin.stories.show', $story->story_id) }}" class="inline-flex items-center gap-2 text-[13.5px] font-bold text-slate-500 hover:text-[#10B981] transition">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </svg>
@@ -184,17 +184,40 @@
         </div>
 
         <!-- Form Container -->
-        <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-8 mt-6 flex flex-col gap-8">
-          
+        <form id="storyPageForm" action="{{ route('admin.story-pages.store', $story->story_id) }}" method="POST" enctype="multipart/form-data" class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-8 mt-6 flex flex-col gap-8">
+          @csrf
+
+          <div class="rounded-[12px] border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-[13px] text-emerald-800">
+            Menambahkan halaman untuk cerita: <strong>{{ $story->title }}</strong>
+          </div>
+
+          @if ($errors->any())
+            <div class="rounded-[14px] border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
+              <p class="font-bold mb-2">Halaman belum dapat disimpan. Periksa kembali isian berikut:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
+
+          @if (session('error'))
+            <div class="rounded-[14px] border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">{{ session('error') }}</div>
+          @endif
+
           <!-- Urutan Halaman -->
           <div>
             <label class="block text-[13.5px] font-bold text-[#0F172A] mb-2">
               Urutan Halaman <span class="text-red-500">*</span>
             </label>
-            <input type="text" placeholder="Masukkan urutan halaman..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition" required>
+            <input type="number" id="pageNumber" name="page_number" min="1" max="8" step="1" value="{{ old('page_number', ((int) $story->pages->max('page_number')) + 1) }}" placeholder="Masukkan urutan halaman..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition" required>
             <p class="text-[12px] font-medium text-slate-400 mt-2">
-              Masukkan urutan halaman sesuai dengan alur cerita. (Contoh: 1, 2, 3, 4, ...)
+              Masukkan urutan halaman sesuai alur cerita. Nomor halaman 1 sampai 8 dan tidak boleh duplikat.
             </p>
+            @error('page_number')
+              <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- Ilustrasi Halaman -->
@@ -215,9 +238,13 @@
               </button>
 
               <!-- Hidden file input & Preview Image -->
-              <input type="file" id="illustrationInput" class="hidden" accept="image/png, image/jpeg, image/jpg">
+              <input type="file" id="illustrationInput" name="illustration" class="hidden" accept="image/png, image/jpeg, image/jpg">
               <img id="illustrationPreview" src="#" alt="Preview Ilustrasi" class="absolute inset-0 w-full h-full object-cover hidden z-0 group-hover:opacity-75 transition-opacity duration-300">
             </div>
+            <p id="illustrationError" class="hidden text-[12px] font-medium text-red-500 mt-1"></p>
+            @error('illustration')
+              <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- SECTION BAHASA BALI -->
@@ -229,10 +256,13 @@
                 <label class="block text-[12.5px] font-bold text-[#0F172A] mb-2">
                   Teks Bahasa Bali <span class="text-red-500">*</span>
                 </label>
-                <textarea id="teksBali" rows="4" maxlength="500" placeholder="Masukkan teks dalam Bahasa Bali..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required></textarea>
+                <textarea id="teksBali" name="balinese_text" rows="4" maxlength="500" placeholder="Masukkan teks dalam Bahasa Bali..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required>{{ old('balinese_text') }}</textarea>
                 <div class="flex justify-end mt-1">
                   <span id="countBali" class="text-[11.5px] font-bold text-slate-400">0/500</span>
                 </div>
+                @error('balinese_text')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
               <!-- Audio -->
               <div>
@@ -254,8 +284,12 @@
                   <button type="button" class="px-4 py-2 bg-white border border-slate-200 group-hover:border-[#10B981] group-hover:text-[#10B981] rounded-[8px] text-slate-600 text-[12px] font-bold transition shadow-sm whitespace-nowrap pointer-events-none">
                     Pilih Audio
                   </button>
-                  <input type="file" id="audioBaliInput" class="hidden" accept="audio/mpeg, audio/wav">
+                  <input type="file" id="audioBaliInput" name="balinese_audio" class="hidden" accept="audio/mpeg, audio/wav, audio/x-wav">
                 </div>
+                <p id="audioBaliError" class="hidden text-[12px] font-medium text-red-500 mt-1"></p>
+                @error('balinese_audio')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
             </div>
           </div>
@@ -269,10 +303,13 @@
                 <label class="block text-[12.5px] font-bold text-[#0F172A] mb-2">
                   Teks Bahasa Indonesia <span class="text-red-500">*</span>
                 </label>
-                <textarea id="teksIndo" rows="4" maxlength="500" placeholder="Masukkan teks dalam Bahasa Indonesia..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required></textarea>
+                <textarea id="teksIndo" name="indonesian_text" rows="4" maxlength="500" placeholder="Masukkan teks dalam Bahasa Indonesia..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required>{{ old('indonesian_text') }}</textarea>
                 <div class="flex justify-end mt-1">
                   <span id="countIndo" class="text-[11.5px] font-bold text-slate-400">0/500</span>
                 </div>
+                @error('indonesian_text')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
               <!-- Audio -->
               <div>
@@ -294,8 +331,12 @@
                   <button type="button" class="px-4 py-2 bg-white border border-slate-200 group-hover:border-[#10B981] group-hover:text-[#10B981] rounded-[8px] text-slate-600 text-[12px] font-bold transition shadow-sm whitespace-nowrap pointer-events-none">
                     Pilih Audio
                   </button>
-                  <input type="file" id="audioIndoInput" class="hidden" accept="audio/mpeg, audio/wav">
+                  <input type="file" id="audioIndoInput" name="indonesian_audio" class="hidden" accept="audio/mpeg, audio/wav, audio/x-wav">
                 </div>
+                <p id="audioIndoError" class="hidden text-[12px] font-medium text-red-500 mt-1"></p>
+                @error('indonesian_audio')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
             </div>
           </div>
@@ -309,10 +350,13 @@
                 <label class="block text-[12.5px] font-bold text-[#0F172A] mb-2">
                   English Text <span class="text-red-500">*</span>
                 </label>
-                <textarea id="teksEn" rows="4" maxlength="500" placeholder="Enter the text in English..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required></textarea>
+                <textarea id="teksEn" name="english_text" rows="4" maxlength="500" placeholder="Enter the text in English..." class="w-full bg-white border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] transition resize-none" required>{{ old('english_text') }}</textarea>
                 <div class="flex justify-end mt-1">
                   <span id="countEn" class="text-[11.5px] font-bold text-slate-400">0/500</span>
                 </div>
+                @error('english_text')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
               <!-- Audio -->
               <div>
@@ -334,15 +378,19 @@
                   <button type="button" class="px-4 py-2 bg-white border border-slate-200 group-hover:border-[#10B981] group-hover:text-[#10B981] rounded-[8px] text-slate-600 text-[12px] font-bold transition shadow-sm whitespace-nowrap pointer-events-none">
                     Pilih Audio
                   </button>
-                  <input type="file" id="audioEnInput" class="hidden" accept="audio/mpeg, audio/wav">
+                  <input type="file" id="audioEnInput" name="english_audio" class="hidden" accept="audio/mpeg, audio/wav, audio/x-wav">
                 </div>
+                <p id="audioEnError" class="hidden text-[12px] font-medium text-red-500 mt-1"></p>
+                @error('english_audio')
+                  <p class="text-[12px] font-medium text-red-500 mt-1">{{ $message }}</p>
+                @enderror
               </div>
             </div>
           </div>
 
           <!-- Action Buttons -->
           <div class="flex items-center justify-between mt-4">
-            <a href="{{ url('/admin/detail-cerita') }}" class="px-6 py-2.5 border border-slate-200 hover:border-[#10B981] bg-white text-slate-600 hover:text-[#10B981] hover:bg-emerald-50/20 rounded-[12px] text-[13.5px] font-bold transition shadow-sm">
+            <a href="{{ route('admin.stories.show', $story->story_id) }}" class="px-6 py-2.5 border border-slate-200 hover:border-[#10B981] bg-white text-slate-600 hover:text-[#10B981] hover:bg-emerald-50/20 rounded-[12px] text-[13.5px] font-bold transition shadow-sm">
               Batal
             </a>
             <!-- Memanggil JS Modal -->
@@ -351,7 +399,7 @@
             </button>
           </div>
 
-        </div>
+        </form>
 
       </div>
     </div>
@@ -411,12 +459,20 @@
 
   <!-- ================= SCRIPT JAVASCRIPT ================= -->
   <script>
-    // --- Script Modal Simpan ---
+    const pageForm = document.getElementById('storyPageForm');
+
+    // Modal konfirmasi simpan.
     function openSaveModal() {
+      if (!pageForm || !pageForm.reportValidity()) return;
+
+      if (!validateRequiredUploads()) return;
+
       const modal = document.getElementById('saveModal');
       const backdrop = document.getElementById('saveBackdrop');
       const content = document.getElementById('saveContent');
-      
+
+      if (!modal || !backdrop || !content) return;
+
       modal.classList.remove('hidden');
       setTimeout(() => {
         backdrop.classList.remove('opacity-0');
@@ -429,100 +485,190 @@
       const modal = document.getElementById('saveModal');
       const backdrop = document.getElementById('saveBackdrop');
       const content = document.getElementById('saveContent');
-      
+
+      if (!modal || !backdrop || !content) return;
+
       backdrop.classList.add('opacity-0');
       content.classList.remove('scale-100', 'opacity-100');
       content.classList.add('scale-95', 'opacity-0');
-      
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 300);
+
+      setTimeout(() => modal.classList.add('hidden'), 300);
     }
 
     function confirmSave() {
-      window.location.href = "{{ url('/admin/detail-cerita') }}";
+      if (pageForm && pageForm.reportValidity() && validateRequiredUploads()) {
+        pageForm.requestSubmit();
+      }
     }
 
-    // ==========================================
-    // --- SCRIPT INTERAKSI FORM UPLOAD FILE ---
-    // ==========================================
+    // Validasi file di sisi browser. Validasi utama tetap dilakukan Laravel.
+    const imageInput = document.getElementById('illustrationInput');
+    const imageArea = document.getElementById('illustrationUploadArea');
+    const imagePreview = document.getElementById('illustrationPreview');
+    const imageText = document.getElementById('illustrationText');
+    const imageError = document.getElementById('illustrationError');
 
-    // 1. Upload Ilustrasi Halaman
-    const illustrationArea = document.getElementById('illustrationUploadArea');
-    const illustrationInput = document.getElementById('illustrationInput');
-    const illustrationPreview = document.getElementById('illustrationPreview');
-    const illustrationText = document.getElementById('illustrationText');
+    const uploadDefinitions = [
+      { inputId: 'audioBaliInput', areaId: 'audioBaliArea', textId: 'audioBaliText', errorId: 'audioBaliError', label: 'Audio Bahasa Bali' },
+      { inputId: 'audioIndoInput', areaId: 'audioIndoArea', textId: 'audioIndoText', errorId: 'audioIndoError', label: 'Audio Bahasa Indonesia' },
+      { inputId: 'audioEnInput', areaId: 'audioEnArea', textId: 'audioEnText', errorId: 'audioEnError', label: 'English Audio' }
+    ];
 
-    if(illustrationArea && illustrationInput) {
-      illustrationArea.addEventListener('click', () => illustrationInput.click());
+    function setUploadError(errorElement, message) {
+      if (!errorElement) return;
+      errorElement.textContent = message || '';
+      errorElement.classList.toggle('hidden', !message);
+    }
 
-      illustrationInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            illustrationPreview.src = e.target.result;
-            illustrationPreview.classList.remove('hidden');
-            illustrationText.innerHTML = `File: <span class="font-medium text-slate-500">${file.name}</span>`;
-          }
-          reader.readAsDataURL(file);
-        } else {
-          illustrationPreview.src = "#";
-          illustrationPreview.classList.add('hidden');
-          illustrationText.innerHTML = `Klik untuk mengunggah gambar`;
+    function hasAllowedExtension(file, extensions) {
+      const extension = file.name.split('.').pop().toLowerCase();
+      return extensions.includes(extension);
+    }
+
+    function validateImageFile(file) {
+      if (!hasAllowedExtension(file, ['jpg', 'jpeg', 'png'])) {
+        return 'Format ilustrasi harus JPG atau PNG.';
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        return 'Ukuran ilustrasi maksimal 2 MB.';
+      }
+      return '';
+    }
+
+    function validateAudioFile(file) {
+      if (!hasAllowedExtension(file, ['mp3', 'wav'])) {
+        return 'Format audio harus MP3 atau WAV.';
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        return 'Ukuran audio maksimal 5 MB.';
+      }
+      return '';
+    }
+
+    function showMissingUpload(input, errorElement, area, message) {
+      setUploadError(errorElement, message);
+      if (area) area.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function validateRequiredUploads() {
+      if (!imageInput.files.length) {
+        showMissingUpload(imageInput, imageError, imageArea, 'Ilustrasi halaman wajib diunggah.');
+        return false;
+      }
+
+      for (const definition of uploadDefinitions) {
+        const input = document.getElementById(definition.inputId);
+        const error = document.getElementById(definition.errorId);
+        const area = document.getElementById(definition.areaId);
+        if (!input || !input.files.length) {
+          showMissingUpload(input, error, area, `${definition.label} wajib diunggah.`);
+          return false;
         }
+      }
+
+      return true;
+    }
+
+    if (imageArea && imageInput) {
+      imageArea.addEventListener('click', () => imageInput.click());
+      imageInput.addEventListener('click', (event) => event.stopPropagation());
+
+      imageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        setUploadError(imageError, '');
+        if (!file) return;
+
+        const error = validateImageFile(file);
+        if (error) {
+          this.value = '';
+          imagePreview.classList.add('hidden');
+          setUploadError(imageError, error);
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          imagePreview.src = event.target.result;
+          imagePreview.classList.remove('hidden');
+          imageText.textContent = `File terpilih: ${file.name}`;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      imageArea.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        imageArea.classList.add('border-[#10B981]', 'bg-emerald-50/40');
+      });
+      imageArea.addEventListener('dragleave', () => {
+        imageArea.classList.remove('border-[#10B981]', 'bg-emerald-50/40');
+      });
+      imageArea.addEventListener('drop', (event) => {
+        event.preventDefault();
+        imageArea.classList.remove('border-[#10B981]', 'bg-emerald-50/40');
+        if (!event.dataTransfer.files.length) return;
+
+        const transfer = new DataTransfer();
+        transfer.items.add(event.dataTransfer.files[0]);
+        imageInput.files = transfer.files;
+        imageInput.dispatchEvent(new Event('change', { bubbles: true }));
       });
     }
 
-    // 2. Fungsi Generic Upload Audio
-    function setupAudioUpload(areaId, inputId, textId) {
-      const area = document.getElementById(areaId);
-      const input = document.getElementById(inputId);
-      const text = document.getElementById(textId);
+    // Upload audio untuk masing-masing bahasa.
+    uploadDefinitions.forEach((definition) => {
+      const area = document.getElementById(definition.areaId);
+      const input = document.getElementById(definition.inputId);
+      const text = document.getElementById(definition.textId);
+      const error = document.getElementById(definition.errorId);
 
-      if(area && input && text) {
-        area.addEventListener('click', () => input.click());
+      if (!area || !input || !text) return;
 
-        input.addEventListener('change', function() {
-          const file = this.files[0];
-          if (file) {
-            text.innerHTML = `<span class="text-[#10B981]">${file.name}</span>`;
-            text.classList.remove('text-[#0F172A]');
-          } else {
-            text.innerHTML = `Klik untuk mengunggah audio`;
-            text.classList.add('text-[#0F172A]');
-          }
-        });
-      }
+      area.addEventListener('click', () => input.click());
+      input.addEventListener('click', (event) => event.stopPropagation());
+      input.addEventListener('change', function () {
+        const file = this.files[0];
+        setUploadError(error, '');
+        if (!file) {
+          text.textContent = 'Klik untuk mengunggah audio';
+          return;
+        }
+
+        const validationMessage = validateAudioFile(file);
+        if (validationMessage) {
+          this.value = '';
+          text.textContent = 'Klik untuk mengunggah audio';
+          setUploadError(error, validationMessage);
+          return;
+        }
+
+        text.textContent = `File terpilih: ${file.name}`;
+      });
+    });
+
+    // Cek upload juga saat form dikirim tanpa tombol modal.
+    if (pageForm) {
+      pageForm.addEventListener('submit', (event) => {
+        if (!validateRequiredUploads()) event.preventDefault();
+      });
     }
 
-    // Inisialisasi Audio Uploads
-    setupAudioUpload('audioBaliArea', 'audioBaliInput', 'audioBaliText');
-    setupAudioUpload('audioIndoArea', 'audioIndoInput', 'audioIndoText');
-    setupAudioUpload('audioEnArea', 'audioEnInput', 'audioEnText');
-
-    // 3. Fungsi Generic Character Counter (Textarea)
+    // Penghitung karakter untuk tiga bahasa.
     function setupCharCounter(inputId, counterId) {
       const input = document.getElementById(inputId);
       const counter = document.getElementById(counterId);
+      if (!input || !counter) return;
 
-      if(input && counter) {
-        input.addEventListener('input', function() {
-          const currentLength = this.value.length;
-          counter.textContent = `${currentLength}/500`;
-          
-          if(currentLength >= 500) {
-            counter.classList.add('text-red-500');
-            counter.classList.remove('text-slate-400');
-          } else {
-            counter.classList.remove('text-red-500');
-            counter.classList.add('text-slate-400');
-          }
-        });
-      }
+      const updateCounter = () => {
+        const length = input.value.length;
+        counter.textContent = `${length}/500`;
+        counter.classList.toggle('text-red-500', length >= 500);
+        counter.classList.toggle('text-slate-400', length < 500);
+      };
+
+      updateCounter();
+      input.addEventListener('input', updateCounter);
     }
 
-    // Inisialisasi Character Counter
     setupCharCounter('teksBali', 'countBali');
     setupCharCounter('teksIndo', 'countIndo');
     setupCharCounter('teksEn', 'countEn');

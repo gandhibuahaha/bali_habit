@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Child;
+use App\Models\Story;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -22,18 +24,6 @@ class ChildProgressController extends Controller
     private const SESSION_KEY = 'active_child_id';
 
     private const STORY_SESSION_KEY = 'active_story';
-
-    /**
-     * The 4 demo stories the story pages know (same slugs and titles as
-     * public/assets/js/halaman_baca.js). Replace with the stories table once
-     * Story Management fills it.
-     */
-    private const STORY_TITLES = [
-        'kedis-puuh' => 'I Alu Teken I Kedis Puuh',
-        'lutung-kekua' => 'I Lutung teken I Kekua',
-        'lelipi-selem' => 'Lelipi Selem Bukit',
-        'lutung-pecalang' => 'I Lutung Dadi Pecalang',
-    ];
 
     public function progress(Request $request): View|RedirectResponse
     {
@@ -99,13 +89,19 @@ class ChildProgressController extends Controller
 
         $noProgress = ['reflections_done' => 0, 'reflections_total' => 0, 'missions_done' => 0, 'missions_total' => 0, 'last_read' => null];
 
-        return view('user.belajar_bersama', compact('child', 'storyProgress', 'noProgress'));
+        // Published stories, same list as Story Management's StoryCatalogController.
+        $stories = $this->publishedStories()
+            ->orderBy('story_order')
+            ->orderBy('title')
+            ->get();
+
+        return view('user.belajar_bersama', compact('child', 'stories', 'storyProgress', 'noProgress'));
     }
 
     /**
      * Story pages (Halaman Baca, Refleksi, Misi, Rekap Cerita) for the picked child.
-     * Opening a story (?cerita=<slug>) remembers it for the following pages.
-     * Nothing is saved yet: that waits for the stories to exist in the database.
+     * Opening a story (?cerita=<story_id>) remembers it for the following pages;
+     * only published stories are accepted. Nothing is saved yet.
      */
     public function storyPage(Request $request, string $page): View|RedirectResponse
     {
@@ -114,14 +110,20 @@ class ChildProgressController extends Controller
             return $child;
         }
 
-        $slug = $request->query('cerita');
-        if (is_string($slug) && isset(self::STORY_TITLES[$slug])) {
-            session([self::STORY_SESSION_KEY => $slug]);
+        $storyId = $request->query('cerita');
+        if (is_string($storyId) && $this->publishedStories()->whereKey($storyId)->exists()) {
+            session([self::STORY_SESSION_KEY => $storyId]);
         }
 
-        $storyTitle = self::STORY_TITLES[session(self::STORY_SESSION_KEY)] ?? null;
+        $storyTitle = $this->publishedStories()->find(session(self::STORY_SESSION_KEY))?->title;
 
         return view($page, compact('child', 'storyTitle'));
+    }
+
+    /** Stories the admin has published (status "active"); drafts stay hidden from parents. */
+    private function publishedStories(): Builder
+    {
+        return Story::query()->where('status', 'active');
     }
 
     /**

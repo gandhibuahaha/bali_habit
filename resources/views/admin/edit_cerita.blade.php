@@ -191,7 +191,33 @@
         </div>
 
         <!-- Kartu Form Edit Cerita -->
-        <div class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-8 sm:p-10 flex flex-col gap-8 mt-2">
+        <form
+          id="storyForm"
+          action="{{ route('admin.stories.update', $story->story_id) }}"
+          method="POST"
+          enctype="multipart/form-data"
+          autocomplete="off"
+          class="bg-white border border-slate-100 rounded-[24px] shadow-sm p-8 sm:p-10 flex flex-col gap-8 mt-2"
+        >
+          @csrf
+          @method('PUT')
+
+          @if ($errors->any())
+            <div class="rounded-[14px] border border-red-200 bg-red-50 p-4 text-[13px] text-red-700">
+              <p class="font-bold mb-2">Perubahan belum dapat disimpan. Periksa kembali isian berikut:</p>
+              <ul class="list-disc pl-5 space-y-1">
+                @foreach ($errors->all() as $error)
+                  <li>{{ $error }}</li>
+                @endforeach
+              </ul>
+            </div>
+          @endif
+
+          @if (session('success'))
+            <div class="rounded-[14px] border border-emerald-200 bg-emerald-50 p-4 text-[13px] text-emerald-700">
+              {{ session('success') }}
+            </div>
+          @endif
 
           <!-- Input: Judul Cerita -->
           <div class="flex flex-col gap-2">
@@ -201,10 +227,16 @@
             <input
               type="text"
               id="inputJudulCerita"
-              value="I Alu Teken I Kedis Puuh"
+              name="title"
+              value="{{ old('title', $story->title) }}"
+              maxlength="150"
+              required
               placeholder="Masukkan judul cerita..."
               class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition"
             >
+            @error('title')
+              <p class="text-[12px] font-medium text-red-500">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- Input: Deskripsi Singkat -->
@@ -215,19 +247,24 @@
             <div class="relative">
               <textarea
                 id="inputDeskripsiCerita"
+                name="description"
                 maxlength="300"
                 rows="4"
+                required
                 placeholder="Tulis deskripsi singkat cerita..."
                 class="w-full bg-slate-50 border border-slate-200 rounded-[12px] p-4 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition resize-none"
-              >Kisah fabel tradisional Bali tentang persahabatan, tipu daya, dan kecerdikan antara I Alu (seekor biawak) dan I Kedis Puuh (burung puyuh) dalam menghadapi tantangan di alam liar.</textarea>
-              <span id="ceritaCharCount" class="absolute bottom-3 right-4 text-[11px] font-bold text-slate-400 pointer-events-none">175/300</span>
+              >{{ old('description', $story->description) }}</textarea>
+              <span id="ceritaCharCount" class="absolute bottom-3 right-4 text-[11px] font-bold text-slate-400 pointer-events-none">{{ strlen(old('description', $story->description ?? '')) }}/300</span>
             </div>
+            @error('description')
+              <p class="text-[12px] font-medium text-red-500">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- Input: Cover Cerita -->
           <div class="flex flex-col gap-2">
             <label class="text-[13.5px] font-bold text-[#1E293B]">
-              Cover Cerita <span class="text-red-500">*</span>
+              Cover Cerita
             </label>
             <div id="coverUploadArea" class="border-2 border-dashed border-[#10B981]/40 hover:border-[#10B981] bg-emerald-50/20 rounded-[20px] p-8 text-center flex flex-col items-center justify-center gap-3 transition cursor-pointer group relative overflow-hidden">
               <!-- Kotak Ikon Gambar -->
@@ -241,17 +278,33 @@
                   Ganti gambar sampul <span class="font-normal text-slate-500">atau seret dan lepas di sini</span>
                 </p>
                 <p id="coverCurrentFile" class="text-[12px] text-slate-400 font-medium">
-                  File saat ini: cover_alu_kedis_puuh.jpg
+                  @if ($story->cover_image)
+                    File saat ini: {{ basename($story->cover_image) }}
+                  @else
+                    Belum ada cover yang tersimpan.
+                  @endif
                 </p>
               </div>
               <button type="button" id="btnSelectCover" class="mt-2 px-4 py-2 bg-white border border-slate-200 hover:border-[#10B981] text-slate-700 text-[12.5px] font-bold rounded-[10px] shadow-sm transition z-10 pointer-events-none">
                 Pilih Gambar
               </button>
 
-              <!-- Input file tersembunyi & Preview Gambar -->
-              <input type="file" id="coverFileInput" class="hidden" accept="image/png, image/jpeg, image/jpg">
-              <img id="coverPreview" src="#" alt="Preview Cover" class="absolute inset-0 w-full h-full object-cover hidden z-0 group-hover:opacity-75 transition-opacity duration-300">
+              <!-- Cover bersifat opsional saat edit. Jika tidak memilih file baru, cover lama tetap digunakan. -->
+              <input
+                type="file"
+                id="coverFileInput"
+                name="cover_image"
+                class="hidden"
+                accept="image/png, image/jpeg, image/jpg"
+                aria-label="Pilih cover cerita baru"
+              >
+              <img id="coverPreview" src="#" alt="Preview cover baru" class="absolute inset-0 w-full h-full object-cover hidden z-0 group-hover:opacity-75 transition-opacity duration-300">
             </div>
+            <p class="text-[12px] text-slate-400 font-medium">Format JPG atau PNG, maksimal 2 MB. Kosongkan jika tidak ingin mengganti cover.</p>
+            <p id="coverError" class="hidden text-[12px] font-medium text-red-500"></p>
+            @error('cover_image')
+              <p class="text-[12px] font-medium text-red-500">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- Input: Status -->
@@ -260,9 +313,9 @@
               Status <span class="text-red-500">*</span>
             </label>
             <div class="relative">
-              <select id="selectStatusCerita" class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition appearance-none cursor-pointer">
-                <option value="draft">Draft</option>
-                <option value="published" selected>Published</option>
+              <select id="selectStatusCerita" name="status" required class="w-full bg-slate-50 border border-slate-200 rounded-[12px] px-4 py-3 text-[13.5px] font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#10B981]/20 focus:border-[#10B981] focus:bg-white transition appearance-none cursor-pointer">
+                <option value="inactive" @selected(old('status', $story->status) === 'inactive')>Draft</option>
+                <option value="active" @selected(old('status', $story->status) === 'active')>Published</option>
               </select>
               <span class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-slate-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
@@ -271,6 +324,9 @@
               </span>
             </div>
             <p class="text-[12px] text-slate-400 font-medium mt-0.5">Cerita yang sudah lengkap dapat dipublikasikan.</p>
+            @error('status')
+              <p class="text-[12px] font-medium text-red-500">{{ $message }}</p>
+            @enderror
           </div>
 
           <!-- Tombol Aksi di Bawah -->
@@ -283,7 +339,7 @@
             </button>
           </div>
 
-        </div>
+        </form>
 
       </div>
     </div>
@@ -351,8 +407,33 @@
 
   <!-- ================= SCRIPT ================= -->
   <script>
-    // --- Script Modal Simpan ---
+    // --- Modal konfirmasi penyimpanan ---
     function openSaveModal() {
+      const form = document.getElementById('storyForm');
+
+      // Validasi judul, deskripsi, dan status melalui validasi browser.
+      if (!form || !form.reportValidity()) return;
+
+      // Cover tidak wajib diganti saat mengedit cerita.
+      const coverFileInput = document.getElementById('coverFileInput');
+      if (coverFileInput && coverFileInput.files.length > 0) {
+        const file = coverFileInput.files[0];
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        const maxCoverSize = 2 * 1024 * 1024;
+
+        if (!allowedTypes.includes(file.type)) {
+          showCoverError('Format gambar harus JPG atau PNG.');
+          return;
+        }
+
+        if (file.size > maxCoverSize) {
+          showCoverError('Ukuran gambar maksimal 2 MB.');
+          return;
+        }
+      }
+
+      clearCoverError();
+
       const modal = document.getElementById('saveModal');
       const backdrop = document.getElementById('saveBackdrop');
       const content = document.getElementById('saveContent');
@@ -384,21 +465,36 @@
     }
 
     function confirmSave() {
-      window.location.href = "{{ url('/admin/story-management') }}";
+      const form = document.getElementById('storyForm');
+      if (form) {
+        form.requestSubmit();
+      }
     }
 
-    // --- Script Pengisian Data Bawaan (Local Storage) & Counter Karakter ---
+    function showCoverError(message) {
+      if (coverError) {
+        coverError.textContent = message;
+        coverError.classList.remove('hidden');
+      }
+    }
+
+    function clearCoverError() {
+      const coverError = document.getElementById('coverError');
+      if (coverError) {
+        coverError.textContent = '';
+        coverError.classList.add('hidden');
+      }
+    }
+
+    // --- Counter karakter deskripsi ---
     document.addEventListener('DOMContentLoaded', () => {
-      const inputJudul = document.getElementById('inputJudulCerita');
       const inputDeskripsi = document.getElementById('inputDeskripsiCerita');
-      const statusSelect = document.getElementById('selectStatusCerita');
       const charCountDisplay = document.getElementById('ceritaCharCount');
-      const coverCurrentFile = document.getElementById('coverCurrentFile');
       const maxLength = 300;
-      let defaultCoverName = 'cover_alu_kedis_puuh.jpg';
 
       function updateCharCounter() {
         if (!inputDeskripsi || !charCountDisplay) return;
+
         const currentLength = inputDeskripsi.value.length;
         charCountDisplay.textContent = `${currentLength}/${maxLength}`;
 
@@ -411,54 +507,80 @@
         }
       }
 
-      const savedData = localStorage.getItem('editCeritaData');
-      if (savedData) {
-        const cerita = JSON.parse(savedData);
-        if (inputJudul && cerita.judul) inputJudul.value = cerita.judul;
-        if (inputDeskripsi && cerita.deskripsi) inputDeskripsi.value = cerita.deskripsi;
-        if (statusSelect && cerita.status) statusSelect.value = cerita.status.toLowerCase();
-        if (coverCurrentFile && cerita.cover) {
-          defaultCoverName = cerita.cover;
-          coverCurrentFile.textContent = `File saat ini: ${defaultCoverName}`;
-        }
-      }
-
       updateCharCounter();
       if (inputDeskripsi) {
         inputDeskripsi.addEventListener('input', updateCharCounter);
       }
 
-      // --- Script Upload Cover Cerita ---
+      // --- Upload dan preview cover baru ---
       const coverUploadArea = document.getElementById('coverUploadArea');
       const coverFileInput = document.getElementById('coverFileInput');
       const coverPreview = document.getElementById('coverPreview');
+      const coverCurrentFile = document.getElementById('coverCurrentFile');
+      const coverError = document.getElementById('coverError');
+      const maxCoverSize = 2 * 1024 * 1024;
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      const originalCoverText = coverCurrentFile ? coverCurrentFile.textContent.trim() : '';
+
+      function displayCoverFile(file) {
+        clearCoverError();
+        if (!file) return;
+
+        if (!allowedTypes.includes(file.type)) {
+          coverFileInput.value = '';
+          coverPreview.src = '#';
+          coverPreview.classList.add('hidden');
+          if (coverCurrentFile) coverCurrentFile.textContent = originalCoverText;
+          showCoverError('Format gambar harus JPG atau PNG.');
+          return;
+        }
+
+        if (file.size > maxCoverSize) {
+          coverFileInput.value = '';
+          coverPreview.src = '#';
+          coverPreview.classList.add('hidden');
+          if (coverCurrentFile) coverCurrentFile.textContent = originalCoverText;
+          showCoverError('Ukuran gambar maksimal 2 MB.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          coverPreview.src = event.target.result;
+          coverPreview.classList.remove('hidden');
+          if (coverCurrentFile) {
+            coverCurrentFile.textContent = `File baru dipilih: ${file.name}`;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
 
       if (coverUploadArea && coverFileInput) {
-        coverUploadArea.addEventListener('click', () => {
-          coverFileInput.click();
+        coverUploadArea.addEventListener('click', () => coverFileInput.click());
+
+        // Hindari klik input file memicu klik area upload berulang.
+        coverFileInput.addEventListener('click', (event) => event.stopPropagation());
+        coverFileInput.addEventListener('change', function() {
+          displayCoverFile(this.files[0]);
         });
 
-        coverFileInput.addEventListener('change', function() {
-          const file = this.files[0];
+        coverUploadArea.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          coverUploadArea.classList.add('border-[#10B981]', 'bg-emerald-50');
+        });
 
-          if (file) {
-            const reader = new FileReader();
+        coverUploadArea.addEventListener('dragleave', () => {
+          coverUploadArea.classList.remove('border-[#10B981]', 'bg-emerald-50');
+        });
 
-            reader.onload = function(e) {
-              coverPreview.src = e.target.result;
-              coverPreview.classList.remove('hidden');
-              if (coverCurrentFile) {
-                coverCurrentFile.innerHTML = `File terpilih: <span class="text-[#10B981] font-bold">${file.name}</span>`;
-              }
-            };
+        coverUploadArea.addEventListener('drop', (event) => {
+          event.preventDefault();
+          coverUploadArea.classList.remove('border-[#10B981]', 'bg-emerald-50');
 
-            reader.readAsDataURL(file);
-          } else {
-            coverPreview.src = "#";
-            coverPreview.classList.add('hidden');
-            if (coverCurrentFile) {
-              coverCurrentFile.textContent = `File saat ini: ${defaultCoverName}`;
-            }
+          const files = event.dataTransfer.files;
+          if (files.length > 0) {
+            coverFileInput.files = files;
+            displayCoverFile(files[0]);
           }
         });
       }
